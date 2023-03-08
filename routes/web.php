@@ -92,3 +92,7 @@ Route::prefix('sales')->group(function () {
     Route::put('/edit/{id?}','App\Http\Controllers\SalesController@update')->name('edit.sale');
     Route::delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
 });
+
+Route::prefix('invoice')->group(function(){
+    Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');
+});
