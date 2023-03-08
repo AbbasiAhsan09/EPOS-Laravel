@@ -1,0 +1,71 @@
+/* Sales Order CSS */
+.item_selection{
+    position: relative;
+}
+.item_selection_list
+{
+    position: absolute;
+    width: 100%;
+    background: #F0F2F5;
+    /* bottom: -10px */
+}
+.item_selection_list .selection_list_item{
+    background: rgb(212, 210, 210);
+    width: 90%;
+    margin: 10px 0 ;
+    border: solid 1px gray;
+    box-shadow: 0px 0px 10px rgb(199, 199, 199);
+    border-radius: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: 0.2s
+}
+.item_selection_list .selection_list_item:hover{
+    background: rgb(224, 224, 224);
+}
+.selection_list_item h5, .selection_list_item p{
+    margin: 0
+}
+.selection_list_item h5{
+    font-size: 16px;
+    text-transform: uppercase
+}
+.selection_list_item p{
+    font-size: 14px;
+    
+}
+.order_create_details_wrapper{
+    /* box-shadow: 0px 0px 10px; */
+    padding:  0;
+}
+
+.order_section_sub_title{
+    color: var(--bs-pink);
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.order_type_items{
+    font-size: 18px;
+}
+
+.order-type-item{
+    border: solid 1px  gray;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.order-type-item input {
+    margin-right: 10px;
+}
+.order-type-item:focus-within{
+border-color: var(--bs-pink);
+}
+
+.order_detail_wrapper{
+    padding:  0 10px;
+    box-shadow: 0px 0px 10px gray;
+    border-radius: 10px;
+    border: solid 1px var(--bs-pink);
+    /* background: white; */
+}

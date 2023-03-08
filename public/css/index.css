@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap');
+:root{
+    --primary-color : rgb(118, 0, 202);
+    --secondary-color:brown;
+    --secondary-color-02  : rgb(56, 56, 56);
+    --primary-color-02:gray;
+    --primary-font : 'Oswald', sans-serif;
+}
+h1,h2,h3,h4,h5,h6{
+    font-family: var(--primary-font);
+    letter-spacing: 1.5px;
+    margin: 20px 0;
+    position: relative;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.s-btn-grp button{
+    border: none;
+    background-color: transparent;
+
+}
+.s-btn-grp button i{
+    font-size: 20px;
+    color: var(--primary-color);
+}
+button{
+    font-family: var(--primary-font);
+}
+.page-title-wrapper{
+    display: flex;
+    align-items: center;
+    align-content: space-between;
+    justify-content:space-around;
+}
+.page-title-wrapper div{
+    flex: 1;
+}
+.page-title-wrapper .btn-grp button{
+    float: right;
+}
+
+.page-title{
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--primary-color);
+  
+}
+.page-title::before{
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: var(--primary-color);
+    
+}
+.p-btn{
+    width: fit-content;
+    padding: 5px 10px ;
+    border-radius: 2px;
+    background-color: var(--primary-color);
+    color: white;
+    letter-spacing: 1.5px;
+    border: transparent solid 2px;
+    transition: .2s;
+}
+.p-btn:hover{
+    background-color: transparent;
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+
+}
+
+.form-control{
+    border: none;
+    border-bottom: 2px solid var(--primary-color);
+    border-radius: 0;
+    background: transparent;
+    margin-bottom: 20px;
+}
+
+label{
+    color: var(--secondary-color-02);
+    font-weight: 600;
+    font-family: var(--primary-font);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {   
+  border-color: var(--secondary-color);
+  box-shadow: none;
+  outline: 0 none;
+}
