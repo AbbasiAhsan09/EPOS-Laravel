@@ -172,10 +172,7 @@ class SalesController extends Controller
     public function receipt(int $id)
     {
         try {
-            $order = Sales::where('id',$id)->with('order_details.item_details')->first();
-
-            // dd($order);
-
+            $order = Sales::where('id',$id)->with('order_details.item_details','customer','user')->first();
             return view('sales.invoices.thermal',compact('order'));
 
         } catch (\Throwable $th) {

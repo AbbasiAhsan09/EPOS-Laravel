@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConfigurationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -95,4 +96,8 @@ Route::prefix('sales')->group(function () {
 
 Route::prefix('invoice')->group(function(){
     Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');
+});
+
+Route::prefix('system')->group(function () {
+    Route::resource('configurations', ConfigurationController::class);
 });
