@@ -2,7 +2,7 @@
 @section('content')
 
 <div class="page-wrapper">
-<div class="container">
+<div class="container-fluid">
 
     <div class="row row-customized">
         <div class="col">
@@ -12,16 +12,18 @@
             <div class="btn-grp">
              
                 <div class="row .row-customized">
-                    <div class="col-lg-8">
+                    <div class="col-lg-6">
                         <div class="input-group input-group-outline">
                             <label class="form-label">Search</label>
                             <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>
-                    <div class="col-lg-4">
-                    <button class="btn btn-outline-primary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#newStoreModal">New Product</button>
+                    <div class="col-lg-6">
+                        <button class="btn btn-outline-primary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#newStoreModal">New Product</button>
+                        <button class="btn btn-outline-secondary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#CsvModal">Import</button>
 
+                    
                     </div>
                 </div>
             </div>
@@ -326,4 +328,42 @@
     </div>
   </div>
   {{-- Modal --}}
+
+
+
+    <!-- CSV Modal -->
+    <div class="modal fade" id="CsvModal" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="newStoreModalLabel">Import CSV File</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('import.product')}}" method="POST"  enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                      
+                        <div class="col-lg-12">
+                            <label for="">Upload File </label>
+                      <div class="input-group input-group-outline">
+                        <input type="file" class="form-control" name="file" required>
+                      </div>
+                        </div>
+                        
+                       
+                        
+                    </div>
+               
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Import</button>
+    
+            </div>
+        </form>
+          </div>
+        </div>
+      </div>
+      {{-- Csv Modal --}}
+
 @endsection

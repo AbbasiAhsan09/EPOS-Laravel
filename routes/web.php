@@ -42,6 +42,7 @@ Route::prefix('products')->group(function(){
     Route::put('/edit/{id}','App\Http\Controllers\ProductController@update')->name('update.product');
     Route::delete('/delete/{id}','App\Http\Controllers\ProductController@destroy')->name('delete.product');
     Route::post('/restore/{id}','App\Http\Controllers\ProductController@restore')->name('restore.product');
+    Route::post('/import-csv','App\Http\Controllers\ProductController@importCsv')->name('import.product');
 });
 
 Route::prefix('uom')->group(function(){

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PartyGroups;
 use App\Models\Sales;
@@ -172,11 +173,12 @@ class SalesController extends Controller
     public function receipt(int $id)
     {
         try {
+            $config = Configuration::latest()->first();
             $order = Sales::where('id',$id)->with('order_details.item_details','customer','user')->first();
-            return view('sales.invoices.thermal',compact('order'));
+            return view('sales.invoices.thermal',compact('order','config'));
 
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 }

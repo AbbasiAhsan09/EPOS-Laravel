@@ -3,12 +3,17 @@
     
     <div class="reciept-wrapper">
         <div class="receipt">
-            <h5 class="nos">NTN : 41300303033  | STN : 41300303033</h5>
+            <h5 class="nos">{{isset($config) && $config->show_ntn ? 'NTN#'.$config->ntn.' | ' : ''}}
+                {{isset($config) && $config->show_ptn ? 'PTN#'.$config->ptn : ''}}</h5>
             <div class="brand">
-                <img src="https://hibarnsley.com/wp-content/uploads/2017/06/dummy-logo.png" alt="Not Available" width="150px">
+            @if (isset($config) && $config->logo)
+            <img src="{{asset("images/logo/$config->logo")}}" alt="Not Available" width="150px">
+            @else
+                {{isset($config) ? $config->app_title : 'Demo'}}
+            @endif    
             </div>
             {{-- <h5 class="nos">INV# 41300303033  | STORE ID : 009</h5> --}}
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ad labore </p>
+            <p>{{isset($config) ? $config->address : ''}}</p>
     
             <div class="inv_details">
     
@@ -65,9 +70,15 @@
                   </tr>
                   <tr class="foot-table">
                     <th colspan="6">Net Total: </th>
-                    <th>{{' '.$order->net_total}} </th>
+                    <th style="font-size: 15px">{{' '.$order->net_total}} </th>
                   </tr>
                 </table>
+
+                <div class="inv_messages" style="margin-top: 10px">
+                    {!!isset($config) ? $config->invoice_message : ''!!}
+                </div>
+
+                <p>This Software is Developed By Ahsan Abbasi | {{isset($config)  ? $config->dev_contact : ''}}</p>
             </div>
         </div>
     </div>

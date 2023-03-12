@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ProductImport;
 use App\Models\Inventory;
 use App\Models\MOU;
 use App\Models\ProductArrtributes;
 use App\Models\ProductCategory;
 use App\Models\Products;
 use Illuminate\Http\Request;
-use Laravel\Ui\Presets\React;
+use Excel;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ProductController extends Controller
 {
@@ -111,7 +113,25 @@ class ProductController extends Controller
             return response()->json($items);
            }
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
+        }
+    }
+
+
+
+    public function importCsv(Request $request)
+    {
+        try {
+            // dd($request);
+            Excel::import(new ProductImport, $request->file('file'));
+
+            return redirect()->back();
+            Alert::toast('Product Imported Successfuly!','success');
+        // dd($request->file('file'));
+
+        } catch (\Throwable $th) {
+            return redirect()->back();
+            Alert::alert('Error', $th->getMessage(),'error');;
         }
     }
 }
