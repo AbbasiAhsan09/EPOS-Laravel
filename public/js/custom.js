@@ -85,6 +85,7 @@ $(document).ready(function(){
                                     '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+
                                     '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
                                     '<td class="total">'+(e.mrp * 1)+'</td>'+
+                                    '<td>  <i class="fa fa-trash"></i><td>'+
                         '</tr>'
                         );
                         removeItemsFromList();
@@ -269,4 +270,9 @@ $(document).ready(function(){
         var returningAmount = received - total_after_disc_other_charges;
         $('#returning-amount').val(returningAmount.toFixed(0));
     }
+
+    $('body').on('click','i.fa.fa-trash',function(){
+        $(this).closest('tr').remove();
+        calculateOrders();
+    })
 });

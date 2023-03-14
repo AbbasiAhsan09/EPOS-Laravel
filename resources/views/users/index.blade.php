@@ -46,7 +46,7 @@
             <td>{{$item->id}}</td>
             <td>{{$item->name}}</td>
             <td>{{$item->email}}</td>
-            <td>{{$item->role_id}}</td>
+            <td>{{$item->userroles->role_name}}</td>
             <td>{{$item->business_id}}</td>
             <td>
                 @if ($item->isActive == 1)

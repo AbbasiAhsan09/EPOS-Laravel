@@ -175,6 +175,7 @@ class SalesController extends Controller
         try {
             $config = Configuration::latest()->first();
             $order = Sales::where('id',$id)->with('order_details.item_details','customer','user')->first();
+            // dd($order);
             return view('sales.invoices.thermal',compact('order','config'));
 
         } catch (\Throwable $th) {

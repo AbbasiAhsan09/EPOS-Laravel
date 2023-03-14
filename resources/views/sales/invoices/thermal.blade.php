@@ -50,7 +50,7 @@
                   @foreach ($order->order_details as $key => $item)
                 <tr class="items-table">
                     <td>{{$key+1}}</td>
-                    <td>{{$item->item_details->name}}</td>
+                    <td>{{$item->item_details}}/td>
                     <td>{{$item->rate}}</td>
                     <td>{{$item->tax}}</td>
                     <td>{{$item->disc}}</td>

@@ -15,6 +15,14 @@ class UserRolesSeeder extends Seeder
      */
     public function run()
     {
-        UserRoles::factory()->count(3)->create();
+        $roles = [
+            'Admin',
+            'Sales',
+            'Manager',
+            'Moderator',
+        ];
+        foreach ($roles as $key => $value) {
+            UserRoles::create(['role_name' => $value, 'status' => 1]);
+        }
     }
 }
