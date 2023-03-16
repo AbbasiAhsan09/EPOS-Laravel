@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseRequestDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class PurchaseRequestController extends Controller
 {
@@ -14,7 +17,7 @@ class PurchaseRequestController extends Controller
      */
     public function index()
     {
-        //
+        return view('purchase.request.list');
     }
 
     /**
@@ -24,7 +27,7 @@ class PurchaseRequestController extends Controller
      */
     public function create()
     {
-        //
+        return view('purchase.request.create');
     }
 
     /**
@@ -35,7 +38,41 @@ class PurchaseRequestController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $validate = $request->validate([
+                'type' => 'required',
+                'item_id' => 'required'
+            ]);
+
+
+            if($validate)
+            {
+                $pr = new PurchaseRequest();
+                $pr->requested_by = Auth::user()->id;
+                $pr->type = $request->type;
+                $pr->remarksa = $request->remarks;
+                $pr->save();
+
+                if($pr && count($request->item_id)){
+                    for ($i=0; $i < count($request->item_id) ; $i++) { 
+                        $item = new PurchaseRequestDetail();
+                        $item->item_id =$request->item_id[$i];
+                        $item->doc_num = $pr->id;
+                        $item->request_id = $pr->id;
+                        $item->qty = $request->qty[$i];
+                        $item->save();
+                    }
+                }
+
+                Alert::toast('Purchase Requisition Added!','success');
+                return redirect('/purchase/request');
+            }else{
+                Alert::toast('Something Went Wrong','error');
+                return redirect('/purchase/request');
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -81,5 +118,11 @@ class PurchaseRequestController extends Controller
     public function destroy(PurchaseRequest $purchaseRequest)
     {
         //
+    }
+
+
+    public function main()
+    {
+        return view('purchase.main');
     }
 }

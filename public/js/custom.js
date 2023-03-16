@@ -128,6 +128,7 @@ $(document).ready(function(){
                         }, 300);
                     }else{
                         swal('Not Found','Item was not found ','error');
+                        $("#searchItemValue").val('');
                     }
                 }
             })

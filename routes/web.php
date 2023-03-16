@@ -95,9 +95,15 @@ Route::prefix('sales')->group(function () {
     Route::delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
 });
 
+
+Route::prefix('purchase')->group(function () {
+Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
+        Route::resource('/request','App\Http\Controllers\PurchaseRequestController');
+});
 Route::prefix('invoice')->group(function(){
     Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');
 });
+
 
 Route::prefix('system')->group(function () {
     Route::resource('configurations', ConfigurationController::class);
