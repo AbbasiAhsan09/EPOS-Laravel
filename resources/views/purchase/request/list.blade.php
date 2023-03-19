@@ -29,15 +29,56 @@
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
             <th>S#</th>
-            <th>Category Name</th>
+            <th>Created By</th>
+            <th>Type</th>
+            <th>Store</th>
+            <th>Required Before</th>
+            <th>Created At</th>
             <th>Status</th>
-           
+
             <th>Actions</th>
         </thead>
         <tbody>
-
+            @foreach ($requests as $key => $item)
+                <tr>
+                    <td>{{$key+1}}</td>
+                    <td>{{$item->created_by->name}}</td>
+                    <td>{{$item->type}}</td>
+                    <td>{{'Default'}}</td>
+                    <td>{{$item->required_on}}</td>
+                    <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
+                    <td>
+                        @if ($item->status == 1)
+                            <span class="badge  badge-sm bg-gradient-success">Approved</span>
+                        @elseif($item->status == 0)
+                        <span class="badge  badge-sm bg-gradient-warning">Unapproved</span>
+                        @else
+                        <span class="badge  badge-sm bg-gradient-danger">Rejected</span>
+                        @endif
+                    </td>
+                    <td>
+                        <div class="s-btn-grp">
+                            
+                            <a class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" >
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" href="{{url("/purchase/request/$item->id/edit")}}">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                            
+                         
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
+    <div class="d-flex justify-content-center">
+        {!! $requests->links('pagination::bootstrap-4') !!}
+    </div>
 </div>
 </div>
 

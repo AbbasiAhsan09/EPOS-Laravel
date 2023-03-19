@@ -190,9 +190,8 @@
             </div>
         </div>
     </div>
-    <script>
-        $('td').on('click','.uom',function(){
-            console.log('hi');
-        })
-    </script>
+@section('scripts')
+     {{-- Custom jS --}}
+<script src="{{asset('js/custom.js')}}"></script>
+@endsection
 @endsection

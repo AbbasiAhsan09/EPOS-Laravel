@@ -21,6 +21,9 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable();
             $table->integer('approved_by')->nullable();
             $table->string('remarks')->nullable();
+            $table->date('required_on')->nullable();
+            $table->decimal('total_amount',50,2);
+            $table->integer('store_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
