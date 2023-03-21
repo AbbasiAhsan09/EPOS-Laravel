@@ -159,6 +159,14 @@
                         </div>
                     </div>
                     {{-- Order TYpe --}}
+                    <div class="input-group input-group-outline">
+                    <select name="status" id="" class="form-control">
+                        <option value="{{0}}" {{isset($purchaseRequest) ? ($purchaseRequest->status == 0 ? 'selected' : '' ) : ''}}>Un-Approved</option>
+                        <option value="{{1}}" {{isset($purchaseRequest) ? ($purchaseRequest->status == 1 ? 'selected' : '' ) : ''}}>Approved</option>
+                        <option value="{{3}}" {{isset($purchaseRequest) ? ($purchaseRequest->status == 3 ? 'selected' : '' ) : ''}}>In-Process</option>
+                        <option value="{{2}}" {{isset($purchaseRequest) ? ($purchaseRequest->status == 2 ? 'selected' : '' ) : ''}}>Rejected</option>
+                    </select>
+                    </div>
                     <div>
                         <button type="submit" class="btn btn-primary btn-block my-5" style="width: 100%">
                             Save & Send

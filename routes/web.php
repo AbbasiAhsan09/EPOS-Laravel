@@ -99,6 +99,7 @@ Route::prefix('sales')->group(function () {
 Route::prefix('purchase')->group(function () {
 Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::resource('/request','App\Http\Controllers\PurchaseRequestController');
+        Route::resource('/quotation','App\Http\Controllers\PurchaseQuotationController');
 });
 Route::prefix('invoice')->group(function(){
     Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');

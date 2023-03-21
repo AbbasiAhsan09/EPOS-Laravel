@@ -17,7 +17,8 @@ class PurchaseRequestController extends Controller
      */
     public function index()
     {
-        $requests = PurchaseRequest::paginate(15);
+        $requests = PurchaseRequest::orderby('status','ASC')->paginate(10);
+
         return view('purchase.request.list',compact('requests'));
     }
 
@@ -138,6 +139,9 @@ class PurchaseRequestController extends Controller
                 $pr->required_on = $request->required_on;
                 $pr->remarks = $request->remarks;
                 $pr->total_amount = $request->gross_total;
+                if(Auth::user()->role_id == 1){
+                    $pr->status = $request->status;
+                }
                 $pr->save();
 
                 PurchaseRequestDetail::where('request_id', $pr->id)->where('status',1)->delete();
@@ -154,6 +158,8 @@ class PurchaseRequestController extends Controller
                         $item->save();
                     }
                 }
+
+                
 
                 Alert::toast('Purchase Requisition Updated!','info');
                 return redirect('/purchase/request');

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Parties;
+use App\Models\PartyGroups;
 use App\Models\PurchaseQuotation;
 use Illuminate\Http\Request;
 
@@ -14,7 +16,8 @@ class PurchaseQuotationController extends Controller
      */
     public function index()
     {
-        //
+        $quotations = PurchaseQuotation::paginate(10);
+        return view('purchase.quotation.quotation_list',compact('quotations'));
     }
 
     /**
@@ -24,7 +27,11 @@ class PurchaseQuotationController extends Controller
      */
     public function create()
     {
-        //
+        $group_v = PartyGroups::where('group_name', 'LIKE' , "vendor%")->first();
+        $group_c = PartyGroups::where('group_name', 'LIKE' , "custo%")->first();
+        $vendors = Parties::where('group_id',$group_v->id ?? '')->get();
+        $customers = Parties::where('group_id',$group_c->id ?? '')->get();
+        return view("purchase.quotation.create_quotation", compact('vendors','customers'));
     }
 
     /**
@@ -35,7 +42,7 @@ class PurchaseQuotationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       
     }
 
     /**

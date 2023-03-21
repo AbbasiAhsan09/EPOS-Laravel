@@ -11,7 +11,7 @@ $(document).ready(function(){
         array.forEach(element => {
                    
                    $('#item_selection_list').append(
-                   '<div class="selection_list_item" data-id="'+element.barcode+'">'+
+                   '<div class="selection_list_item" data-id="'+ element.barcode +'">'+
                                '<h5>'+element.name+" - " + element.barcode + '</h5>'+
                                '<p>Lorem ipsum dolor sit amet.</p>'+
                            '</div>'
@@ -90,7 +90,7 @@ $(document).ready(function(){
                         );
                         removeItemsFromList();
                         console.log(e.uoms.base_unit_value);
-                        // swal('product');  
+                      
                 }
             });
            } 
@@ -194,15 +194,22 @@ $(document).ready(function(){
     });
     function orderType(){
         if($('#posOrder').is(':checked')){
-            $('.select_party_wrapper').css('display' , 'none');
-            $('#customer_select').prop('required' , false);
-            $('#customer_select').val('');
-            $('.other-methods').css('display' , 'none');
+            $('.select_party_wrapper').css('display' , 'block');
+            $('.select_vendor_wrapper').css('display' , 'none');
+            $('#customer_select').prop('required' , true);
+            $('#customer_select').prop('disabled' , false);
+            $('#vendor_select').prop('disabled' , true);
+            $('#vendor_select').val('');
+            $('.other-methods').css('display' , 'inline-block');
             $('.other-methods input').prop('checked',false);
         }else{
-            $('.select_party_wrapper').css('display' , 'block');
+            $('.select_party_wrapper').css('display' , 'none');
+            $('.select_vendor_wrapper').css('display' , 'block');
+            $('#customer_select').val('');
             $('.other-methods').css('display' , 'inline-block')
-            $('#customer_select').prop('required' , true);
+            $('#vendor_select').prop('required' , true);
+            $('#customer_select').prop('disabled' , true);
+            $('#vendor_select').prop('disabled' , false);
         }
         
     }

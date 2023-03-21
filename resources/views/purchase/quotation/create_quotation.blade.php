@@ -6,10 +6,7 @@
                 <div class="col-lg-8">
                     <div class="row">
                         <div class="col">
-                            <h1 class="page-title">Create Orders</h1>
-                        </div>
-                        <div class="col">
-
+                            <h1 class="page-title">Create Quotation</h1>
                         </div>
                     </div>
 
@@ -73,13 +70,18 @@
                                     <div class="order_type_items">   
                                                 <label for="posOrder" class="order-type-item">
                                                 <input type="radio" name="order_tyoe" id="posOrder" value="pos" class="form-check-input order_type_val" checked>
-                                                    POS ORDER
+                                                    SALE QUOTATION 
                                                 </label>
                                       
                                                 <label for="normalOrder" class="order-type-item">
                                                 <input type="radio" name="order_tyoe" id="normalOrder" value="normal" class="form-check-input order_type_val">
-                                                    NORMAL ORDER
+                                                    PURCHASE QUOTATION
                                                 </label>
+
+
+                                                
+
+
                                     </div>
                                 </div>
                             </div>
@@ -96,14 +98,33 @@
                                 <div class="input-group input-group-outline">
                                     <select name="party_id" class="form-control" id="customer_select" >
                                         <option value="">Select Customer</option>
-                                        @foreach ($customers as $party)
-                                            <option value="{{$party->id}}">{{$party->party_name}}</option>
+                                        @foreach ($customers as $customer)
+                                            <option value="{{$customer->id}}">{{$customer->party_name}}</option>
                                         @endforeach
                                     </select>
                                   </div> 
                             </div>
                         </div>
                     {{-- Customer  --}}
+
+                     {{-- Customer  --}}
+                     <div class="select_vendor_wrapper">
+                        <h4 class="order_section_sub_title">
+                            Select Vendor
+                        </h4>
+                        <div class="select_party">
+                            
+                            <div class="input-group input-group-outline">
+                                <select name="party_id" class="form-control" id="vendor_select" >
+                                    <option value="">Select Vendor</option>
+                                    @foreach ($vendors as $vendor)
+                                        <option value="{{$vendor->id}}">{{$vendor->party_name}}</option>
+                                    @endforeach
+                                </select>
+                              </div> 
+                        </div>
+                    </div>
+                {{-- Customer  --}}
                   
                     {{-- Payment Methods --}}
                     <div class="payment_methods_wrapper my-3">
@@ -192,6 +213,6 @@
     </div>
 @section('scripts')
      {{-- Custom jS --}}
-<script src="{{asset('js/custom.js')}}"></script>
+<script src="{{asset('js/quotation.js')}}"></script>
 @endsection
 @endsection

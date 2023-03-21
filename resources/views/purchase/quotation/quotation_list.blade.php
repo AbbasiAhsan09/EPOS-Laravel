@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="row row-customized">
     <div class="col">
-        <h1 class="page-title">Purchase Requistion</h1>
+        <h1 class="page-title">Purchase Quotations</h1>
     </div>
     <div class="col">
         <div class="btn-grp">
@@ -17,15 +17,12 @@
                         <select name="" id="" class="form-control">
                             <option value="">--Select Status--</option>
                             <option value="1">Approved</option>
-                            <option value="0">Un-Approved</option>
-                            <option value="3">In-Process</option>
-                            <option value="2">Rejected</option>
                         </select>
                       </div>
                   
                 </div>
                 <div class="col-lg-4">
-                <a href="{{url("/purchase/request/create")}}" class="btn btn-outline-primary btn-sm mb-0" >Create Requistion</a>
+                <a href="{{url("/purchase/quotation/create")}}" class="btn btn-outline-primary btn-sm mb-0" >Create Quotation</a>
 
                 </div>
             </div>
@@ -45,7 +42,7 @@
             <th>Actions</th>
         </thead>
         <tbody>
-            @foreach ($requests as $key => $item)
+            @foreach ($quotations as $key => $item)
                 <tr>
                     <td>{{$key+1}}</td>
                     <td>{{$item->created_by->name}}</td>
@@ -54,15 +51,7 @@
                     <td>{{$item->required_on}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
                     <td>
-                        @if ($item->status == 1)
-                            <span class="badge  badge-sm bg-gradient-success">Approved</span>
-                        @elseif($item->status == 0)
-                        <span class="badge  badge-sm bg-gradient-warning">Unapproved</span>
-                        @elseif($item->status == 2)
-                        <span class="badge  badge-sm bg-gradient-danger">Rejected</span>
-                        @elseif($item->status == 3)
-                        <span class="badge  badge-sm bg-gradient-info">In Process</span>
-                        @endif
+                  
                     </td>
                     <td>
                         <div class="s-btn-grp">
@@ -85,7 +74,7 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        {!! $requests->links('pagination::bootstrap-4') !!}
+        {!! $quotations->links('pagination::bootstrap-4') !!}
     </div>
 </div>
 </div>

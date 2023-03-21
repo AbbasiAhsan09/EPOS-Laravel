@@ -22,6 +22,11 @@ return new class extends Migration
             $table->string('remarks')->nullable();
             $table->foreignId('created_by')->constrained('users');
             $table->integer('status')->default(1);
+            $table->decimal('other_charges',50,2);
+            $table->decimal('gross_total',50,2);
+            $table->decimal('discount',50,2);
+            $table->enum('discount_type',['PERCENT','FLAT']);
+            $table->decimal('net_total',50,2);
             $table->softDeletes();
             $table->timestamps();
         });
