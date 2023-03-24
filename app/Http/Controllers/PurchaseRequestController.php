@@ -70,7 +70,7 @@ class PurchaseRequestController extends Controller
                         $item->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                         $item->qty = $request->qty[$i];
                         $item->rate = $request->rate[$i];
-                        $item->total = $request->qty[$i] * $request->rate[$i];
+                        $item->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                         $item->save();
                     }
                 }

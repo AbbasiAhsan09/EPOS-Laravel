@@ -1,5 +1,6 @@
 // Orders JS
 $(document).ready(function(){
+    calculateOrders();
     var total_amount = 0;
     // Resting Item List 
     function removeItemsFromList(){
@@ -73,20 +74,20 @@ $(document).ready(function(){
                 type : 'GET',
                 success : function(e){
                         $('#cartList').append(
-                        '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
-                                    '<td>'+e.name+'</td>'+
-                                    '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
-                                    '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'disabled' : '')+'>'+
-                                    '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
-                                    '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
-                                    '</select>'+
-                                    '</td>'+
-                                    '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="0.01" class="form-control rate" value="'+e.mrp+'"></td>'+
-                                    '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+
-                                    '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
-                                    '<td class="total">'+(e.mrp * 1)+'</td>'+
-                                    '<td>  <i class="fa fa-trash"></i><td>'+
-                        '</tr>'
+                            '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
+                            '<td>'+e.name+'</td>'+
+                            '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
+                            '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
+                            '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
+                            '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
+                            '</select>'+
+                            '</td>'+
+                            '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+e.mrp+'"></td>'+
+                            '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+
+                            '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
+                            '<td class="total">'+(e.mrp * 1)+'</td>'+
+                            '<td>  <i class="fa fa-trash"></i><td>'+
+                '</tr>'
                         );
                         removeItemsFromList();
                         console.log(e.uoms.base_unit_value);
@@ -201,7 +202,7 @@ $(document).ready(function(){
             $('#vendor_select').prop('disabled' , true);
             $('#vendor_select').val('');
             $('.other-methods').css('display' , 'inline-block');
-            $('.other-methods input').prop('checked',false);
+            // $('.other-methods input').prop('checked',false);
         }else{
             $('.select_party_wrapper').css('display' , 'none');
             $('.select_vendor_wrapper').css('display' , 'block');
@@ -242,7 +243,7 @@ $(document).ready(function(){
     function validationForSubmit(){
         var returningVal = $('#returning-amount').val();
         if(returningVal < 0.00 && $('#posOrder').is(':checked')){
-            $('#saveOrderBtn').prop('disabled' , true);
+            $('#saveOrderBtn').prop('disabled' , false);
         }else{
             $('#saveOrderBtn').prop('disabled' , false);
         }

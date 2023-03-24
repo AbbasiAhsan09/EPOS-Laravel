@@ -32,11 +32,13 @@
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
             <th>S#</th>
-            <th>Created By</th>
+            <th>Doc #</th>
+            <th>PR #</th>
             <th>Type</th>
             <th>Store</th>
             <th>Required Before</th>
             <th>Created At</th>
+            <th>Created By</th>
             <th>Status</th>
 
             <th>Actions</th>
@@ -45,8 +47,10 @@
             @foreach ($quotations as $key => $item)
                 <tr>
                     <td>{{$key+1}}</td>
-                    <td>{{$item->created_by->name}}</td>
+                    <td>{{$item->doc_num}}</td>
+                    <td><a href="" style="font-style: italic">{{$item->req_num ?? '(Null)'}}</a></td>
                     <td>{{$item->type}}</td>
+                    <td>{{$item->created_by_user->name}}</td>
                     <td>{{'Default'}}</td>
                     <td>{{$item->required_on}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
@@ -59,7 +63,7 @@
                             <a class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" >
                                 <i class="fa fa-eye"></i>
                             </a>
-                            <a class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" href="{{url("/purchase/request/$item->id/edit")}}">
+                            <a class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" href="{{url("/purchase/quotation/$item->id/edit")}}">
                                 <i class="fa fa-edit"></i>
                             </a>
                             <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('qty',50,2)->default(0);
             $table->decimal('rate',50,2);
             $table->decimal('total',50,2);
+            $table->decimal('tax',50,2)->default(0);
+            $table->decimal('disc',50,2)->default(0);
             $table->integer('status')->default(0);
             $table->timestamps();
         });
