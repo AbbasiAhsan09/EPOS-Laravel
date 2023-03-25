@@ -6,7 +6,7 @@
                 <div class="col-lg-8">
                     <div class="row">
                         <div class="col">
-                            <h1 class="page-title">{{isset($quotation) ? 'Edit' : 'Create'}} Quotation : {{isset($quotation) ? $quotation->doc_num : ''}}</h1>
+                            <h1 class="page-title">{{isset($order) ? 'Edit' : 'Create'}} PO : {{isset($order) ? $order->doc_num : ''}}</h1>
                         </div>
                     </div>
 
@@ -25,8 +25,8 @@
                             </div>
                            </div>
                            {{-- Form start --}}
-                        @if (isset($quotation))
-                        <form action="{{route('quotation.update', $quotation->id)}}" method="POST">
+                        @if (isset($order))
+                        <form action="{{route('quotation.update', $order->id)}}" method="POST">
                             @csrf
                             @method('put')
                         @else
@@ -45,8 +45,8 @@
                                 </thead>
                                 <tbody id="cartList">
                                                
-                                       @if (isset($quotation) && count($quotation->details))
-                                       @foreach ($quotation->details as $item)
+                                       @if (isset($order) && count($order->details))
+                                       @foreach ($order->details as $item)
                                        <tr data-id="{{$item->items->barcode}}" class="itemsInCart">
                                            <td>{{$item->items->name}}</td>
                                            <td> 
@@ -103,14 +103,14 @@
                                         Order Type
                                     </h3>
                                     <div class="order_type_items">   
-                                                <label for="posOrder" class="order-type-item">
-                                                <input type="radio" name="order_tyoe" id="posOrder" value="pos" class="form-check-input order_type_val" {{isset($quotation) ? ($quotation->type == 'SALES' ? 'checked' : '') : 'checked'}}>
+                                                {{-- <label for="posOrder" class="order-type-item">
+                                                <input type="radio" name="order_tyoe" id="posOrder" value="pos" class="form-check-input order_type_val" {{isset($order) ? ($order->type == 'SALES' ? 'checked' : '') : 'checked'}}>
                                                     SALE QUOTATION 
-                                                </label>
+                                                </label> --}}
                                       
                                                 <label for="normalOrder" class="order-type-item">
-                                                <input type="radio" name="order_tyoe" id="normalOrder" value="normal" class="form-check-input order_type_val" {{isset($quotation) ? ($quotation->type == 'PURCHASE' ? 'checked' : '') : ''}}>
-                                                    PURCHASE QUOTATION
+                                                <input type="radio" name="order_tyoe" id="normalOrder" value="normal" class="form-check-input order_type_val" checked>
+                                                    PURCHASE ORDER
                                                 </label>
 
 
@@ -133,9 +133,9 @@
                                 <div class="input-group input-group-outline">
                                     <select name="party_id" class="form-control" id="customer_select" >
                                         <option value="">Select Customer</option>
-                                        @foreach ($customers as $customer)
-                                            <option value="{{$customer->id}}" {{isset($quotation) &&  $quotation->party_id == $customer->id  ? 'selected' : ''}}>{{$customer->party_name}}</option>
-                                        @endforeach
+                                        {{-- @foreach ($customers as $customer)
+                                            <option value="{{$customer->id}}" {{isset($order) &&  $order->party_id == $customer->id  ? 'selected' : ''}}>{{$customer->party_name}}</option>
+                                        @endforeach --}}
                                     </select>
                                   </div> 
                             </div>
@@ -153,15 +153,15 @@
                                 <select name="party_id" class="form-control" id="vendor_select" >
                                     <option value="">Select Vendor</option>
                                     @foreach ($vendors as $vendor)
-                                        <option value="{{$vendor->id}}"  {{isset($quotation) &&  $quotation->party_id == $vendor->id  ? 'selected' : ''}}>{{$vendor->party_name}}</option>
+                                        <option value="{{$vendor->id}}"  {{isset($order) &&  $order->party_id == $vendor->id  ? 'selected' : ''}}>{{$vendor->party_name}}</option>
                                     @endforeach
                                 </select>
                               </div> 
                         </div>
-                        <h4 class="order_section_sub_title mt-2">Requisition No.</h4>
+                        <h4 class="order_section_sub_title mt-2">Quotation No.</h4>
                      
                             <div class="input-group input-group-outline">
-                                <input type="text" name="req_num" class="form-control" value="{{isset($quotation) ? $quotation->req_num : ''}}">
+                                <input type="text" name="q_num" class="form-control" value="{{isset($order) ? $order->req_num : ''}}">
                               </div> 
                        
                     </div>
@@ -208,7 +208,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <input type="text" name="discount"  id="discount" class="form-control" required 
-                                        value="{{isset($quotation) ? ($quotation->discount_type == 'PERCENT' ? '%'.(round(($quotation->discount * 100)/$quotation->gross_total, 2)) : $quotation->discount) : '%'}}" onkeypress="validationForSubmit()" >
+                                        value="{{isset($order) ? ($order->discount_type == 'PERCENT' ? '%'.(round(($order->discount * 100)/$order->gross_total, 2)) : $order->discount) : '%'}}" onkeypress="validationForSubmit()" >
                                     </div>
                                     <div class="col" id="discountSection" style="display: none">
                                         <input type="number"  id="discountValue" disabled readonly class="form-control" required value="%" onkeypress="validationForSubmit()" >
@@ -220,7 +220,7 @@
                                 Other Charges:
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" onkeypress="validationForSubmit()"  value="{{$quotation->other_charges  ?? 0}}">
+                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" onkeypress="validationForSubmit()"  value="{{$order->other_charges  ?? 0}}">
                             </div>
 
                             <hr>
@@ -228,7 +228,7 @@
                                 Remarks:
                             </h4>
                             <div class="input-group input-group-outline">
-                            <textarea name="remarks" id="" cols="" rows="5" class="form-control" placeholder="Remarks Here...">{{isset($quotation) ? $quotation->remarks : ''}}</textarea>
+                            <textarea name="remarks" id="" cols="" rows="5" class="form-control" placeholder="Remarks Here...">{{isset($order) ? $order->remarks : ''}}</textarea>
                             </div>
                             <div class="hide">
                                 <h4 class="order_section_sub_title" >

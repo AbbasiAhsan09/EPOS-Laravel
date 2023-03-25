@@ -204,7 +204,7 @@ class PurchaseQuotationController extends Controller
                 }
                 
                 Alert::toast('Quotation Updated!','info');
-                return redirect()->back();
+                return redirect('/purchase/quotation');
     
             }else{
     

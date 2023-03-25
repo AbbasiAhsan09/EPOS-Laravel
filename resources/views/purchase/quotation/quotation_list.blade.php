@@ -29,17 +29,17 @@
         </div>
     </div>
 </div>
-    <table class="table table-sm table-responsive-sm table-striped">
+    <table class="table table-sm table-responsive-sm table-striped ">
         <thead>
             <th>S#</th>
             <th>Doc #</th>
             <th>PR #</th>
             <th>Type</th>
-            <th>Store</th>
-            <th>Required Before</th>
-            <th>Created At</th>
+            <th>Party</th>
+            <th>Gross Total</th>
+            <th>Net. Total</th>
             <th>Created By</th>
-            <th>Status</th>
+            <th>Created At</th>
 
             <th>Actions</th>
         </thead>
@@ -50,13 +50,13 @@
                     <td>{{$item->doc_num}}</td>
                     <td><a href="" style="font-style: italic">{{$item->req_num ?? '(Null)'}}</a></td>
                     <td>{{$item->type}}</td>
-                    <td>{{$item->created_by_user->name}}</td>
-                    <td>{{'Default'}}</td>
-                    <td>{{$item->required_on}}</td>
-                    <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
-                    <td>
-                  
+                    <td>{{$item->party->party_name}}</td>
+                    <td>{{env('CURRENCY').' '.$item->gross_total}}</td>
+                    <td class="text-primary">
+                      <b>  {{env('CURRENCY').' '.($item->gross_total - $item->discount) + $item->other_charges }}</b>
                     </td>
+                    <td>{{$item->created_by_user->name}}</td>
+                    <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
                     <td>
                         <div class="s-btn-grp">
                             

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Parties;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-        //
+        return view('purchase.orders.orders_list');
     }
 
     /**
@@ -24,7 +25,9 @@ class PurchaseOrderController extends Controller
      */
     public function create()
     {
-        //
+        // dd('hi');
+        $vendors = Parties::where('group_id' , 2)->get();
+        return view('purchase.orders.create_order',compact('vendors'));
     }
 
     /**

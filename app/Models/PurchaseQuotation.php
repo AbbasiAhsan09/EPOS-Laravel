@@ -32,4 +32,14 @@ public function created_by_user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
+
+    /**
+     * Get the party that owns the PurchaseQuotation
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function party(): BelongsTo
+    {
+        return $this->belongsTo(Parties::class, 'party_id', 'id');
+    }
 }

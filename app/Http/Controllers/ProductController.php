@@ -18,7 +18,7 @@ class ProductController extends Controller
     {
         $uom = MOU::all();
         $categories = ProductCategory::all();
-        $items = Products::with('categories')->with('uoms')->get();
+        $items = Products::with('categories')->with('uoms')->paginate(10);
         // dd($items);
         // dd($items);
         $arrt = ProductArrtributes::all();
