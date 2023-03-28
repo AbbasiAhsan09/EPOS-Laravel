@@ -16,11 +16,14 @@ return new class extends Migration
         Schema::create('purchase_invoices', function (Blueprint $table) {
             $table->id();
             $table->string('doc_num');
+            $table->date('doc_date');
+            $table->date('due_date');
             $table->foreignId('party_id')->constrained('parties');
             $table->foreignId('po_id')->constrained('purchase_orders');
             $table->decimal('total',50,2);
             $table->decimal('discount',50,2);
             $table->enum('discount_type' ,['PERCENT','FLAT'])->default('PERCENT');
+            $table->enum('payment_method',['cash','card','bank','cheque'])->default('cash');
             $table->decimal('tax',50,2);
             $table->decimal('shipping',50,2);
             $table->decimal('others',50,2)->default(0);

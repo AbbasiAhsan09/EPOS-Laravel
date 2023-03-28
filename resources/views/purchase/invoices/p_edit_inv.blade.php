@@ -140,6 +140,25 @@
 
                      {{-- Customer  --}}
                      <div class="select_vendor_wrapper">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <h4 class="order_section_sub_title">
+                                    Inv Date
+                                </h4>
+                                <div class="input-group input-group-outline">
+                                    <input type="date" name="doc_date" class="form-control" value="{{$invoice->doc_date}}" >
+                                  </div> 
+                            </div>
+
+                            <div class="col">
+                                <h4 class="order_section_sub_title">
+                                    Due Date
+                                </h4>
+                                <div class="input-group input-group-outline">
+                                    <input type="date" name="due_date" class="form-control" value="{{$invoice->due_date}}" >
+                                  </div> 
+                            </div>
+                        </div>
                         <h4 class="order_section_sub_title">
                             Select Vendor
                         </h4>

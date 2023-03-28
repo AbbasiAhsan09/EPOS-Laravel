@@ -140,6 +140,26 @@
 
                      {{-- Customer  --}}
                      <div class="select_vendor_wrapper">
+                        <div class="row">
+                            <div class="col">
+                                <h4 class="order_section_sub_title">
+                                    Inv Date
+                                </h4>
+                                <div class="input-group input-group-outline">
+                                    <input type="date" name="doc_date" class="form-control" value="{{date('Y-m-d',time())}}" >
+                                  </div> 
+                            </div>
+
+                            <div class="col">
+                                <h4 class="order_section_sub_title">
+                                    Due Date
+                                </h4>
+                                <div class="input-group input-group-outline">
+                                    <input type="date" name="due_date" class="form-control" value="{{date('Y-m-d',strtotime(\Carbon\Carbon::now()->addDays(10)))}}" >
+                                  </div> 
+                            </div>
+                        </div>
+
                         <h4 class="order_section_sub_title">
                             Select Vendor
                         </h4>

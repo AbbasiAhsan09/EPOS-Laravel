@@ -97,6 +97,8 @@ class PurchaseInvoiceController extends Controller
             $invoice->net_amount = (($request->gross_total + $request->other_charges) - ($discount));
             $invoice->created_by = Auth::user()->id;
             $invoice->remarks = $request->remarks;
+            $invoice->doc_date = $request->doc_date;
+            $invoice->due_date = $request->due_date;
             $invoice->save();
 
             if($invoice && count($request->item_id)){
@@ -195,6 +197,8 @@ class PurchaseInvoiceController extends Controller
                 $invoice->net_amount = (($request->gross_total + $request->other_charges) - ($discount));
                 $invoice->created_by = Auth::user()->id;
                 $invoice->remarks = $request->remarks;
+                $invoice->doc_date = $request->doc_date;
+                $invoice->due_date = $request->due_date;
                 $invoice->save();
     
                 if($invoice && count($request->item_id)){

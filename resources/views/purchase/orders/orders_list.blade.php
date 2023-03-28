@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="row row-customized">
     <div class="col">
-        <h1 class="page-title">Purchase Quotations</h1>
+        <h1 class="page-title">Purchase Orders</h1>
     </div>
     <div class="col">
         <div class="btn-grp">
@@ -67,6 +67,9 @@
                                 <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li>
                                 <li><a class="dropdown-item" href="{{url("/purchase/invoice/$item->id/create")}}"><i class="fa fa-file-invoice"></i> Create Invoice</a></li>
                                 <li><a class="dropdown-item" href="{{url("/purchase/order/$item->id/edit")}}"><i class="fa fa-edit"></i> Edit</a></li>
+                                @if (count($item->invoices))
+                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#newStoreModal{{$item->id}}"><i class="fa fa-file-invoice" ></i> Invoices</a></li>
+                                @endif
                                 <li><a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a></li>
                             </ul>
                             </div>
@@ -74,6 +77,36 @@
                         </div>
                     </td>
                 </tr>
+
+
+                
+          <!-- Modal -->
+                <div class="modal fade" id="newStoreModal{{$item->id}}" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="newStoreModalLabel">Invoices : </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                        <ul>
+                            @foreach ($item->invoices as $invoice)
+                            <li>
+                                <a href="{{route('invoice.show',$invoice->id)}}">{{'Inv # '.$invoice->doc_num .' | Date: '.date('d.m.y' , strtotime($invoice->created_at))}}</a>
+                            </li>
+                                
+                            @endforeach
+                        </ul>
+                        </div>
+                        
+                    </div>
+                    </div>
+                </div>
+                {{-- Modal --}}
+
+
+
+
             @endforeach
         </tbody>
     </table>
