@@ -6,7 +6,7 @@
                 <div class="col-lg-8">
                     <div class="row">
                         <div class="col">
-                            <h1 class="page-title">{{isset($order) ? 'Edit' : 'Create'}} PO : {{isset($order) ? $order->doc_num : ''}}</h1>
+                            <h1 class="page-title">{{isset($order) ? 'Create' : 'Create'}} Purchase Invoice  </h1>
                         </div>
                     </div>
 
@@ -26,11 +26,7 @@
                            </div>
                            {{-- Form start --}}
                         @if (isset($order))
-                        <form action="{{route('order.update', $order->id)}}" method="POST">
-                            @csrf
-                            @method('put')
-                        @else
-                        <form action="{{route('order.store')}}" method="POST">
+                        <form action="{{route('invoice.store')}}" method="POST">
                             @csrf
                             @method('post')
                         @endif
@@ -100,7 +96,7 @@
                             <div class="order_type_wrapper">
                                 <div class="order_type">
                                     <h3 class="order_section_sub_title">
-                                        Order Type
+                                        Invoice Type
                                     </h3>
                                     <div class="order_type_items">   
                                                 {{-- <label for="posOrder" class="order-type-item">
@@ -110,7 +106,7 @@
                                       
                                                 <label for="normalOrder" class="order-type-item">
                                                 <input type="radio" name="order_tyoe" id="normalOrder" value="normal" class="form-check-input order_type_val" checked>
-                                                    PURCHASE ORDER
+                                                    PURCHASE INVOICE
                                                 </label>
 
 
@@ -150,17 +146,18 @@
                         <div class="select_party">
                             
                             <div class="input-group input-group-outline">
-                                <select name="party_id" class=" select2Style form-control" id="vendor_select" >
+                                <select name="party_id" class="select2Style form-control" id="vendor_select" style="width: 100%">
+                                    
                                     @foreach ($vendors as $vendor)
                                         <option value="{{$vendor->id}}"  {{isset($order) &&  $order->party_id == $vendor->id  ? 'selected' : ''}}>{{$vendor->party_name}}</option>
                                     @endforeach
                                 </select>
                               </div> 
                         </div>
-                        <h4 class="order_section_sub_title mt-2">Quotation No.</h4>
+                        <h4 class="order_section_sub_title mt-2">Purchase Order #</h4>
                      
                             <div class="input-group input-group-outline">
-                                <input type="text" name="q_num" class="form-control" value="{{isset($order) ? $order->req_num : ''}}">
+                                <input type="text" name="q_num" class="form-control" value="{{isset($order) ? $order->doc_num : ''}}" readonly>
                               </div> 
                        
                     </div>
@@ -229,18 +226,18 @@
                             <div class="input-group input-group-outline">
                             <textarea name="remarks" id="" cols="" rows="5" class="form-control" placeholder="Remarks Here...">{{isset($order) ? $order->remarks : ''}}</textarea>
                             </div>
-                            <div class="hide">
+                            <div class="">
                                 <h4 class="order_section_sub_title" >
-                                    Received Amount:
+                                    Paid Amount ({{env('CURRENCY')}}):
                                 </h4>
                                 <div class="input-group input-group-outline">
-                                    <input type="number" name="recieved" id="received-amount" class="form-control" disabled value="0" min="1" onkeypress="validationForSubmit()" >
+                                    <input type="number" name="recieved" id="received-amount" class="form-control"  value="0" min="1" onkeypress="validationForSubmit()" >
                                 </div> 
                                 <hr>
                                 <div class="row row-customized">
                                     <div class="col">
                                         <h4 class="order_section_sub_title">
-                                            Returning Amount:
+                                            Balance:
                                         </h4>
                                     </div>
                                     <div class="col">

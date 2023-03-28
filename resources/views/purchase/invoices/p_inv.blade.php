@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="row row-customized">
     <div class="col">
-        <h1 class="page-title">Purchase Quotations</h1>
+        <h1 class="page-title">Purchase Invoices</h1>
     </div>
     <div class="col">
         <div class="btn-grp">
@@ -33,8 +33,7 @@
         <thead>
             <th>S#</th>
             <th>Doc #</th>
-            <th>Quotation #</th>
-            <th>Type</th>
+            <th>PO #</th>
             <th>Party</th>
             <th>Gross Total</th>
             <th>Net. Total</th>
@@ -44,33 +43,22 @@
             <th>Actions</th>
         </thead>
         <tbody>
-            @foreach ($orders as $key => $item)
-                <tr>
+            @foreach ($invoices as $key => $item)
+                <tr >
                     <td>{{$key+1}}</td>
                     <td>{{$item->doc_num}}</td>
-                    <td><a href="" style="font-style: italic">{{$item->quotation_num ?? '(Null)'}}</a></td>
-                    <td>{{$item->type ?? "STANDARD"}}</td>
+                    <td><a href="{{url("/purchase/order/".$item->order->id."/edit")}}" style="font-style: italic">{{$item->order->doc_num ?? '(Null)'}}</a></td>
+                    
                     <td>{{$item->party->party_name}}</td>
-                    <td>{{env('CURRENCY').' '.$item->sub_total}}</td>
+                    <td>{{env('CURRENCY').' '.$item->total}}</td>
                     <td class="text-primary">
-                      <b>  {{env('CURRENCY').' '.($item->sub_total - $item->discount) + $item->other_charges }}</b>
+                      <b>  {{env('CURRENCY').' '.($item->total - $item->discount) + $item->other_charges }}</b>
                     </td>
                     <td>{{$item->created_by_user->name}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
                     <td>
                         <div class="s-btn-grp">
-                            <div class="dropdown">
-                            <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4  dropdown-toggle" type="button" id="dropdownMenuButton{{$item->id}}" data-bs-toggle="dropdown" aria-expanded="true">
-                                {{-- <i class="fa fa-list"></i> --}}
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$item->id}}">
-                                <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li>
-                                <li><a class="dropdown-item" href="{{url("/purchase/invoice/$item->id/create")}}"><i class="fa fa-file-invoice"></i> Create Invoice</a></li>
-                                <li><a class="dropdown-item" href="{{url("/purchase/order/$item->id/edit")}}"><i class="fa fa-edit"></i> Edit</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a></li>
-                            </ul>
-                            </div>
-                         
+                            <a class="btn btn-link text-dark text-sm mb-0 px-0 ms-4 {{$item->created_at != $item->updated_at ? 'text-primary' : ''}}" href="{{url("/purchase/invoice/$item->id/edit")}}"><i class="fa fa-edit"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -78,9 +66,11 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center">
-        {!! $orders->links('pagination::bootstrap-4') !!}
+        {!! $invoices->links('pagination::bootstrap-4') !!}
     </div>
 </div>
 </div>
+
+
 
 @endsection

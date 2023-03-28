@@ -101,6 +101,8 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::resource('/request','App\Http\Controllers\PurchaseRequestController');
         Route::resource('/quotation','App\Http\Controllers\PurchaseQuotationController');
         Route::resource('/order','App\Http\Controllers\PurchaseOrderController');
+        Route::resource('/invoice','App\Http\Controllers\PurchaseInvoiceController');
+        Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
 });
 Route::prefix('invoice')->group(function(){
     Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');

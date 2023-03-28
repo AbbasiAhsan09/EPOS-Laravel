@@ -8,32 +8,31 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PurchaseOrder extends Model
+class PurchaseInvoice extends Model
 {
     use HasFactory, SoftDeletes;
-
     /**
-     * Get all of the details for the PurchaseQuotation
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function details(): HasMany
-    {
-        return $this->hasMany(PurchaseOrderDetails::class, 'po_id', 'id');
-    }
-
-    /**
-     * Get the created_by that owns the PurchaseQuotation
+     * Get the order that owns the PurchaseInvoice
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-public function created_by_user(): BelongsTo
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'po_id', 'id');
+    }
+
+    /**
+     * Get the created_by_user that owns the PurchaseInvoice
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function created_by_user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     /**
-     * Get the party that owns the PurchaseQuotation
+     * Get the party that owns the PurchaseInvoice
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -42,8 +41,8 @@ public function created_by_user(): BelongsTo
         return $this->belongsTo(Parties::class, 'party_id', 'id');
     }
 
-    public function invoices() : HasMany
+    public function details() : HasMany
     {
-        return $this->hasMany(PurchaseInvoice::class, 'po_id' , 'id');
+        return $this->hasMany(PurchaseInvoiceDetails::class, 'inv_id' , 'id');
     }
 }

@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PurchaseOrderDetails extends Model
+class PurchaseInvoiceDetails extends Model
 {
     use HasFactory, SoftDeletes;
 
     /**
-     * Get the items that owns the PurchaseOrderDetails
+     * Get the items that owns the PurchaseInvoiceDetails
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

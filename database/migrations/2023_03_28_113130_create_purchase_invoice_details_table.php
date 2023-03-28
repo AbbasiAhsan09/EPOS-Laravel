@@ -13,17 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('purchase_order_details', function (Blueprint $table) {
+        Schema::create('purchase_invoice_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('po_id')->constrained('purchase_orders');
+            $table->foreignId('inv_id')->constrained('purchase_invoices');
             $table->foreignId('item_id')->constrained('products');
-            $table->decimal('qty',50,2);
+            $table->decimal('qty',50,2)->default(0);
             $table->decimal('rate',50,2);
-            $table->decimal('tax',50,2);
-            $table->decimal('discount',3,2)->default(0); // In Percentage
             $table->decimal('total',50,2);
-            $table->integer('status')->default(1);
-            $table->boolean('is_base_unit');
+            $table->decimal('tax',50,2)->default(0);
+            $table->decimal('disc',50,2)->default(0);
+            $table->integer('status')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -36,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchase_order_details');
+        Schema::dropIfExists('purchase_invoice_details');
     }
 };

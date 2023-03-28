@@ -13,19 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('purchase_orders', function (Blueprint $table) {
+        Schema::create('purchase_invoices', function (Blueprint $table) {
             $table->id();
             $table->string('doc_num');
             $table->foreignId('party_id')->constrained('parties');
-            $table->string('quotation_num')->nullable();
-            $table->enum('type',['STANDARD','CONTRACT','PLANNED','STANDING'])->nullable();
+            $table->foreignId('po_id')->constrained('purchase_orders');
+            $table->decimal('total',50,2);
+            $table->decimal('discount',50,2);
+            $table->enum('discount_type' ,['PERCENT','FLAT'])->default('PERCENT');
+            $table->decimal('tax',50,2);
+            $table->decimal('shipping',50,2);
+            $table->decimal('others',50,2)->default(0);
+            $table->decimal('net_amount',50,2);
             $table->foreignId('created_by')->constrained('users');
-            $table->decimal('sub_total',50,2);
-            $table->decimal('discount')->default(0);
-            $table->enum('discount_type',['PERCENT','FLAT'])->default('PERCENT');
-            $table->decimal('shipping_cost',50,2)->default(0);
-            $table->decimal('tax',50,2)->default(0);
-            $table->integer('status')->default(1); //0 cancelled order
             $table->text('remarks')->nullable();
             $table->softDeletes();
             $table->timestamps();
@@ -39,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchase_orders');
+        Schema::dropIfExists('purchase_invoices');
     }
 };
