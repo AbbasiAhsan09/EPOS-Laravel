@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('disc',50,2)->default(0);
             $table->integer('status')->default(0);
             $table->softDeletes();
+            $table->boolean('is_base_unit')->default(0);
             $table->timestamps();
         });
     }

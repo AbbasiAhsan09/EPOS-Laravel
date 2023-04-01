@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
 use App\Models\Parties;
+use App\Models\Products;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseInvoiceDetails;
 use App\Models\PurchaseOrder;
@@ -91,6 +93,7 @@ class PurchaseInvoiceController extends Controller
                 $invoice->discount = $request->discount;
                 $discount =  $request->discount;
             }
+
             $invoice->others = $request->other_charges;
             $invoice->tax = 0;
             $invoice->shipping = 0;
@@ -113,6 +116,34 @@ class PurchaseInvoiceController extends Controller
                         $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                         $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                         $detail->save();
+// Inventory Manage
+                        if($detail){
+                            $totalCost = 0;
+                            $totalNewCost = 0;
+                            $item = Products::find($detail->item_id);
+                            
+                            $newQty = ($detail->is_base_unit ? ($detail->qty) : ((isset($item->uoms->base_unit_value ) ? $item->uoms->base_unit_value : 1 ) * $detail->qty));
+                            $newRate = ($detail->is_base_unit ? ($detail->rate) : ($detail->rate / (isset($item->uoms->base_unit_value) ? $item->uoms->base_unit_value : 1 )));
+
+                            $inventory = Inventory::where('item_id', $detail->item_id)->where('is_opnening_stock', 0)->first();
+
+                            if(!$inventory){
+                                $inventory = new Inventory();
+                                $inventory->item_id = $detail->item_id;
+                                $inventory->is_opnening_stock = 0;
+                                $inventory->stock_qty = $newQty;
+                                $inventory->wght_cost = $newRate;
+                            }else{
+                                $totalCost = $inventory->stock_qty * $inventory->wght_cost;
+                                $totalNewCost = $newQty * $newRate;
+                                $inventory->wght_cost = ($totalCost + $totalNewCost) / ($inventory->stock_qty + $newQty);
+                                $inventory->stock_qty = ($inventory->stock_qty + $newQty);
+                            }
+
+                            $inventory->save();
+
+                          
+                        }
                     }
                 
             }
@@ -203,12 +234,16 @@ class PurchaseInvoiceController extends Controller
     
                 if($invoice && count($request->item_id)){
                         $deleteItems = PurchaseInvoiceDetails::where('inv_id' , $invoice->id)->whereNotIn('item_id' , $request->item_id);
+                        // dd($deleteItems->pluck('qty'));
                         $deleteItems->delete();
                         for ($i=0; $i < count($request->item_id) ; $i++) { 
                             $detail =  PurchaseInvoiceDetails::where('inv_id' , $invoice->id)->where('item_id' , $request->item_id[$i])->first();
                             if(!$detail){
-                                $detail = new PurchaseInvoiceDetails();
+                            $detail = new PurchaseInvoiceDetails();
                             }
+                            $item = Products::find($detail->item_id);
+                            $diffQty = $request->qty[$i] - ($detail->is_base_unit ? ($detail->qty) : (isset($item->uoms->base_unit_value) ? ($item->uoms->base_unit_value *  $detail->qty) : $detail->qty)) ;
+
                             $detail->inv_id = $invoice->id;
                             $detail->item_id = $request->item_id[$i];
                             $detail->rate = $request->rate[$i];
@@ -217,6 +252,9 @@ class PurchaseInvoiceController extends Controller
                             $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                             $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                             $detail->save();
+
+                            dd($diffQty);
+
                         }
                     
                 }
@@ -225,7 +263,7 @@ class PurchaseInvoiceController extends Controller
                 return redirect("/purchase/invoice");
             }
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
