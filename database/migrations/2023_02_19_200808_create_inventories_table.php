@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->boolean('is_opnening_stock')->default(0);
             $table->integer('item_id');
-            $table->integer('po_id')->nullable();
+            // $table->integer('po_id')->nullable();
+            $table->decimal('wght_cost')->default(0);
             $table->decimal('stock_qty',50,2); //Stock Qty will be calculated as base unit
             $table->integer('status')->default(1);
             $table->timestamps();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConfigurationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,6 +42,7 @@ Route::prefix('products')->group(function(){
     Route::put('/edit/{id}','App\Http\Controllers\ProductController@update')->name('update.product');
     Route::delete('/delete/{id}','App\Http\Controllers\ProductController@destroy')->name('delete.product');
     Route::post('/restore/{id}','App\Http\Controllers\ProductController@restore')->name('restore.product');
+    Route::post('/import-csv','App\Http\Controllers\ProductController@importCsv')->name('import.product');
 });
 
 Route::prefix('uom')->group(function(){
@@ -91,4 +93,22 @@ Route::prefix('sales')->group(function () {
     Route::post('/add','App\Http\Controllers\SalesController@store')->name('add.sale');
     Route::put('/edit/{id?}','App\Http\Controllers\SalesController@update')->name('edit.sale');
     Route::delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
+});
+
+
+Route::prefix('purchase')->group(function () {
+Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
+        Route::resource('/request','App\Http\Controllers\PurchaseRequestController');
+        Route::resource('/quotation','App\Http\Controllers\PurchaseQuotationController');
+        Route::resource('/order','App\Http\Controllers\PurchaseOrderController');
+        Route::resource('/invoice','App\Http\Controllers\PurchaseInvoiceController');
+        Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
+});
+Route::prefix('invoice')->group(function(){
+    Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');
+});
+
+
+Route::prefix('system')->group(function () {
+    Route::resource('configurations', ConfigurationController::class);
 });

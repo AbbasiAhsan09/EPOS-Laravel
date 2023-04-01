@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="page-wrapper">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row ">
                 <div class="col-lg-8">
                     <div class="row">
@@ -190,9 +190,8 @@
             </div>
         </div>
     </div>
-    <script>
-        $('td').on('click','.uom',function(){
-            console.log('hi');
-        })
-    </script>
+@section('scripts')
+     {{-- Custom jS --}}
+<script src="{{asset('js/custom.js')}}"></script>
+@endsection
 @endsection

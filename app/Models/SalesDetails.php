@@ -4,9 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SalesDetails extends Model
 {
     protected $table = 'sales_details';
+    /**
+     * Get the user that owns the SalesDetails
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function item_details(): BelongsTo
+    {
+        return $this->belongsTo(Products::class, 'item_id', 'id');
+    }
     use HasFactory;
 }

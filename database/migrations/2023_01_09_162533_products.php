@@ -24,6 +24,7 @@ return new class extends Migration
             $table->integer('uom')->default(0);
             $table->decimal('mrp',10,2)->default(0.00);
             $table->decimal('tp',10,2)->default(0.00);
+            $table->decimal('discount',10,2)->default(0.00);
             $table->decimal('taxes')->default(0.00);
             $table->integer('store_id');
             $table->string('img')->nullable();

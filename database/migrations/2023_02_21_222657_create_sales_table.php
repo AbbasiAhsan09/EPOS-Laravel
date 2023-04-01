@@ -18,8 +18,10 @@ return new class extends Migration
             $table->string('remarks')->nullable();
             $table->integer('customer_id')->default(0);
             $table->decimal('gross_total',50,2);
-            $table->decimal('vat',50,2);
-            $table->decimal('gst',50,2);
+            $table->decimal('vat',50,2)->default(0);
+            $table->decimal('gst',50,2)->default(0);
+            $table->decimal('discount',50,2)->default(0);
+            $table->enum('discount_type',['FLAT','PERCENT']);
             $table->decimal('advance_tax')->default(0);
             $table->decimal('other_tax',50,2)->default(0);
             $table->decimal('other_charges',50,2)->default(0);

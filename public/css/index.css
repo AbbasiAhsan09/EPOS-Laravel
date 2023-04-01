@@ -6,6 +6,14 @@
     --primary-color-02:gray;
     --primary-font : 'Oswald', sans-serif;
 }
+@font-face {
+    font-family: receipt-font;
+    src: url('../') format('woff2'),
+        url('./fonts/reciept/FakeReceipt-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 h1,h2,h3,h4,h5,h6{
     font-family: var(--primary-font);
     letter-spacing: 1.5px;

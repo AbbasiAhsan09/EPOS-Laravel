@@ -69,3 +69,7 @@ border-color: var(--bs-pink);
     border: solid 1px var(--bs-pink);
     /* background: white; */
 }
+
+.hide{
+    display: none !important;
+}
