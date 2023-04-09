@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string('dev_contact')->nullable();
             $table->foreignId('added_by')->constrained('users');
             $table->integer('updated_by')->nullable();
+            $table->integer('invoice_type')->default(1);
             $table->timestamps();
         });
     }
