@@ -130,8 +130,9 @@ class ProductController extends Controller
         // dd($request->file('file'));
 
         } catch (\Throwable $th) {
+            throw $th;
             return redirect()->back();
-            Alert::alert('Error', $th->getMessage(),'error');;
+            Alert::alert('Error', $th->getMessage(),'error');
         }
     }
 }

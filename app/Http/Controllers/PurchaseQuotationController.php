@@ -59,7 +59,8 @@ class PurchaseQuotationController extends Controller
         if($validate){
             // dd($request->all());
             $quotation = new PurchaseQuotation();
-            $quotation->doc_num = date('d',time())."/".($request->order_tyoe == 'normal' ? 'PR' : 'SA').'/'.date('m/y',time()).'/'.PurchaseQuotation::latest()->first()->id + 1;
+            // $quotation->doc_num = date('d',time())."/".($request->order_tyoe == 'normal' ? 'PR' : 'SA').'/'.date('m/y',time()).'/'.(PurchaseQuotation::latest()->first()->id? PurchaseQuotation::latest()->first()->id :  0 )+ 1;
+            $quotation->doc_num = date('d',time())."/".($request->order_tyoe == 'normal' ? 'PR' : 'SA').'/'.date('m/y',time()).'/'. 1;
             $quotation->req_num = $request->req_num;
             $quotation->party_id = $request->party_id;
             $quotation->type = ($request->order_tyoe == 'normal' ? 'PURCHASE' : 'SALES');
