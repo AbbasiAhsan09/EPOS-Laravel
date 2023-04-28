@@ -127,9 +127,26 @@ class SalesController extends Controller
      * @param  \App\Models\Sales  $sales
      * @return \Illuminate\Http\Response
      */
-    public function edit(Sales $sales)
+    public function edit(int $id , Sales $sales)
     {
-        //
+        try {  
+            $order = Sales::where('id',$id)->with('order_details.item_details')->first();
+            if($order){
+                $group = PartyGroups::where('group_name','LIKE','Customer%')->first();
+                if($group){
+                    $customers = Parties::where('group_id',$group->id)->get();
+                }else{
+                    $customers = [];
+                }
+
+                return view('sales.sale_orders.new_order',compact('order' , 'customers'));
+            }
+
+          
+            return redirect()->back()->withErrors('invalid_request' , 'Ooops! Your Request is Invalid!');
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**

@@ -90,6 +90,7 @@ Route::prefix('parties')->group(function () {
 Route::prefix('sales')->group(function () {
     Route::get('/','App\Http\Controllers\SalesController@index');
     Route::get('/add','App\Http\Controllers\SalesController@addNewOrder');
+    Route::get('/edit/{id}','App\Http\Controllers\SalesController@edit');
     Route::post('/add','App\Http\Controllers\SalesController@store')->name('add.sale');
     Route::put('/edit/{id?}','App\Http\Controllers\SalesController@update')->name('edit.sale');
     Route::delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
