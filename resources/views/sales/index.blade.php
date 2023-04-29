@@ -48,9 +48,9 @@
             @if (Auth::user()->role_id ==1 )
             <td>
                 <div class="s-btn-grp">
-                  <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#newStoreModal{{$item->id}}">
+                  <a href="{{url('/sales/edit/'.$item->id.'')}}" class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" >
                       <i class="fa fa-edit"></i>
-                  </button>
+                  </a>
                   {{-- <button class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
                       <i class="fa fa-trash"></i>
                   </button> --}}
@@ -61,39 +61,7 @@
 
         </tr>
 
-          <!-- Modal -->
-  <div class="modal fade" id="newStoreModal{{$item->id}}" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="newStoreModalLabel">Edit Group</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      <div class="modal-body">
-            <form action="{{route('edit.partyGroup',$item->id)}}" method="POST">
-                @csrf
-                @method('put')
-                <div class="row">
-                    <div class="col-lg-12">
-                        <label for="">Party Group Name</label>
-                    <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" name="group_name" required  value="{{$item->group_name}}">
-                    </div>
-                    </div>
-                </div>
-           
-        </div> 
-        <div class="modal-footer">
-          
-          <button type="submit" class="btn btn-primary">Update</button>
-
-
-        </div>
-    </form>
-      </div>
-    </div>
-  </div>
-  {{-- Modal --}}
+  
 
 
 

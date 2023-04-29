@@ -76,7 +76,7 @@ $(document).ready(function(){
                         '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
                                     '<td>'+e.name+'</td>'+
                                     '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
-                                    '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'disabled' : '')+'>'+
+                                    '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
                                     '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
                                     '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
                                     '</select>'+

@@ -13,9 +13,7 @@
                         <div class="col">
                             <h1 class="page-title">{{$isEditMode ? 'Edit' : 'Create'}} Orders {{$isEditMode ? (' : '.$order->tran_no ?? '') : '' }}</h1>
                         </div>
-                        <div class="col">
-
-                        </div>
+                
                     </div>
 
                     <div class="new_order_item_selection_wrapper">
@@ -218,7 +216,7 @@
                                 </div>
                                 <div class="col">
                                     <div class="input-group input-group-outline">
-                                        <input type="number" class="form-control" disabled readonly value="{{$isEditMode ? round(($order->recieved - $order->net_total))   : 0}}" id="returning-amount">
+                                        <input type="number" class="form-control" disabled readonly value="{{ $isEditMode ? round(($order->recieved - $order->net_total))   : 0 }}" id="returning-amount">
                                     </div>
                                 </div>
                             </div>
