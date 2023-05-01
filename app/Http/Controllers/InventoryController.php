@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Trait\InventoryTrait;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
+    use InventoryTrait;
     /**
      * Display a listing of the resource.
      *
@@ -81,5 +83,14 @@ class InventoryController extends Controller
     public function destroy(Inventory $inventory)
     {
         //
+    }
+
+    public function checkInventory($item_id, $is_base_unit)
+    {
+        try {
+          return  response()->json($this->checkAvaialableInventory($item_id , $is_base_unit));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 }

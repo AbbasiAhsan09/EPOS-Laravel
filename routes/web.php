@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ConfigurationController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -106,10 +107,12 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
 });
 Route::prefix('invoice')->group(function(){
-    Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');
+    Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });
 
 
 Route::prefix('system')->group(function () {
     Route::resource('configurations', ConfigurationController::class);
 });
+ 
+Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');

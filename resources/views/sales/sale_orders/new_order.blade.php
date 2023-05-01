@@ -70,7 +70,7 @@
                                          </td>
                                         <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                 min="1" class="form-control rate" value="{{$item->rate}}"></td>
-                                        <td><input name="qty[]" type="number" step="0.01" placeholder="Qty"
+                                        <td><input name="qty[]" type="number" step="0.01" data-item-id="{{$item->item_details->id}}" placeholder="Qty"
                                                 min="1" class="form-control pr_qty" value="{{$item->qty}}"></td>
                                         <td><input name="tax[]" type="number" step="0.01" placeholder="Tax"
                                                 min="0" class="form-control tax" value="{{$item->tax}}"></td>
@@ -151,21 +151,21 @@
                         </h4>
                         <div class="payment_methods">
                             <label for="cash" class="order-type-item">
-                                <input type="radio" name="payment_method" id="cash" value="cash" class="form-check-input order_type_val" checked>
+                                <input type="radio" name="payment_method" id="cash" value="cash" class="form-check-input order_type_val" {{$isEditMode ? (($order->payment_method == 'cash') ? 'checked' : '') : 'checked'}}>
                                    Cash
                             </label>
                             <label for="card" class="order-type-item">
-                                <input type="radio" name="payment_method" id="card"  value="card" class="form-check-input order_type_val" >
+                                <input type="radio" name="payment_method" id="card"  value="card" class="form-check-input order_type_val" {{$isEditMode ? (($order->payment_method == 'card') ? 'checked' : '') : ''}}>
                                    Card 
                             </label>
 
                             <label for="Bank" class="order-type-item other-methods">
-                                <input type="radio" name="payment_method" id="Bank" value="bank"  class="form-check-input order_type_val " >
+                                <input type="radio" name="payment_method" id="Bank" value="bank"  class="form-check-input order_type_val " {{$isEditMode ? (($order->payment_method == 'bank') ? 'checked' : '') : ''}}>
                                    Bank 
                             </label>
 
                             <label for="Cheque" class="order-type-item other-methods">
-                                <input type="radio" name="payment_method" id="Cheque"  value="cheque" class="form-check-input order_type_val " >
+                                <input type="radio" name="payment_method" id="Cheque"  value="cheque" class="form-check-input order_type_val " {{$isEditMode ? (($order->payment_method == 'cheque' ) ? 'checked' : '') : ''}}>
                                    Cheque 
                             </label>
                             

@@ -1,7 +1,9 @@
+<head>
 <title>Invoice</title>
-<body>
+</head>
+<body style="width: fit-content">
     
-    <div class="reciept-wrapper">
+    <div class="reciept-wrapper" id="receiptMain">
         <div class="receipt">
             <h5 class="nos">{{isset($config) && $config->show_ntn ? 'NTN#'.$config->ntn.' | ' : ''}}
                 {{isset($config) && $config->show_ptn ? 'PTN#'.$config->ptn : ''}}</h5>
@@ -82,6 +84,7 @@
             </div>
         </div>
     </div>
+    
 </body>
 
 <style>
@@ -143,3 +146,23 @@ table th{
     }
     
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+  // print the window when a button is clicked
+    // enable automatic printing in Chrome
+    var printSettings = {
+      'mediaSize': { 'name': 'na_legal', 'height_microns': 355.6, 'width_microns': 215.9, 'custom_display_name': 'Legal' },
+      'shouldPrintBackgrounds': true
+    };
+    if (navigator.userAgent.indexOf('Chrome') !== -1) {
+      printSettings['autoprint'] = true;
+    }
+    // print the window
+    window.print();
+    setTimeout(() => {
+        window.close();
+    }, 1000);
+});
+</script>

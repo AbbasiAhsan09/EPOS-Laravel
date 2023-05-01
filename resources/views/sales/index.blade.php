@@ -13,8 +13,11 @@
             <div class="row .row-customized">
                 <div class="col-lg-7">
                     <div class="input-group input-group-outline">
-                        <label class="form-label">Search</label>
-                        <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
+                       <select name="" id="type_search" class="form-control">
+                        <option value="sales"  {{session()->get('sales') ? 'selected' : ''}}>Sale</option>
+                        <option value="all" {{session()->get('all') ? 'selected' : ''}}>All</option>
+                        <option value="canceled" {{session()->get('canceled') ? 'selected' : ''}}>Canceled</option>
+                       </select>
                       </div>  
                 </div>
                 <div class="col-lg-5">
@@ -29,6 +32,7 @@
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
             <th>ID</th>
+            <th>Transaction #</th>
             <th>Customer</th>
             <th>Created at</th>
             <th>User</th>
@@ -39,8 +43,9 @@
         </thead>
         <tbody>
            @foreach ($items as $key => $item)
-           <tr>
-         <td>{{$key+1}}</td>
+           <tr >
+         <td>{{$item->id}}</td>
+         <td  class="{{$item->deleted_at !== null ? 'text-danger' : ''}}">{{$item->tran_no}}</td>
          <td>{{isset($item->customer) ? $item->customer->party_name : 'Cash'}}</td>    
         <td>{{date('d-M-y | h:m' , strtotime($item->created_at))}}</td>
         <td>{{$item->user->name}}</td>   
@@ -48,75 +53,85 @@
             @if (Auth::user()->role_id ==1 )
             <td>
                 <div class="s-btn-grp">
-                  <a href="{{url('/sales/edit/'.$item->id.'')}}" class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" >
-                      <i class="fa fa-edit"></i>
-                  </a>
-                  {{-- <button class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
-                      <i class="fa fa-trash"></i>
-                  </button> --}}
-               
-              </div>
+                  <div class="dropdown">
+                  <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4  dropdown-toggle" type="button" id="dropdownMenuButton{{$item->id}}" data-bs-toggle="dropdown" aria-expanded="true">
+                      {{-- <i class="fa fa-list"></i> --}}
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$item->id}}">
+                      <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li>
+                      @if ($item->deleted_at === null)
+                      <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li>
+                      <li><a class="dropdown-item" href="{{url('/sales/edit/'.$item->id.'')}}"><i class="fa fa-edit"></i> Edit</a></li>
+                      <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>
+                      @endif
+                  </ul>
+                  </div>
+              
+                </div>
               </td>
             @endif
 
         </tr>
 
-  
-
-
-
-    <!-- Delete Modal -->
+    {{--  Delete Modal  --}}
+    
     <div class="modal fade" id="dltModal{{$item->id}}" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="newStoreModalLabel">Delete UOM</h5>
+            <h5 class="modal-title" id="newStoreModalLabel">Delete Sale: {{$item->tran_no}}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          {{-- <div class="modal-body">
-              <form action="{{route('delete.uom',$item->id)}}" method="POST">
+          <div class="modal-body">
+              <form action="{{route('delete.sale',$item->id)}}" method="POST">
                   @csrf
-                  @method('put')
-                 <label class="form-label">Are you sure you want to delete {{$item->uom}}</label>
-             
-          </div> --}}
+                  @method('delete')
+                 <label class="form-label">Are you sure you want to delete {{$item->tran_no}}</label>
+          </div>
           <div class="modal-footer">
-            
             <button type="button" class="btn btn-outline-primary">No</button>
             <button type="submit" class="btn btn-primary">Yes</button>
-  
-  
           </div>
       </form>
         </div>
       </div>
     </div>
+
     {{--Delete Modal --}}
+
            @endforeach
         </tbody>
     </table>
+    
+    {{$items->links('pagination::bootstrap-4')}}
+
 </div>
 </div>
 
-  
   <!-- Modal -->
   <div class="modal fade" id="newStoreModal" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="newStoreModalLabel">Create New Group</h5>
+          <h5 class="modal-title" id="newStoreModalLabel">Filter</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
        <div class="modal-body">
-            <form action="{{route('add.partyGroup')}}" method="POST">
-                @csrf
+            <form id="search_filter">
+             
                 <div class="row">
-                    <div class="col-lg-12">
-                        <label for="">Party Group Name</label>
+                    <div class="col-lg-6">
+                        <label for="">Start Date</label>
                     <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" name="group_name" required>
+                      <input type="date" class="form-control" id="start_date" value="{{session()->get('start_date')}}" required>
                     </div>
-                    </div>  
+                    </div> 
+                    <div class="col-lg-6">
+                      <label for="">End Date</label>
+                  <div class="input-group input-group-outline" >
+                    <input type="date" class="form-control" id="end_date" value="{{session()->get('end_date')}}" required>
+                  </div>
+                  </div>  
                 </div>
            
         </div> 
@@ -129,5 +144,29 @@
     </div>
   </div>
   {{-- Modal --}}
+
+  @section('scripts')
+      <script>
+        $('#type_search').change(function(){
+          window.location.replace('/sales?type='+$(this).val());
+        });
+
+        $('#search_filter').submit(function(e){
+
+          e.preventDefault();
+          var start_date = $('#start_date').val();
+          var end_date = $('#end_date').val();
+          var type = $('#type_search').val();
+          window.location.replace('/sales?type='+type+'&start_date='+start_date+'&end_date='+end_date);
+        
+        });
+
+    $('.popup').click(function(event) {
+        event.preventDefault();
+        window.open($(this).attr("href"), "popupWindow", "width=300,height=600,scrollbars=yes,left="+($(window).width()-400)+",top=50");
+    });
+
+      </script>
+  @endsection
 
 @endsection

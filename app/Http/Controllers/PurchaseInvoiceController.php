@@ -248,9 +248,11 @@ class PurchaseInvoiceController extends Controller
                         $deleteItems->delete();
                         
                         for ($i=0; $i < count($request->item_id) ; $i++) { 
+                            
                             $item = Products::where('id',$request->item_id[$i])->with('uoms')->first();
                             $reqQty = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? $request->qty[$i] : ($request->qty[$i] * ($item->uoms->base_unit_value ?? 1)));
                             $detail =  PurchaseInvoiceDetails::where('inv_id' , $invoice->id)->where('item_id' , $request->item_id[$i])->first();
+                            
                             if(!$detail){
                             
                             $detail = new PurchaseInvoiceDetails();
@@ -267,6 +269,7 @@ class PurchaseInvoiceController extends Controller
                                 $inventory->updated_at = time();                               
                                 $inventory->save();
                             }
+
                             $detail->inv_id = $invoice->id;
                             $detail->item_id = $request->item_id[$i];
                             $detail->rate = $request->rate[$i];
