@@ -58,7 +58,7 @@
                       {{-- <i class="fa fa-list"></i> --}}
                   </button>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$item->id}}">
-                      <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li>
+                      {{-- <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li> --}}
                       @if ($item->deleted_at === null)
                       <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li>
                       <li><a class="dropdown-item" href="{{url('/sales/edit/'.$item->id.'')}}"><i class="fa fa-edit"></i> Edit</a></li>

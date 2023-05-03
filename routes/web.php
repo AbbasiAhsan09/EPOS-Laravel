@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\ConfigurationController;
+use App\Http\Controllers\CustomerLedgerController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\VendorLedgerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -115,4 +117,9 @@ Route::prefix('system')->group(function () {
     Route::resource('configurations', ConfigurationController::class);
 });
  
+Route::resources([
+    'customer-ledger' => CustomerLedgerController::class,
+    'vendor-ledger'  => VendorLedgerController::class
+]);
+
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');

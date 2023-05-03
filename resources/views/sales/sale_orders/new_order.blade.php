@@ -3,6 +3,7 @@
 @php
     
     $isEditMode = isset($order);
+    
 
 @endphp
     <div class="page-wrapper">
@@ -71,7 +72,7 @@
                                         <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                 min="1" class="form-control rate" value="{{$item->rate}}"></td>
                                         <td><input name="qty[]" type="number" step="0.01" data-item-id="{{$item->item_details->id}}" placeholder="Qty"
-                                                min="1" class="form-control pr_qty" value="{{$item->qty}}"></td>
+                                                min="1" class="form-control pr_qty {{$isEditMode ? 'edit_qty' : ''}}" value="{{$item->qty}}"></td>
                                         <td><input name="tax[]" type="number" step="0.01" placeholder="Tax"
                                                 min="0" class="form-control tax" value="{{$item->tax}}"></td>
                                         <td class="total">{{$item->total}}</td>
