@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('customer_ledgers', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('purchase_invoices', function (Blueprint $table) {
+            $table->decimal('recieved', 50,2)->default(0);
         });
     }
 
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customer_ledgers');
+        Schema::table('purchase_invoices', function (Blueprint $table) {
+            //
+        });
     }
 };

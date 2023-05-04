@@ -2,8 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Parties;
+use App\Models\PartyGroups;
+use App\Models\PurchaseInvoice;
 use App\Models\VendorLedger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
+
+use function PHPUnit\Framework\isNull;
 
 class VendorLedgerController extends Controller
 {
@@ -12,9 +19,29 @@ class VendorLedgerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        session()->forget('p_start_date');
+        session()->forget('p_end_date');
+        session()->forget('l_vendor_id');
+        // dd($request->all());
+        $group_id  = PartyGroups::where('group_name', 'LIKE', "Vendo%")->first()->id;
+        $vendors = Parties::where('group_id', $group_id)->orderBy('party_name','ASC')->get();
+        $items = Parties::where('group_id', $group_id)
+            ->with(['purchases' => function($query) use($request){
+                $query->when(($request->has('start_date') && $request->has('end_date')) && ($request->start_date != null) && ($request->end_date != null),function($query) use($request){
+                    session()->put('p_start_date', $request->start_date);
+                    session()->put('p_end_date', $request->end_date);
+                    $query->whereBetween(DB::raw('purchase_invoices.created_at'), [$request->start_date, $request->end_date]);
+                })
+                ->when($request->has('vendor_id') && ($request->vendor_id != null) , function($query) use($request){
+                    $query->where('purchase_invoices.party_id' , $request->vendor_id);
+                    session()->put('l_vendor_id',$request->vendor_id);
+                });
+            }])->paginate(20)->withQueryString();
+            // dd($items);
+
+        return view('vendor-ledger.vendor-ledger', compact('items','vendors'));
     }
 
     /**
@@ -24,7 +51,7 @@ class VendorLedgerController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -44,9 +71,21 @@ class VendorLedgerController extends Controller
      * @param  \App\Models\VendorLedger  $vendorLedger
      * @return \Illuminate\Http\Response
      */
-    public function show(VendorLedger $vendorLedger)
+    public function show( int $id)
     {
-        //
+        $vendor = Parties::find($id);
+        if ($vendor) {
+            $items = PurchaseInvoice::where('party_id', $id)
+                ->whereRaw('net_amount - recieved > (0.99)')
+                ->paginate(10);
+
+            return view(
+                'vendor-ledger.details',
+                compact('items', 'vendor')
+            );
+        }
+
+        return redirect()->back()->withErrors(['error' => 'Invalid Request!']);
     }
 
     /**
@@ -67,9 +106,40 @@ class VendorLedgerController extends Controller
      * @param  \App\Models\VendorLedger  $vendorLedger
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, VendorLedger $vendorLedger)
+    public function update(Request $request, int $vendor_id)
     {
-        //
+        
+        $validate = $request->validate([
+            'amount' => 'required | integer | min:1 ',
+            'date' => 'date | required'
+        ]);
+
+
+        if($validate){
+            $amount = $request->amount;
+            $invoices = PurchaseInvoice::where('party_id' , $vendor_id)
+            ->whereRaw('net_amount - recieved > (0.99)')->get();
+
+            if($invoices->count()){
+                foreach ($invoices as $key => $invoice) {
+                    $balance = $invoice->net_amount -  $invoice->recieved;
+                    if($amount >= $balance){
+                        if($invoice->update(['recieved' =>$invoice->recieved + $balance , 'updated_at' => strtotime($request->date)])){
+                            $amount = $amount - $balance;
+                        }
+                    }else{
+                        if($invoice->update(['recieved' =>$invoice->recieved + $amount, 'updated_at' => strtotime($request->date)])){
+                            $amount = 0;
+                            break;
+                        } 
+                    }
+                }
+            }
+            Alert::toast('Bulk Payment Updated!','success');
+            return redirect()->back();
+        }
+            
+            
     }
 
     /**

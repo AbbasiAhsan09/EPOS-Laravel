@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PurchaseInvoice extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $fillable = ['updated_at' , 'created_at' ,'recieved' ,'net_amount'];
     /**
      * Get the order that owns the PurchaseInvoice
      *

@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="row row-customized">
     <div class="col">
-        <h1 class="page-title">  <small>{{$customer->party_name ?? ''}} : Ledger Details </small></h1>
+        <h1 class="page-title">  <small>{{$vendor->party_name ?? ''}} : Ledger Details </small></h1>
     </div>
     {{-- <div class="col">
         <form action="{{ route('customer-ledger.index') }}" method="GET">
@@ -58,13 +58,13 @@
        @foreach ($items as $key => $item)
        <tr >
      <td>{{$item->id}}</td>
-     <td  class="{{$item->deleted_at !== null ? 'text-danger' : ''}}">{{$item->tran_no}}</td>
-     <td>{{isset($item->customer) ? $item->customer->party_name : 'Cash'}}</td>    
+     <td  class="{{$item->deleted_at !== null ? 'text-danger' : ''}}">{{$item->doc_num}}</td>
+     <td>{{isset($item->party) ? $item->party->party_name : 'Cash'}}</td>    
     <td>{{date('d-M-y | h:m' , strtotime($item->created_at))}}</td>
     {{-- <td>{{$item->user->name}}</td>    --}}
-    <td> {{env('CURRENCY').$item->net_total}}</td> 
+    <td> {{env('CURRENCY').$item->net_amount}}</td> 
     <td> {{env('CURRENCY').$item->recieved}}</td> 
-    <td> {{env('CURRENCY').round($item->net_total - $item->recieved)}}</td> 
+    <td> {{env('CURRENCY').round($item->net_amount - $item->recieved)}}</td> 
 
         @if (Auth::user()->role_id ==1 )
         <td>
@@ -77,7 +77,7 @@
                  
                   @if ($item->deleted_at === null)
                   <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li>
-                  <li><a class="dropdown-item" href="{{url('/sales/edit/'.$item->id.'')}}"><i class="fa fa-edit"></i> Edit</a></li>
+                  <li><a class="dropdown-item" href='{{url("/purchase/invoice/".$item->id."/edit")}}'><i class="fa fa-edit"></i> Edit</a></li>
                   <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>
                   @endif
               </ul>
@@ -95,14 +95,14 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="newStoreModalLabel">Delete Sale: {{$item->tran_no}}</h5>
+        <h5 class="modal-title" id="newStoreModalLabel">Delete Invoice: {{$item->doc_num}}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
           <form action="{{route('delete.sale',$item->id)}}" method="POST">
               @csrf
               @method('delete')
-             <label class="form-label">Are you sure you want to delete {{$item->tran_no}}</label>
+             <label class="form-label">Are you sure you want to delete {{$item->doc_num}}</label>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary">No</button>
@@ -119,14 +119,14 @@
     </tbody>
     <tfoot>
         <th colspan="4"> Total</th>
-        <th>{{$items->sum('net_total')}}</th>
-        <th>{{$items->sum('recieved')}}</th>
-        <th>{{round($items->sum('net_total') - $items->sum('recieved'))}}</th>
+        <th>{{env('CURRENCY').round($items->sum('net_amount'))}}</th>
+        <th>{{env('CURRENCY').round($items->sum('recieved'))}}</th>
+        <th>{{env('CURRENCY').round($items->sum('net_amount') - $items->sum('recieved'))}}</th>
     </tfoot>
 </table>
     
     {{$items->links('pagination::bootstrap-4')}}
-<form action="{{route('customer-ledger.update',$customer->id)}}" method="POST">
+<form action="{{route('vendor-ledger.update',$vendor->id)}}" method="POST">
   @csrf
   @method('put')
   <div class="row row-customized">
@@ -141,7 +141,7 @@
     <div class="col-lg-4">
         <label for="">Amount</label>
          <div class="input-group input-group-outline">  
-           <input type="number" class="form-control" name="amount" required min="1" max="{{round($items->sum('net_total') - $items->sum('recieved'))}}">
+           <input type="number" class="form-control" name="amount" required min="1" max="{{round($items->sum('net_amount') - $items->sum('recieved'))}}">
           </div>   
     </div>
 

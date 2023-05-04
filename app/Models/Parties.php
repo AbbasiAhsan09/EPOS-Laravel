@@ -31,4 +31,14 @@ class Parties extends Model
     {
         return $this->hasMany(Sales::class, 'customer_id', 'id');
     }
+
+        /**
+     * Get all of the sales for the Parties
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(PurchaseInvoice::class, 'party_id', 'id');
+    }
 }
