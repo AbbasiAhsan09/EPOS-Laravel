@@ -64,7 +64,7 @@
                                 {{-- <i class="fa fa-list"></i> --}}
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$item->id}}">
-                                <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li>
+                                {{-- <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li> --}}
                                 <li><a class="dropdown-item" href="{{url("/purchase/invoice/$item->id/create")}}"><i class="fa fa-file-invoice"></i> Create Invoice</a></li>
                                 <li><a class="dropdown-item" href="{{url("/purchase/order/$item->id/edit")}}"><i class="fa fa-edit"></i> Edit</a></li>
                                 @if (count($item->invoices))

@@ -11,20 +11,19 @@
         <div class="btn-grp">
          
             <div class="row .row-customized">
-                <div class="col-lg-8">
+                <div class="col-lg-12">
                     <div class="input-group input-group-outline">
                         
-                        <select name="" id="" class="form-control">
+                        <select name="type" id="" class="form-control">
                             <option value="">--Select Status--</option>
-                            <option value="1">Approved</option>
+                            <option value="all">All</option>
+                            <option value="current">Current</option>
+                            <option value="deleted">Deleted</option>
                         </select>
                       </div>
                   
                 </div>
-                <div class="col-lg-4">
-                <a href="{{url("/purchase/order/create")}}" class="btn btn-outline-primary btn-sm mb-0" >Create PO</a>
-
-                </div>
+                
             </div>
         </div>
     </div>

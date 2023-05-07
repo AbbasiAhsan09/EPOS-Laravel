@@ -40,89 +40,55 @@
      
     </div> --}}
 </div>
-<table class="table table-sm table-responsive-sm table-striped">
-    <thead>
-        <th>ID</th>
-        <th>Transaction #</th>
-        <th>Customer</th>
-        <th>Created at</th>
-        {{-- <th>User</th> --}}
-        <th>Net Amount</th>
-        <th>Recieved</th>
-        <th>Balance</th>
-        @if (Auth::user()->role_id == 1)
-        <th>Actions</th>
-        @endif
-    </thead>
-    <tbody>
-       @foreach ($items as $key => $item)
-       <tr >
-     <td>{{$item->id}}</td>
-     <td  class="{{$item->deleted_at !== null ? 'text-danger' : ''}}">{{$item->doc_num}}</td>
-     <td>{{isset($item->party) ? $item->party->party_name : 'Cash'}}</td>    
-    <td>{{date('d-M-y | h:m' , strtotime($item->created_at))}}</td>
-    {{-- <td>{{$item->user->name}}</td>    --}}
-    <td> {{env('CURRENCY').$item->net_amount}}</td> 
-    <td> {{env('CURRENCY').$item->recieved}}</td> 
-    <td> {{env('CURRENCY').round($item->net_amount - $item->recieved)}}</td> 
+<table class="table table-sm table-responsive-sm table-striped ">
+  <thead>
+      <th>S#</th>
+      <th>Doc #</th>
+      <th>PO #</th>
+      <th>Party</th>
+      {{-- <th>Gross Total</th> --}}
+      <th>Net. Total</th>
+      <th>Recieved</th>
+      <th>Balance</th>
+      <th>Created By</th>
+      <th>Created At</th>
 
-        @if (Auth::user()->role_id ==1 )
-        <td>
-            <div class="s-btn-grp">
-              <div class="dropdown">
-                <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4  dropdown-toggle" type="button" id="dropdownMenuButton{{$item->id}}" data-bs-toggle="dropdown" aria-expanded="true">
-                    {{-- <i class="fa fa-list"></i> --}}
-                </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$item->id}}">
-                 
-                  @if ($item->deleted_at === null)
-                  <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li>
-                  <li><a class="dropdown-item" href='{{url("/purchase/invoice/".$item->id."/edit")}}'><i class="fa fa-edit"></i> Edit</a></li>
-                  <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>
-                  @endif
-              </ul>
-              </div>
-          
-            </div>
-          </td>
-        @endif
-
-    </tr>
-
-{{--  Delete Modal  --}}
-
-<div class="modal fade" id="dltModal{{$item->id}}" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="newStoreModalLabel">Delete Invoice: {{$item->doc_num}}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-          <form action="{{route('delete.sale',$item->id)}}" method="POST">
-              @csrf
-              @method('delete')
-             <label class="form-label">Are you sure you want to delete {{$item->doc_num}}</label>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-primary">No</button>
-        <button type="submit" class="btn btn-primary">Yes</button>
-      </div>
-  </form>
-    </div>
-  </div>
-</div>
-
-{{--Delete Modal --}}
-
-       @endforeach
-    </tbody>
-    <tfoot>
-        <th colspan="4"> Total</th>
-        <th>{{env('CURRENCY').round($items->sum('net_amount'))}}</th>
-        <th>{{env('CURRENCY').round($items->sum('recieved'))}}</th>
-        <th>{{env('CURRENCY').round($items->sum('net_amount') - $items->sum('recieved'))}}</th>
-    </tfoot>
+      <th>Actions</th>
+  </thead>
+  <tbody>
+      @foreach ($items as $key => $item)
+          <tr >
+              <td>{{$key+1}}</td>
+              <td>{{$item->doc_num}}</td>
+              <td><a href="{{url("/purchase/order/".$item->order->id."/edit")}}" style="font-style: italic">{{$item->order->doc_num ?? '(Null)'}}</a></td>
+              
+              <td>{{$item->party->party_name}}</td>
+              {{-- <td>{{env('CURRENCY').' '.$item->total}}</td> --}}
+              <td class="text-primary">
+                <b>  {{$item->net_amount}}</b>
+              </td>
+              <td class="text-primary">
+                <b>  {{$item->recieved}}</b>
+              </td>
+              <td class="text-primary">
+                <b>  {{$item->net_amount - $item->recieved}}</b>
+              </td>
+              <td>{{$item->created_by_user->name}}</td>
+              <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
+              <td>
+                  <div class="s-btn-grp">
+                      <a class="btn btn-link text-dark text-sm mb-0 px-0 ms-4 {{$item->created_at != $item->updated_at ? 'text-primary' : ''}}" href="{{url("/purchase/invoice/$item->id/edit")}}"><i class="fa fa-edit"></i></a>
+                  </div>
+              </td>
+          </tr>
+      @endforeach
+  </tbody>
+  <tfoot>
+    <th colspan="4">Total</th>
+    <th>{{$items->sum('net_amount')}}</th>
+    <th>{{$items->sum('recieved')}}</th>
+    <th>{{$items->sum('net_amount') - $items->sum('recieved')}}</th>
+  </tfoot>
 </table>
     
     {{$items->links('pagination::bootstrap-4')}}

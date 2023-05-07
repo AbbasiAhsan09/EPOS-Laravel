@@ -1,17 +1,8 @@
-<!--
-=========================================================
-* Material Dashboard 2 - v3.0.4
-=========================================================
+@php
+    use App\Models\Configuration;
+    $currenConfig = Configuration::latest()->first();
+@endphp
 
-* Product Page: https://www.creative-tim.com/product/material-dashboard
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://www.creative-tim.com/license)
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
--->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -48,16 +39,16 @@
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">
-        <img src="../assets/img/logo-ct.png" class="navbar-brand-img h-100" alt="main_logo">
-        <span class="ms-1 font-weight-bold text-white">Material Dashboard 2</span>
+      <a class="navbar-brand m-0" href="/" >
+        <img src="{{asset("images/logo/$currenConfig->logo")}}" class="navbar-brand-img h-100" alt="main_logo">
+        <span class="ms-1 font-weight-bold text-white">{{$currenConfig->app_title ?? ''}}</span>
       </a>
     </div>
     <hr class="horizontal light mt-0 mb-2">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link text-white active bg-gradient-primary" href="../pages/dashboard.html">
+          <a class="nav-link text-white   {{request()->is('/') ? 'active bg-gradient-primary' : ''}}" href="{{url('/')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">dashboard</i>
             </div>
@@ -65,7 +56,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="/product-category">
+          <a class="nav-link text-white {{request()->is('product-category') ? 'active bg-gradient-primary' : ''}}" href="{{url('/product-category')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">table_view</i>
             </div>
@@ -73,7 +64,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="/products">
+          <a class="nav-link text-white {{request()->is('products') ? 'active bg-gradient-primary' : ''}} " href="/products">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">receipt_long</i>
             </div>
@@ -81,26 +72,19 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="/sales">
+          <a class="nav-link text-white {{request()->is('sales') || request()->segment(1) === 'sales' ? 'active bg-gradient-primary' : ''}} " href="/sales">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">people</i>
+              <i class="material-icons opacity-10">sell</i>
             </div>
             <span class="nav-link-text ms-1">Sales</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="/parties">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">people</i>
-            </div>
-            <span class="nav-link-text ms-1">Parties</span>
-          </a>
-        </li>
 
+        
         <li class="nav-item">
-          <a class="nav-link text-white " href="/purchase">
+          <a class="nav-link text-white {{request()->is('purchase') || request()->segment(1) === 'purchase' ? 'active bg-gradient-primary' : ''}}" href="/purchase">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">people</i>
+              <i class="material-icons opacity-10">inventory_2</i>
             </div>
             <span class="nav-link-text ms-1">Purchase</span>
           </a>
@@ -108,29 +92,56 @@
 
 
         <li class="nav-item">
-          <a class="nav-link text-white " href="/users">
+          <a class="nav-link text-white {{request()->is('parties') || request()->segment(1) === 'parties' ? 'active bg-gradient-primary' : ''}}" href="{{url('parties')}}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">people</i>
+            </div>
+            <span class="nav-link-text ms-1">Parties</span>
+          </a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{request()->is('ledgers') || request()->is('customer-ledger') || request()->is('vendor-ledger')  || request()->segment(1) === 'ledgers'  ? 'active bg-gradient-primary' : ''}}" href="{{url('ledgers')}}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">account_balance</i>
+            </div>
+            <span class="nav-link-text ms-1">Ledgers</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{request()->is('reports') || request()->segment(1) === 'reports' ? 'active bg-gradient-primary' : ''}}" href="/users">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">bar_chart</i>
+            </div>
+            <span class="nav-link-text ms-1">Reports</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{request()->is('users') || request()->segment(1) === 'users' ? 'active bg-gradient-primary' : ''}}" href="/users">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">people</i>
             </div>
             <span class="nav-link-text ms-1">Users</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/rtl.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">format_textdirection_r_to_l</i>
-            </div>
-            <span class="nav-link-text ms-1">RTL</span>
-          </a>
+      
+       
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">System Settings</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/notifications.html">
+          <a class="nav-link text-white {{request()->is('system') || request()->segment(1) === 'system' ? 'active bg-gradient-primary' : ''}}" href="{{url('/system/configurations')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">notifications</i>
+              <i class="material-icons opacity-10">settings</i>
             </div>
-            <span class="nav-link-text ms-1">Notifications</span>
+            <span class="nav-link-text ms-1">Setting</span>
           </a>
         </li>
+       
+
         <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>
         </li>
@@ -142,27 +153,20 @@
             <span class="nav-link-text ms-1">Profile</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/sign-in.html">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">login</i>
-            </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
+       
         <li class="nav-item">
           <a class="nav-link text-white " href="../pages/sign-up.html">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">assignment</i>
+              <i class="material-icons opacity-10">logout</i>
             </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
+            <span class="nav-link-text ms-1">Sign Out</span>
           </a>
         </li>
       </ul>
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">
       <div class="mx-3">
-        <a class="btn bg-gradient-primary mt-4 w-100" href="https://www.creative-tim.com/product/material-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a>
+        <a class="btn bg-gradient-primary mt-4 w-100"  type="button">Need Help?</a>
       </div>
     </div>
   </aside>
@@ -174,7 +178,7 @@
         </main>
     </div>
     @livewireScripts
-    <footer class="footer py-4  ">
+    {{-- <footer class="footer py-4  ">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-lg-between">
             <div class="col-lg-6 mb-lg-0 mb-4">
@@ -205,7 +209,7 @@
             </div>
           </div>
         </div>
-      </footer>
+      </footer> --}}
     </div>
   </main>
   <div class="fixed-plugin">

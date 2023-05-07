@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\PurchaseReportController;
+use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\VendorLedgerController;
 use Illuminate\Support\Facades\Route;
 
@@ -107,6 +111,15 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::resource('/order','App\Http\Controllers\PurchaseOrderController');
         Route::resource('/invoice','App\Http\Controllers\PurchaseInvoiceController');
         Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
+});
+
+Route::prefix('reports')->group(function(){
+    Route::get('/', [HomeController::class , 'reports']);
+    Route::resources([
+        'sales-report' => SalesReportController::class,
+        'purchase-report' => PurchaseReportController::class,
+        'inventory-report' => InventoryReportController::class
+    ]);
 });
 Route::prefix('invoice')->group(function(){
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');

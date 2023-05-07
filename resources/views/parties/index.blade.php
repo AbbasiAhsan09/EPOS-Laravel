@@ -2,7 +2,7 @@
 @section('content')
 
 <div class="page-wrapper">
-<div class="container">
+<div class="container-fluid">
  
   <div class="row row-customized">
     <div class="col">
