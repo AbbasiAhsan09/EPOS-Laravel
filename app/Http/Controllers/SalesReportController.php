@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Parties;
+use App\Models\PartyGroups;
+use App\Models\Sales;
 use Illuminate\Http\Request;
 
 class SalesReportController extends Controller
@@ -11,9 +14,16 @@ class SalesReportController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $from = $request->start_date;
+        $to = $request->end_date;
+        $party = PartyGroups::where('group_name' , 'LIKE', 'customer%')->first();
+        $customers = Parties::where('group_id', $party->id)->get();
+        $records = Sales::orderBy('id', 'DESC')->paginate(20);
+        
+        return view('reports.sales-report.report1', compact('records', 'from', 'to', 'customers'));
+
     }
 
     /**

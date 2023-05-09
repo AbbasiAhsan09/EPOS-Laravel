@@ -19,18 +19,18 @@
                     </a>
                 </div>
                 <div class="col-lg-3">
-                    <a href="{{url('/reports/sales-report')}}" class="btn btn-block btn-primary btn-lg ">
+                    <a href="{{route('purchase-report.detail')}}" class="btn btn-block btn-primary btn-lg ">
                         Purchase Reports (Product Wise)
                     </a>
                 </div>
                 <div class="col-lg-3">
-                    <a href="{{url('/reports/inventory-report')}}" class="btn btn-block btn-primary btn-lg ">
-                        Purchase Reports (Overall)
+                    <a href="{{route('purchase-report.summary')}}" class="btn btn-block btn-primary btn-lg ">
+                        Purchase Summary (Overall)
                     </a>
                 </div>
 
                 <div class="col-lg-3">
-                    <a href="{{url('/reports/inventory-report')}}" class="btn btn-block btn-primary btn-lg ">
+                    <a href="{{url('/reports/purchase-report?filter_deleted=true')}}" class="btn btn-block btn-primary btn-lg ">
                         Purchase Reports (Deleted)
                     </a>
                 </div>
@@ -44,7 +44,7 @@
                 <h3>Sales Reports</h3>
                 <div class="row">
                     <div class="col-lg-3">
-                        <a href="{{url('/reports/purchase-report')}}" class="btn btn-block btn-primary btn-lg ">
+                        <a href="{{route('sales-report.index')}}" class="btn btn-block btn-primary btn-lg ">
                             Sales Reports
                         </a>
                     </div>

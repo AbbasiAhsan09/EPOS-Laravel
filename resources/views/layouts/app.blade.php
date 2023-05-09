@@ -32,10 +32,12 @@
   <!-- CSS Files -->
   <link id="pagestyle" href="{{asset('css/material-dashboard.css?v=3.0.4')}}" rel="stylesheet" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  @livewireStyles
 </head>
 
 <body class="g-sidenav-show  bg-gray-200">
   @include('sweetalert::alert')
+  @if (Auth::check())
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
@@ -111,7 +113,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-white {{request()->is('reports') || request()->segment(1) === 'reports' ? 'active bg-gradient-primary' : ''}}" href="/users">
+          <a class="nav-link text-white {{request()->is('reports') || request()->segment(1) === 'reports' ? 'active bg-gradient-primary' : ''}}" href="{{url('reports')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">bar_chart</i>
             </div>
@@ -170,6 +172,7 @@
       </div>
     </div>
   </aside>
+  @endif
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
     @include('includes.top_nav')
 

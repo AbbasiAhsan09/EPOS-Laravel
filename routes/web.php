@@ -21,12 +21,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 Auth::routes();
 
+Route::middleware('auth')->group(function () {
+    
+
+
+Route::get('/', function () {
+    return view('home');
+});
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //
 Route::prefix('store','App\Http\Controllers\StoresController')->group(function(){
@@ -120,6 +125,9 @@ Route::prefix('reports')->group(function(){
         'purchase-report' => PurchaseReportController::class,
         'inventory-report' => InventoryReportController::class
     ]);
+
+    Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
+    Route::get('purchase-summary-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.summary');
 });
 Route::prefix('invoice')->group(function(){
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
@@ -136,3 +144,4 @@ Route::resources([
 ]);
 
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
+});
