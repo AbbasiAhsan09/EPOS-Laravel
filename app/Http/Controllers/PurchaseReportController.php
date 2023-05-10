@@ -129,6 +129,50 @@ class PurchaseReportController extends Controller
             throw $th;
         }
     }
+
+    public function summary(Request $request)
+    {
+        try {
+            //session remove
+            session()->forget('purchase-summary-report-start-date');
+            session()->forget('purchase-summary-report-end-date');
+            session()->forget('purchase-summary-vendor');
+            $from = $request->start_date;
+            $to = $request->end_date;
+
+            $group = PartyGroups::where('group_name', 'LIKE' ,'vendor%')->first();
+            $vendors = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->get();
+            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)
+            ->when($request->has('vendor') && $request->vendor !== null, function($query) use($request){
+               session()->put('purchase-summary-vendor',  $request->vendor);
+                $query->where('id' , $request->vendor);
+            })
+            ->when(($request->has('start_date') && $request->has('end_date')) 
+            && ($request->start_date !== null && $request->end_date !== null) , function($query) use($request) {
+                $query->with(['purchases' => function($sub) use($request){
+                    session()->put('purchase-summary-report-start-date', $request->start_date);
+                    session()->put('purchase-summary-report-end-date',$request->end_date);
+                    $sub->whereBetween('created_at' , [$request->start_date , $request->end_date]);
+                }]);
+            });
+            if($request->type == 'pdf'){
+                $records = $records->get();
+                $data = [
+                    'records' => $records,
+                    'from' => $from,
+                    'to' => $to,
+                ];
+                $pdf = PDF::loadView('reports.purchase-report.pdf-report3', $data)->setPaper('a4', 'portrait');
+                return $pdf->stream();
+            }
+
+            $records = $records->paginate(10);
+            // dd($records);
+            return view('reports.purchase-report.report3', compact('records' , 'from' , 'to' , 'vendors'));
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *
