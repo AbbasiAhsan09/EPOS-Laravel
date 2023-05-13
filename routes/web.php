@@ -128,6 +128,8 @@ Route::prefix('reports')->group(function(){
 
     Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
     Route::get('purchase-summary-report', [PurchaseReportController::class, 'summary'])->name('purchase-report.summary');
+    Route::get('sales-summary-report', [SalesReportController::class, 'summary'])->name('sales-report.summary');
+    Route::get('sales-detail-report', [SalesReportController::class, 'detail'])->name('sales-report.detail');
 });
 Route::prefix('invoice')->group(function(){
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');

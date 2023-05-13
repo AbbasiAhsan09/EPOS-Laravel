@@ -8,28 +8,29 @@
         <h1 class="page-title">Sales Report <small>{{session()->get('sales_filter_deleted') ? '(Deleted)' : ''}}</small></h1>
     </div>
     <div class="col">
-        <form action="{{route('purchase-report.index')}}" method="GET">
+        <form action="{{route('sales-report.index')}}" method="GET">
             <div class="btn-grp">
          
                 <div class="row .row-customized">
                     <div class="col-lg-2">
                         <div class="input-group input-group-outline">
-                            <input type="date" name="start_date" value="{{session()->get('purchase-report-start-date')}}" class="form-control">
+                            <input type="date" name="start_date" value="{{session()->get('sales_report_start_date')}}" class="form-control">
                           </div>
                       
                     </div>
                     <div class="col-lg-2">
                         <div class="input-group input-group-outline">
-                            <input type="date" name="end_date" value="{{session()->get('purchase-report-end-date')}}" placeholder="To"  class="form-control">
+                            <input type="date" name="end_date" value="{{session()->get('sales_report_end_date')}}" placeholder="To"  class="form-control">
                           </div>
                       
                     </div>
                     <div class="col-lg-4">
                         <div class="input-group input-group-outline">
-                            <select name="vendor" class="form-control" id="">
+                            <select name="customer" class="form-control" id="">
                                 <option value="">All Customers</option>
+                                <option value="0" {{session()->get('sales_report_customer')  == '0' ? 'selected' : ''}}>Cash</option>
                                 @foreach ($customers as $customer)
-                                    <option value="{{$customer->id}}" {{session()->get('customer')  == $customer->id ? 'selected' : ''}}>{{$customer->party_name}}</option>
+                                    <option value="{{$customer->id}}" {{session()->get('sales_report_customer')  == $customer->id ? 'selected' : ''}}>{{$customer->party_name}}</option>
                                 @endforeach
                             </select>
                           </div>
@@ -45,7 +46,7 @@
                           </div>
                       
                     </div>
-                    <input type="hidden" name="filter_deleted" value="{{session()->get('filter_deleted') ? 'true' : 'false'}}">
+                    <input type="hidden" name="filter_deleted" value="{{session()->get('sales_filter_deleted') ? 'true' : 'false'}}">
                     <div class="col-lg-2">
                         <button class="btn btn-primary">Search</button>
                     </div>
@@ -134,9 +135,8 @@
 </table>
 
 
-    <div class="d-flex justify-content-center">
+   
         {!! $records->links('pagination::bootstrap-4') !!}
-    </div>
 </div>
 </div>
 

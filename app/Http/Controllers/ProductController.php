@@ -47,11 +47,15 @@ class ProductController extends Controller
 
             if($product){
                 $uom = MOU::find($request->uom);
-                $inventory = new Inventory();
-                $inventory->is_opnening_stock = true;
-                $inventory->stock_qty = $product->opening_stock * $uom->base_unit_value;
-                $inventory->item_id = $product->id;
-                $inventory->save();
+
+                $inventory = Inventory::firstOrCreate([
+                    'is_opnening_stock' => 0,
+                    'item_id' => $product->id
+                ]);
+
+                $inventory->update([
+                    'stock_qty' => ($inventory->stock_qty + ($product->opening_stock * (isset($uom->base_unit_value) ? $uom->base_unit_value : 1)))
+                ]);
             }
 
             toast('Product Added!','success');
@@ -65,12 +69,14 @@ class ProductController extends Controller
     {
         try {
             $product =  Products::find($id);
+            $oldQty = $product->opening_stock;
             $product->name = $request->product;
             $product->barcode = $request->code;
             $product->uom = $request->uom;
             $product->category = $request->category;
             $product->mrp = $request->mrp;
             $product->low_stock = $request->low_stock;
+            $product->opening_stock = $request->opening_stock;
             $product->tp = $request->tp;
             $product->taxes = $request->tax;
             $product->store_id = 1;
@@ -79,10 +85,26 @@ class ProductController extends Controller
             $product->description = $request->description;
             $product->save();
 
+            if($product){
+                $newQty = $product->opening_stock;
+                $diffQty = $newQty - $oldQty;
+                $uom = MOU::find($request->uom);
+                $inventory = Inventory::firstOrCreate([
+                    'is_opnening_stock' => 0,
+                    'item_id' => $product->id
+                ]);
+
+                $inventory->update([
+                    'stock_qty' => ($inventory->stock_qty + ($diffQty * (isset($uom->base_unit_value) ? $uom->base_unit_value : 1)))
+                ]);
+            }
+
+            
+
             toast('Product Updated!','info');
             return redirect()->back();
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
