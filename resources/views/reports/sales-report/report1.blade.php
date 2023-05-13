@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="row row-customized">
     <div class="col-lg-4">
-        <h1 class="page-title">Sales Report <small>{{session()->get('filter_deleted') ? '(Deleted)' : ''}}</small></h1>
+        <h1 class="page-title">Sales Report <small>{{session()->get('sales_filter_deleted') ? '(Deleted)' : ''}}</small></h1>
     </div>
     <div class="col">
         <form action="{{route('purchase-report.index')}}" method="GET">
