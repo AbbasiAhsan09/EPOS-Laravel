@@ -8,6 +8,7 @@ use App\Http\Controllers\InventoryReportController;
 use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\VendorLedgerController;
+use App\Models\CustomerLedger;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,11 +28,19 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     
+Route::get('logout-auth', function(){
+     Auth::logout();
+     return redirect()->route('login');
+})->name('auth.logout');
 
 
-Route::get('/', function () {
-    return view('home');
+Route::prefix('charts')->group(function(){
+    Route::get('weekly-sales', [HomeController::class,'weeklySales']);
+    Route::get('monthly-sales', [HomeController::class, 'monthlySales']);
+    Route::get('monthly-purchases', [HomeController::class, 'purchaseMonthlySales']);
 });
+
+Route::get('/',  [App\Http\Controllers\HomeController::class, 'index']);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //
 Route::prefix('store','App\Http\Controllers\StoresController')->group(function(){
@@ -131,6 +140,7 @@ Route::prefix('reports')->group(function(){
     Route::get('sales-summary-report', [SalesReportController::class, 'summary'])->name('sales-report.summary');
     Route::get('sales-detail-report', [SalesReportController::class, 'detail'])->name('sales-report.detail');
 });
+Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });

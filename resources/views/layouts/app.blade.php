@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/apple-icon.png')}}">
   <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
   <title>
-    Material Dashboard 2 by Creative Tim
+    POS | Devdox Solution
   </title>
   {{-- Custom CSS --}}
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
@@ -43,7 +43,9 @@
       <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="/" >
         <img src="{{asset("images/logo/$currenConfig->logo")}}" class="navbar-brand-img h-100" alt="main_logo">
+        @if (empty($currenConfig->logo))
         <span class="ms-1 font-weight-bold text-white">{{$currenConfig->app_title ?? ''}}</span>
+        @endif
       </a>
     </div>
     <hr class="horizontal light mt-0 mb-2">
@@ -57,12 +59,21 @@
             <span class="nav-link-text ms-1">Dashboard</span>
           </a>
         </li>
+       
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('product-category') ? 'active bg-gradient-primary' : ''}}" href="{{url('/product-category')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">table_view</i>
             </div>
             <span class="nav-link-text ms-1">Categories</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white {{request()->is('uom') ? 'active bg-gradient-primary' : ''}}" href="{{url('/uom')}}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">table_view</i>
+            </div>
+            <span class="nav-link-text ms-1">UOM</span>
           </a>
         </li>
         <li class="nav-item">
@@ -147,17 +158,17 @@
         <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>
         </li>
-        <li class="nav-item">
+        {{-- <li class="nav-item">
           <a class="nav-link text-white " href="../pages/profile.html">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">person</i>
             </div>
             <span class="nav-link-text ms-1">Profile</span>
           </a>
-        </li>
+        </li> --}}
        
         <li class="nav-item">
-          <a class="nav-link text-white " href="../pages/sign-up.html">
+          <a class="nav-link text-white " href="{{route('auth.logout')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">logout</i>
             </div>
@@ -181,39 +192,7 @@
         </main>
     </div>
     @livewireScripts
-    {{-- <footer class="footer py-4  ">
-        <div class="container-fluid">
-          <div class="row align-items-center justify-content-lg-between">
-            <div class="col-lg-6 mb-lg-0 mb-4">
-              <div class="copyright text-center text-sm text-muted text-lg-start">
-                © <script>
-                  document.write(new Date().getFullYear())
-                </script>,
-                made with <i class="fa fa-heart"></i> by
-                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
-                for a better web.
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer> --}}
-    </div>
+   </div>
   </main>
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
@@ -298,10 +277,14 @@
   <script>
     var ctx = document.getElementById("chart-bars").getContext("2d");
 
-    new Chart(ctx, {
+    $.ajax({
+      url : 'charts/weekly-sales',
+      type : 'GET',
+      success: function(res){
+        new Chart(ctx, {
       type: "bar",
       data: {
-        labels: ["M", "T", "W", "T", "F", "S", "S"],
+        labels: res.label,
         datasets: [{
           label: "Sales",
           tension: 0.4,
@@ -309,7 +292,7 @@
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: [50, 20, 10, 22, 50, 10, 40],
+          data: res.data,
           maxBarThickness: 6
         }, ],
       },
@@ -375,16 +358,23 @@
         },
       },
     });
+      }
+    })
+    
 
 
     var ctx2 = document.getElementById("chart-line").getContext("2d");
 
-    new Chart(ctx2, {
+    $.ajax({
+      url : 'charts/monthly-sales',
+      type : 'GET',
+      success : function(res){
+        new Chart(ctx2, {
       type: "line",
       data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: res.label,
         datasets: [{
-          label: "Mobile apps",
+          label: "Sales",
           tension: 0,
           borderWidth: 0,
           pointRadius: 5,
@@ -395,7 +385,7 @@
           borderWidth: 4,
           backgroundColor: "transparent",
           fill: true,
-          data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+          data: res.data,
           maxBarThickness: 6
 
         }],
@@ -459,15 +449,22 @@
         },
       },
     });
+      }
+    });
+    
 
     var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
 
-    new Chart(ctx3, {
+    $.ajax({
+      url : '/charts/monthly-purchases',
+      type : 'GET',
+      success: function(res){
+        new Chart(ctx3, {
       type: "line",
       data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: res.label,
         datasets: [{
-          label: "Mobile apps",
+          label: "Purchases",
           tension: 0,
           borderWidth: 0,
           pointRadius: 5,
@@ -477,7 +474,7 @@
           borderWidth: 4,
           backgroundColor: "transparent",
           fill: true,
-          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+          data: res.data,
           maxBarThickness: 6
 
         }],
@@ -541,6 +538,9 @@
         },
       },
     });
+      }
+    });
+  
   </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;

@@ -38,6 +38,10 @@ class CustomerLedgerController extends Controller
         return view('customer-ledger.customer-ledger', compact('items'));
     }
 
+    public function main()
+    {
+        return view('ledgers.main');
+    }
     /**
      * Show the form for creating a new resource.
      *

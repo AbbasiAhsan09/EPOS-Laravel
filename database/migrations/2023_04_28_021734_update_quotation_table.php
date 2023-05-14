@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('purchase_quotations', function (Blueprint $table) {
             $table->decimal('net_total' , 50, 2)->nullable()->change();
-            $table->dropColumn('is_base_unit');
+            // $table->dropColumn('is_base_unit');
         });
     }
 
