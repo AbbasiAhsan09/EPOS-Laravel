@@ -18,5 +18,15 @@ class SalesDetails extends Model
     {
         return $this->belongsTo(Products::class, 'item_id', 'id');
     }
+
+    /**
+     * Get the order that owns the SalesDetails
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function sale(): BelongsTo
+    {
+        return $this->belongsTo(Sales::class, 'sale_id', 'id');
+    }
     use HasFactory;
 }

@@ -251,6 +251,7 @@
                                     Paid Amount ({{env('CURRENCY')}}):
                                 </h4>
                                 <div class="input-group input-group-outline">
+                                   
                                     <input type="number" name="recieved" id="received-amount" class="form-control"  value="0" min="1" onkeypress="validationForSubmit()" >
                                 </div> 
                                 <hr>

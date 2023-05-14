@@ -1,6 +1,14 @@
 <?php
 
 use App\Http\Controllers\ConfigurationController;
+use App\Http\Controllers\CustomerLedgerController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\PurchaseReportController;
+use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\VendorLedgerController;
+use App\Models\CustomerLedger;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,12 +22,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 Auth::routes();
 
+Route::middleware('auth')->group(function () {
+    
+Route::get('logout-auth', function(){
+     Auth::logout();
+     return redirect()->route('login');
+})->name('auth.logout');
+
+
+Route::prefix('charts')->group(function(){
+    Route::get('weekly-sales', [HomeController::class,'weeklySales']);
+    Route::get('monthly-sales', [HomeController::class, 'monthlySales']);
+    Route::get('monthly-purchases', [HomeController::class, 'purchaseMonthlySales']);
+});
+
+Route::get('/',  [App\Http\Controllers\HomeController::class, 'index']);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //
 Route::prefix('store','App\Http\Controllers\StoresController')->group(function(){
@@ -90,6 +111,7 @@ Route::prefix('parties')->group(function () {
 Route::prefix('sales')->group(function () {
     Route::get('/','App\Http\Controllers\SalesController@index');
     Route::get('/add','App\Http\Controllers\SalesController@addNewOrder');
+    Route::get('/edit/{id}','App\Http\Controllers\SalesController@edit');
     Route::post('/add','App\Http\Controllers\SalesController@store')->name('add.sale');
     Route::put('/edit/{id?}','App\Http\Controllers\SalesController@update')->name('edit.sale');
     Route::delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
@@ -104,11 +126,34 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::resource('/invoice','App\Http\Controllers\PurchaseInvoiceController');
         Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
 });
+
+Route::prefix('reports')->group(function(){
+    Route::get('/', [HomeController::class , 'reports']);
+    Route::resources([
+        'sales-report' => SalesReportController::class,
+        'purchase-report' => PurchaseReportController::class,
+        'inventory-report' => InventoryReportController::class
+    ]);
+
+    Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
+    Route::get('purchase-summary-report', [PurchaseReportController::class, 'summary'])->name('purchase-report.summary');
+    Route::get('sales-summary-report', [SalesReportController::class, 'summary'])->name('sales-report.summary');
+    Route::get('sales-detail-report', [SalesReportController::class, 'detail'])->name('sales-report.detail');
+});
+Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
-    Route::get('/thermal/{id}','App\Http\Controllers\SalesController@receipt');
+    Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });
 
 
 Route::prefix('system')->group(function () {
     Route::resource('configurations', ConfigurationController::class);
+});
+ 
+Route::resources([
+    'customer-ledger' => CustomerLedgerController::class,
+    'vendor-ledger'  => VendorLedgerController::class
+]);
+
+Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
 });

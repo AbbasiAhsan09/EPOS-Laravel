@@ -20,4 +20,8 @@ class PurchaseInvoiceDetails extends Model
     {
         return $this->belongsTo(Products::class, 'item_id', 'id');
     }
+    public function invoice() : BelongsTo
+    {
+        return $this->belongsTo(PurchaseInvoice::class , 'inv_id' , 'id');
+    }
 }

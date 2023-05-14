@@ -57,9 +57,9 @@ class PurchaseQuotationController extends Controller
         ]);
 
         if($validate){
-            // dd($request->all());
             $quotation = new PurchaseQuotation();
-            $quotation->doc_num = date('d',time())."/".($request->order_tyoe == 'normal' ? 'PR' : 'SA').'/'.date('m/y',time()).'/'.PurchaseQuotation::latest()->first()->id + 1;
+            $quotation->doc_num = date('d',time())."/".($request->order_tyoe == 'normal' ? 'PR' : 'SA').'/'.date('m/y',time()).'/'.(PurchaseQuotation::latest()->first()->id? PurchaseQuotation::latest()->first()->id :  0 )+ 1;
+            // $quotation->doc_num = date('d',time())."/".($request->order_tyoe == 'normal' ? 'PR' : 'SA').'/'.date('m/y',time()).'/'. 1;
             $quotation->req_num = $request->req_num;
             $quotation->party_id = $request->party_id;
             $quotation->type = ($request->order_tyoe == 'normal' ? 'PURCHASE' : 'SALES');
@@ -78,7 +78,7 @@ class PurchaseQuotationController extends Controller
                 $discount =  $request->discount;
             }
             $quotation->save();
-// dd($request->all());
+
             if($quotation){
                 for ($i=0; $i < count($request->item_id) ; $i++) { 
                     $detail = new PurchaseQuotationDetails();
@@ -97,10 +97,10 @@ class PurchaseQuotationController extends Controller
             Alert::toast('Quotation Added!','success');
             return redirect()->back();
 
-        }else{
-
         }
-            dd($request->all());
+
+        return redirect()->back()->withInput()->withErrors($validate);
+         
        } catch (\Throwable $th) {
         throw $th;
        }

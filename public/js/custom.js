@@ -76,13 +76,13 @@ $(document).ready(function(){
                         '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
                                     '<td>'+e.name+'</td>'+
                                     '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
-                                    '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'disabled' : '')+'>'+
+                                    '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
                                     '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
                                     '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
                                     '</select>'+
                                     '</td>'+
                                     '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="0.01" class="form-control rate" value="'+e.mrp+'"></td>'+
-                                    '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+
+                                    '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty"  data-item-id="'+e.id+'" value="'+1+'"></td>'+
                                     '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
                                     '<td class="total">'+(e.mrp * 1)+'</td>'+
                                     '<td>  <i class="fa fa-trash"></i><td>'+
@@ -275,5 +275,53 @@ $(document).ready(function(){
     $('body').on('click','i.fa.fa-trash',function(){
         $(this).closest('tr').remove();
         calculateOrders();
+    });
+
+    $('body').on('change', '.uom',function(){
+        var curr = $(this);
+        var qty_ins = $(this).parent().parent().find('.pr_qty');
+        var qty = $(this).parent().parent().find('.pr_qty').val();
+      var is_base_unit =  curr.val() > 1 ? true : false;
+       var item_id = $(this).parent().parent().find('.pr_qty').attr('data-item-id');
+      
+        $.ajax({
+            url : '/check-inventory/'+item_id+'/'+(is_base_unit ? 1: 0),
+            type : 'GET',
+            success : function(res){
+                console.log(res, qty);
+                if((res * 1) < qty){
+                    swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
+                    qty_ins.val(Math.round(res));
+                    if((res *1) === 0){
+                        curr.parent().parent().closest('tr').remove();
+                        
+                    }
+                }
+            }
+        });
     })
+    
+    $('body').on('keyup', '.pr_qty',function(){
+        var curr = $(this);
+        var qty = $(this).val();
+      var is_base_unit =  curr.parent().parent().find('.uom').val() > 1 ? true : false;
+       var item_id = curr.attr('data-item-id');
+      
+        $.ajax({
+            url : '/check-inventory/'+item_id+'/'+(is_base_unit ? 1: 0),
+            type : 'GET',
+            success : function(res){
+                console.log(res, qty);
+                if((res * 1) < qty){
+                    swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
+                    curr.val(Math.round(res));
+                    if((res *1) === 0){
+                        curr.parent().parent().closest('tr').remove();
+                        
+                    }
+                }
+            }
+        });
+    })
+  
 });

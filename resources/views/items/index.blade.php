@@ -163,19 +163,19 @@
                         </select>
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <label for="">TAX % *</label>
                         <div class="input-group input-group-outline">
                             <input type="number" step="0.01" class="form-control" name="tax" required value="{{$item->taxes}}" min="0">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <label for="">MRP *</label>
                         <div class="input-group input-group-outline">
                             <input type="number" step="0.01" class="form-control" name="mrp" value="{{$item->mrp}}" required  min="0">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <label for="">Trade Price *</label>
                         <div class="input-group input-group-outline">
                             <input type="number" step="0.01" class="form-control" name="tp" value="{{$item->tp}}" required  min="0">
@@ -185,6 +185,13 @@
                         <label class="form-label">Low Stock Alert </label>
                         <div class="input-group input-group-outline">
                         <input type="number" class="form-control" name="low_stock" required value="{{$item->low_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                          </div>
+                      
+                    </div>
+                    <div class="col-lg-3">
+                        <label class="form-label">Opening Inventory </label>
+                        <div class="input-group input-group-outline">
+                        <input type="number" class="form-control" name="opening_stock" required value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>

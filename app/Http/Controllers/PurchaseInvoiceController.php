@@ -234,15 +234,41 @@ class PurchaseInvoiceController extends Controller
     
                 if($invoice && count($request->item_id)){
                         $deleteItems = PurchaseInvoiceDetails::where('inv_id' , $invoice->id)->whereNotIn('item_id' , $request->item_id);
-                        // dd($deleteItems->pluck('qty'));
+                        foreach ($deleteItems->get() as $key => $deletedItem) {
+                            // dd($deleteItems->get());
+                            $inventory = Inventory::where('item_id',$deletedItem->item_id)->where('is_opnening_stock',0)->first();
+                            // (['is_opnening_stock' => 0 ,'item_id' => $deletedItem->item_id]);
+                            // dd($inventory);
+                            $dltItemRef = Products::where('id',$deletedItem->item_id)->with('uoms')->first();
+                            // dd($dltItemRef);
+                            $dltQty = $deletedItem->is_base_unit ? $deletedItem->qty : ($deletedItem->qty * (isset($dltItemRef->uoms->base_unit_value) ? $dltItemRef->uoms->base_unit_value : 1)); 
+                            $inventory->stock_qty = $inventory->stock_qty - $dltQty;
+                            $inventory->save();
+                        }
                         $deleteItems->delete();
+                        
                         for ($i=0; $i < count($request->item_id) ; $i++) { 
+                            
+                            $item = Products::where('id',$request->item_id[$i])->with('uoms')->first();
+                            $reqQty = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? $request->qty[$i] : ($request->qty[$i] * ($item->uoms->base_unit_value ?? 1)));
                             $detail =  PurchaseInvoiceDetails::where('inv_id' , $invoice->id)->where('item_id' , $request->item_id[$i])->first();
+                            
                             if(!$detail){
+                            
                             $detail = new PurchaseInvoiceDetails();
+                            $inventory = Inventory::FirstOrCreate(['is_opnening_stock' => 0 ,'item_id' => $request->item_id[$i]]);
+                            $inventory->stock_qty = $inventory->stock_qty + $reqQty;
+                            $inventory->updated_at = time();                               
+                            $inventory->save(); 
+
+                            }else{
+                                $oldQty = ($detail->is_base_unit ? $detail->qty : ($detail->qty *  (isset($item->uoms->base_unit_value) ? $item->uoms->base_unit_value : 1)));
+                                $diffQty =  $reqQty - $oldQty;
+                                $inventory =Inventory::FirstOrCreate(['is_opnening_stock' => 0 ,'item_id' => $detail->item_id]);
+                                $inventory->stock_qty = $inventory->stock_qty + $diffQty;
+                                $inventory->updated_at = time();                               
+                                $inventory->save();
                             }
-                            $item = Products::find($detail->item_id);
-                            $diffQty = $request->qty[$i] - ($detail->is_base_unit ? ($detail->qty) : (isset($item->uoms->base_unit_value) ? ($item->uoms->base_unit_value *  $detail->qty) : $detail->qty)) ;
 
                             $detail->inv_id = $invoice->id;
                             $detail->item_id = $request->item_id[$i];
@@ -252,14 +278,10 @@ class PurchaseInvoiceController extends Controller
                             $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                             $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                             $detail->save();
-
-                            dd($diffQty);
-
                         }
-                    
                 }
 
-                Alert::toast('Invoice Created!','success');
+                Alert::toast('Invoice Updated!','info');
                 return redirect("/purchase/invoice");
             }
         } catch (\Throwable $th) {
