@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/apple-icon.png')}}">
   <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
   <title>
-    POS | Devdox Solution
+    POS | Devdox Solutiongi 
   </title>
   {{-- Custom CSS --}}
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">

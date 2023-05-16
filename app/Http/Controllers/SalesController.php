@@ -337,9 +337,11 @@ class SalesController extends Controller
     {
         try {
             $config = Configuration::latest()->first();
+            $inv_type = $config->invoice_type;
+            $template  = $config->invoice_template;
             $order = Sales::where('id', $id)->with('order_details.item_details', 'customer', 'user')->first();
-            // dd($order);
-            return view('sales.invoices.thermal', compact('order', 'config'));
+            $viewName = 'sales.invoices.'.($inv_type == 0 ? 'web.' : 'thermal.' ).$template;
+            return view($viewName, compact('order', 'config'));
         } catch (\Throwable $th) {
             throw $th;
         }

@@ -49,7 +49,7 @@
            <tr>
             <td>{{$key+1}}</td>
             <td>{{$item->brand}}</td>
-            <td>{{$item->categories->category}}</td>
+            <td>{{$item->categories->category ?? ''}}</td>
             <td>{{$item->name}}</td>
             <td>{{$item->barcode}}</td>
             <td>{{$item->uom  ? $item->uoms->uom  : 'Default' }}</td>

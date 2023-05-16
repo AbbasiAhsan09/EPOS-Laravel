@@ -55,22 +55,38 @@
                     </div>
 
                     
-
-
-
+                    <div class="col-lg-3">
+                      <label for="">Invoice Type:</label>
+                      <div class="input-group input-group-outline">
+                        <select name="invoice_type"  id="" class="form-control">
+                          <option value="1"  {{isset($currenConfig) && $currenConfig->invoice_type === 1 ? 'selected'  : '' }}>Thermal</option>
+                          <option value="0" {{isset($currenConfig) && $currenConfig->invoice_type === 0 ? 'selected'  : '' }}>Web</option>
+                        </select>
+                      </div>
+                    </div>
 
 
                     <div class="col-lg-3">
-                        <label for="">Invoice Message:</label>
+                      <label for="">Invoice Template:</label>
+                      <div class="input-group input-group-outline">
+                        <select name="invoice_template"  id="" class="form-control">
+                          <option value="invoice1"  {{isset($currenConfig) && $currenConfig->invoice_template === 'invoice1' ? 'selected'  : '' }}>Invoice 1</option>
+                          <option value="invoice2"  {{isset($currenConfig) && $currenConfig->invoice_template === 'invoice2' ? 'selected'  : '' }}>Invoice 2</option>
+                          <option value="invoice3"  {{isset($currenConfig) && $currenConfig->invoice_template === 'invoice3' ? 'selected'  : '' }}>Invoice 3</option>
+                        </select>
+                      </div>
+                    </div>
+
+
+                    <div class="col-lg-3">
+                        <label for="">Invoice Type:</label>
                     <div class="input-group input-group-outline">
                       <textarea name="inv_message"   class="form-control">{{isset($currenConfig) ? $currenConfig->invoice_message : '' }}</textarea>
                     </div>
                     </div>
 
                     
-                    <div class="col-lg-3">
-                       
-                    </div>
+                    
 
                     <div class="col-lg-3">
                          <div class="mt-3 d-flex">
@@ -108,7 +124,7 @@
                     </div>
 
 
-                    <div class="col-lg-3">
+                    <div class="col-lg-3 mt-2">
                         @if (isset($currenConfig) && $currenConfig->logo)
                             <img src="{{asset("images/logo/$currenConfig->logo")}}" alt="Not Availabe" width="130px">
                         @endif

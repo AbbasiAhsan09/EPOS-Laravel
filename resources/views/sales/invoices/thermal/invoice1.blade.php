@@ -80,7 +80,7 @@
                     {!!isset($config) ? $config->invoice_message : ''!!}
                 </div>
 
-                <p>This Software is Developed By Ahsan Abbasi | {{isset($config)  ? $config->dev_contact : ''}}</p>
+                <p>This Software is Developed By DevDox Solution | {{isset($config)  ? $config->dev_contact : ''}}</p>
             </div>
         </div>
     </div>
