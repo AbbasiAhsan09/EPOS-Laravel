@@ -128,10 +128,11 @@ class ProductController extends Controller
     {
         try {
            if($exact == 1){
-            $item = Products::where('barcode' , $param)->with('uoms')->first();
+            $item = Products::where('barcode' , $param)->with('uoms','categories.field')->first();
             return response()->json($item);
            }else{
-            $items = Products::where('name' , 'LIKE' , "$param%")->orwhere('barcode' , 'LIKE' , "$param%")->with('uoms')->get();
+            $items = Products::where('name' , 'LIKE' , "$param%")
+            ->orwhere('barcode' , 'LIKE' , "$param%")->with('uoms','categories.field')->get();
             return response()->json($items);
            }
         } catch (\Throwable $th) {

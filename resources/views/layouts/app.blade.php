@@ -61,6 +61,15 @@
         </li>
        
         <li class="nav-item">
+          <a class="nav-link text-white {{request()->is('fields') ? 'active bg-gradient-primary' : ''}}" href="{{url('/fields')}}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">table_view</i>
+            </div>
+            <span class="nav-link-text ms-1">Fields</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
           <a class="nav-link text-white {{request()->is('product-category') ? 'active bg-gradient-primary' : ''}}" href="{{url('/product-category')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">table_view</i>

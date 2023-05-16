@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -18,9 +19,9 @@ class ProductCategory extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function categories(): HasMany
+    public function field(): BelongsTo
     {
-        return $this->hasMany(ProductCategory::class, 'parent_cat', 'id');
+        return $this->BelongsTo(Fields::class, 'parent_cat', 'id');
     }
     protected $table = 'product_categories';
 }

@@ -13,7 +13,7 @@ $(document).ready(function(){
                    
                    $('#item_selection_list').append(
                    '<div class="selection_list_item" data-id="'+ element.barcode +'">'+
-                               '<h5>'+element.name+" - " + element.barcode + '</h5>'+
+                               '<h5>'+element.categories.field.name+' - '+element.categories.category+' - '+element.name+" - " + element.barcode + '</h5>'+
                                '<p>Lorem ipsum dolor sit amet.</p>'+
                            '</div>'
                    );
@@ -75,7 +75,7 @@ $(document).ready(function(){
                 success : function(e){
                         $('#cartList').append(
                             '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
-                            '<td>'+e.name+'</td>'+
+                            '<td>'+e.categories.field.name+' '+e.categories.category+' '+e.name+'</td>'+
                             '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
                             '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
                             '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    

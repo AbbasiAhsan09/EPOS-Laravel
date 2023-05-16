@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fields;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,8 @@ class ProductCategoryController extends Controller
     public function index()
     {
         $cat = ProductCategory::orderBy('id','DESC')->get();
-        return view('product_category.index',compact('cat'));
+        $fields = Fields::all();
+        return view('product_category.index',compact('cat','fields'));
     }
 
     /**
@@ -38,6 +40,7 @@ class ProductCategoryController extends Controller
     {
         $category = new ProductCategory();
         $category->category = $request->category;
+        $category->parent_cat = $request->field;
         // $category->description = $request->description;
         $category->save();
         toast('Added New Category','success');

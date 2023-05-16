@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
+use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryReportController;
@@ -145,15 +146,19 @@ Route::prefix('invoice')->group(function(){
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });
 
-
-Route::middleware('admin.role')->prefix('system')->group(function () {
+Route::middleware('manager.role')->resource('fields', FieldsController::class);
+Route::middleware('manager.role')->prefix('system')->group(function () {
     Route::resource('configurations', ConfigurationController::class);
+    
 });
+
+
  
 Route::resources([
     'customer-ledger' => CustomerLedgerController::class,
-    'vendor-ledger'  => VendorLedgerController::class
+    'vendor-ledger'  => VendorLedgerController::class,
 ]);
+
 
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
 });
