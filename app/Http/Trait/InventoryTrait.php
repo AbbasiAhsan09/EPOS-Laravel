@@ -91,5 +91,19 @@ trait InventoryTrait
         } 
 
 
+        // Deleted Items on purchase invoice 
+        public function deleteItemOnPurchaseInvoice($details)
+        {
+            if(isset($details) && count($details)){
+                foreach ($details as $key => $detail) {
+                    $dltItemRef = Products::where('id',$detail->item_id)->with('uoms')->first();
+                    $dltQty = $detail->is_base_unit ? $detail->qty : ($detail->qty * (isset($dltItemRef->uoms->base_unit_value) ? $dltItemRef->uoms->base_unit_value : 1));
+                    $item = Inventory::where('item_id', $detail->item_id)
+                    ->where('is_opnening_stock',0)->first();
+                    $item->update(['stock_qty' => $item->stock_qty - $dltQty]);
+                }
+            }
+        } 
+
 
 }

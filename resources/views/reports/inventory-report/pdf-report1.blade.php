@@ -11,6 +11,7 @@
 </h2>
 <table border="1">
     <thead>
+        <th>Field</th>
         <th>Category</th>
         <th>Product</th>
         <th>Available Stock (Base units)</th>
@@ -21,6 +22,7 @@
     <tbody>
        @foreach ($records as $key => $item)
                 <tr >
+                    <td>{{$item->field}}</td>
                     <td>{{$item->category}}</td>
                     <td>{{$item->name}}</td>
                     <td>{{(!empty($item->stock_qty) ? ($item->stock_qty) : 0).' '.$item->base_unit}}</td>

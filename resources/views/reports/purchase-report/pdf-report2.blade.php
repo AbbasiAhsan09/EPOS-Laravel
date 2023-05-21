@@ -13,6 +13,7 @@
     <thead>
         <th>Inv ID</th>
         <th>Doc #</th>
+        <th>Field</th>
         <th>Category</th>
         <th>Product</th>
         <th>Rate</th>
@@ -28,6 +29,7 @@
             <tr>
                 <td>{{$item->inv_id}}</td>
                 <td>{{$item->invoice->doc_num}}</td>
+                <td>{{$item->items->categories->field->name}}</td>
                 <td>{{$item->items->categories->category}}</td>
                 <td>{{$item->items->name}}</td>
                 <td>{{$item->rate}}</td>
@@ -40,6 +42,10 @@
             </tr>
         @endforeach
     </tbody>
+    <tfoot>
+        <th colspan="10">Total</th>
+        <th colspan="2">{{$records->sum('total')}}</th>
+    </tfoot>
 </table>
 <style>
     table{

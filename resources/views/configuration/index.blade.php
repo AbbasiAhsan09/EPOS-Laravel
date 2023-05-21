@@ -73,6 +73,7 @@
                           <option value="invoice1"  {{isset($currenConfig) && $currenConfig->invoice_template === 'invoice1' ? 'selected'  : '' }}>Invoice 1</option>
                           <option value="invoice2"  {{isset($currenConfig) && $currenConfig->invoice_template === 'invoice2' ? 'selected'  : '' }}>Invoice 2</option>
                           <option value="invoice3"  {{isset($currenConfig) && $currenConfig->invoice_template === 'invoice3' ? 'selected'  : '' }}>Invoice 3</option>
+                          {{-- <option value="invoice4"  {{isset($currenConfig) && $currenConfig->invoice_template === 'invoice4' ? 'selected'  : '' }}>Invoice 4</option> --}}
                         </select>
                       </div>
                     </div>

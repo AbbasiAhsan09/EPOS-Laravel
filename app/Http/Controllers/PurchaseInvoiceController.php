@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Trait\InventoryTrait;
 use App\Models\Inventory;
 use App\Models\Parties;
 use App\Models\Products;
@@ -14,6 +15,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class PurchaseInvoiceController extends Controller
 {
+    use InventoryTrait;
     /**
      * Display a listing of the resource.
      *
@@ -295,8 +297,21 @@ class PurchaseInvoiceController extends Controller
      * @param  \App\Models\PurchaseInvoice  $purchaseInvoice
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PurchaseInvoice $purchaseInvoice)
+    public function destroy(int $id)
     {
-        //
+        // dd('hi');
+      try {
+        $invoice = PurchaseInvoice::find($id);
+        if($invoice){
+            $details = PurchaseInvoiceDetails::where('inv_id', $invoice->id);
+            $this->deleteItemOnPurchaseInvoice($details->get());
+            $details->delete();
+            $invoice->delete();
+            Alert::toast('Purchase Invoice Deleted!', 'info');
+            return redirect()->back();
+        }
+      } catch (\Throwable $th) {
+        throw $th;
+      }
     }
 }

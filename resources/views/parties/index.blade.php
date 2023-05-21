@@ -85,9 +85,9 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
        <div class="modal-body">
-            <form action="{{route('add.party')}}" method="POST">
+            <form action="{{route('edit.party',$item->id)}}" method="POST">
                 @csrf
-                @method('post')
+                @method('put')
                 <div class="row">
                     <div class="col-lg-6">
                         <label for="">Party  Name *</label>

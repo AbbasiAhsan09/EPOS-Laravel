@@ -12,10 +12,13 @@
          
             <div class="row .row-customized">
                 <div class="col-lg-8">
-                    <div class="input-group input-group-outline">
+                    <form action="{{url('product-category')}}" method="GET">
+                      <div class="input-group input-group-outline">
                         <label class="form-label">Search</label>
-                        <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
+                        <input type="text" value="{{ session()->get('cat_filter') }}" class="form-control" name="filter"
+                         onfocus="focused(this)" onfocusout="defocused(this)">
                       </div>
+                    </form>
                   
                 </div>
                 <div class="col-lg-4">
@@ -141,6 +144,8 @@
            @endforeach
         </tbody>
     </table>
+    {{$cat->links('pagination::bootstrap-4')}}
+
 </div>
 </div>
 

@@ -191,42 +191,43 @@
       <div class="col-lg-4 col-md-6">
         <div class="card h-100">
           <div class="card-header pb-0">
-            <h6>Orders overview</h6>
-            <p class="text-sm">
+            <h6>Balance Details</h6>
+            {{-- <p class="text-sm">
               <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
               <span class="font-weight-bold">24%</span> this month
-            </p>
+            </p> --}}
           </div>
           <div class="card-body p-3">
             <div class="timeline timeline-one-side">
               <div class="timeline-block mb-3">
                 <span class="timeline-step">
-                  <i class="material-icons text-success text-gradient">notifications</i>
+                  <i class="material-icons text-warning text-gradient">sell</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
-                  <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round($saleBalance->sum('net_total') -  $saleBalance->sum('recieved'))}}</h6>
+                  <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Sales Balance (Overall Cash)</p>
                 </div>
               </div>
               <div class="timeline-block mb-3">
                 <span class="timeline-step">
-                  <i class="material-icons text-danger text-gradient">code</i>
+                  <i class="material-icons text-success text-gradient">sell</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">New order #1832412</h6>
-                  <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round($saleBalanceParties->sum('net_total') -  $saleBalanceParties->sum('recieved'))}}</h6>
+                  <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Sales Balance (Overall Parties)</p>
                 </div>
               </div>
               <div class="timeline-block mb-3">
                 <span class="timeline-step">
-                  <i class="material-icons text-info text-gradient">shopping_cart</i>
+                  <i class="material-icons text-danger text-gradient">inventory_2</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">Server payments for April</h6>
-                  <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round(($purchaseBalance->sum('net_amount') -  $purchaseBalance->sum('recieved')))}}</h6>
+                  <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Purchase Balance (Overall)</p>
                 </div>
               </div>
-              <div class="timeline-block mb-3">
+             
+              {{-- <div class="timeline-block mb-3">
                 <span class="timeline-step">
                   <i class="material-icons text-warning text-gradient">credit_card</i>
                 </span>
@@ -252,7 +253,7 @@
                   <h6 class="text-dark text-sm font-weight-bold mb-0">New order #9583120</h6>
                   <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
                 </div>
-              </div>
+              </div> --}}
             </div>
           </div>
         </div>

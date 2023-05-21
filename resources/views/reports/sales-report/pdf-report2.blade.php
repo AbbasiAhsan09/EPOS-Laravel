@@ -9,10 +9,11 @@
         @endif
     
 </h2>
-<table class="table table-sm table-responsive-sm table-striped " border="1">
+<table class="table table-sm table-responsive-sm table-striped ">
     <thead>
-        <th>Sale ID</th>
+        <th>Inv ID</th>
         <th>Doc #</th>
+        <th>Field</th>
         <th>Category</th>
         <th>Product</th>
         <th>Rate</th>
@@ -27,9 +28,14 @@
         @foreach ($records as $item)
             <tr>
                 <td>{{$item->sale_id}}</td>
-                <td>{{$item->sale->tran_no ?? ''}}</td>
-                <td>{{$item->item_details->categories->category}}</td>
-                <td>{{$item->item_details->name}}</td>
+                <td>
+                {{-- <a href="{{url('sales/edit/'.$item->sale_id)}}" class="text-primary"> --}}
+                    {{$item->sale->tran_no ?? ''}}
+                {{-- </a> --}}
+                </td>
+                <td>{{$item->item_details->categories->field->name ?? ""}}</td>
+                <td>{{$item->item_details->categories->category ?? ""}}</td>
+                <td>{{$item->item_details->name ?? ""}}</td>
                 <td>{{$item->rate}}</td>
                 <td>%{{$item->tax}}</td>
                 <td>%{{0}}</td>
@@ -39,13 +45,12 @@
                 <td>{{date('m-d-y', strtotime($item->created_at))}}</td>
             </tr>
         @endforeach
+       <tfoot>
         <tr>
-            <td colspan="7"> Total :</td>
-            <td>{{$records->sum('qty')}}</td>
-            <td></td>
-            <td>{{$records->sum('total')}}</td>
-            <td>Countr({{$records->count()}})</td>
+        <th colspan="10">Total</th>
+        <th colspan="2">{{env('CURRENCY').round($records->sum('total'))}}</th>
         </tr>
+    </tfoot>
     </tbody>
 </table>
 <style>

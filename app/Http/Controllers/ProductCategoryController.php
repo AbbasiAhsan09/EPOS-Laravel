@@ -13,9 +13,16 @@ class ProductCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cat = ProductCategory::orderBy('id','DESC')->get();
+        session()->forget('cat_filter');
+
+        $cat = ProductCategory::orderBy('id','DESC')
+        ->when($request->has('filter') && $request->filter != null ,  function($query) use ($request){
+            $query->where('category', 'LIKE', '%'.$request->filter.'%');
+            session()->put('cat_filter', $request->filter);
+        })
+        ->paginate(20)->withQueryString();
         $fields = Fields::all();
         return view('product_category.index',compact('cat','fields'));
     }

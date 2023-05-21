@@ -4,7 +4,7 @@
 <div class="page-wrapper">
 <div class="container-fluid">
   <div class="row row-customized">
-    <div class="col-lg-4">
+    <div class="col-lg-3">
         <h1 class="page-title">Sales Detail Report</h1>
     </div>
     <div class="col">
@@ -30,7 +30,9 @@
                     </div>
                    
                     {{-- Livewire Component--}}
-                    @livewire('category-product', ['selected_category' => session()->get('sales-detail-report-category') ?? null,
+                    @livewire('category-product', 
+                    ['selected_field' => session()->get('sales-detail-report-field') ?? null,
+                    'selected_category' => session()->get('sales-detail-report-category') ?? null,
                      'selected_product' => session()->get('sales-detail-report-product') ?? null]) 
                     {{-- Livewire Component--}} 
 
@@ -58,6 +60,7 @@
         <thead>
             <th>Inv ID</th>
             <th>Doc #</th>
+            <th>Field</th>
             <th>Category</th>
             <th>Product</th>
             <th>Rate</th>
@@ -73,9 +76,10 @@
                 <tr>
                     <td>{{$item->sale_id}}</td>
                     <td>
-                        <a href="{{url('sales/edit/'.$item->sale_id)}}" class="text-primary">{{$item->sale->tran_no ?? ''}}</a></td>
-                    <td>{{$item->item_details->categories->category}}</td>
-                    <td>{{$item->item_details->name}}</td>
+                    <a href="{{url('sales/edit/'.$item->sale_id)}}" class="text-primary">{{$item->sale->tran_no ?? ''}}</a></td>
+                    <td>{{$item->item_details->categories->field->name ?? ""}}</td>
+                    <td>{{$item->item_details->categories->category ?? ""}}</td>
+                    <td>{{$item->item_details->name ?? ""}}</td>
                     <td>{{$item->rate}}</td>
                     <td>%{{$item->tax}}</td>
                     <td>%{{0}}</td>
@@ -85,7 +89,12 @@
                     <td>{{date('m-d-y', strtotime($item->created_at))}}</td>
                 </tr>
             @endforeach
-           
+           <tfoot>
+            <tr>
+            <th colspan="11">Total</th>
+            <th colspan="1">{{env('CURRENCY').$records->sum('total')}}</th>
+            </tr>
+        </tfoot>
         </tbody>
     </table>
     {!! $records->links('pagination::bootstrap-4') !!}

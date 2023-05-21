@@ -56,8 +56,8 @@ class PartiesController extends Controller
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;
-            $party->country = $request->country;
-            $party->city = $request->city;
+            // $party->country = $request->country;
+            // $party->city = $request->city;
             $party->website = $request->website;
             $party->group_id = $request->group_id;
             $party->location = $request->location;
@@ -69,7 +69,7 @@ class PartiesController extends Controller
 
 
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
@@ -102,9 +102,29 @@ class PartiesController extends Controller
      * @param  \App\Models\Parties  $parties
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Parties $parties)
+    public function update(Request $request, int $id)
     {
-        //
+        try {
+            // dd($request);
+            $party =  Parties::find($id);
+            $party->party_name = $request->party_name;
+            $party->email = $request->email;
+            $party->phone = $request->phone;
+            // $party->country = $request->country;
+            // $party->city = $request->city;
+            $party->website = $request->website;
+            $party->group_id = $request->group_id;
+            $party->location = $request->location;
+            $party->save();
+
+            
+            toast('Party Updated!','info');
+            return redirect()->back();
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**

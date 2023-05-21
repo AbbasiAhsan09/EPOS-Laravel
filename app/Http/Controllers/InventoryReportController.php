@@ -21,27 +21,50 @@ class InventoryReportController extends Controller
             session()->forget('inventory_report_name');
             session()->forget('type');
             session()->forget('inventory_filterBy');
+            session()->forget('inventory-report-field');
+            session()->forget('inventory-report-category');
+            session()->forget('inventory-report-product');
             $records = Products::select(
                 '*',
                 'products.name',
                 'product_categories.category',
                 'mou.uom',
                 'mou.base_unit',
-                'mou.base_unit_value'
+                'mou.base_unit_value',
+                'fields.name as field'
             )
                 ->leftJoin('inventories', 'inventories.item_id', '=', 'products.id')
                 ->join('product_categories', 'products.category', '=', 'product_categories.id')
+                ->join('fields' , 'product_categories.parent_cat' , '=' ,'fields.id')
                 ->leftJoin('mou', 'products.uom', '=', 'mou.id')
                 ->orderBy('product_categories.category')
                 ->orderBy('products.name')
                 ->when(($request->has('name') && $request->name != null)
                     ,function ($query) use ($request) {
-                       $query->where('products.name', 'LIKE', '%'.$request->name.'%')->orWhere(function($qr) use($request){
+                       $query->where('products.name', 'LIKE', '%'.$request->name.'%')
+                       ->orWhere(function($qr) use($request){
                         $qr->where('product_categories.category', 'LIKE', '%'.$request->name.'%');
-                        session()->put('inventory_report_name', $request->name);
+                       })
+                       ->orWhere(function($qp) use($request){
+                        $qp->where('fields.name', 'LIKE', '%'.$request->name.'%');
                        });
+                       session()->put('inventory_report_name', $request->name);
                 })
-                
+                ->when($request->has('field') && $request->field != null, function($query) use ($request){
+                        $query->where('fields.id', $request->field);
+                        session()->put('inventory-report-field', $request->field);
+
+                })
+                ->when($request->has('category') && $request->category != null, function($query) use ($request){
+                    $query->where('product_categories.id', $request->category);
+                    session()->put('inventory-report-category', $request->category);
+
+                })
+                ->when($request->has('product') && $request->product != null, function($query) use ($request){
+                    $query->where('products.id', $request->product);
+                    session()->put('inventory-report-product', $request->product);
+
+                })
                 ->when($request->has('filterBy') && $request->filterBy == 'lowStock', function($query) use($request){
                     $query->where('inventories.stock_qty', '=<', DB::raw('products.low_stock * mou.base_unit_value'));
                     session()->put('inventory_filterBy', true);

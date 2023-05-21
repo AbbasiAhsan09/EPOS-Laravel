@@ -28,11 +28,14 @@ class HomeController extends Controller
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
+        $saleBalance = Sales::select('net_total','recieved')->where('customer_id',0)->get();
+        $saleBalanceParties = Sales::select('net_total','recieved')->where('customer_id','!=',0)->get();
+        $purchaseBalance = PurchaseInvoice::select('net_amount','recieved',)->get();
 
         $sales = Sales::whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)
             ->orderBy('id', 'DESC')->get();
         $purchases = PurchaseInvoice::whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)->get();
-        return view('home', compact('sales', 'purchases'));
+        return view('home', compact('sales', 'purchases','saleBalance', 'purchaseBalance','saleBalanceParties'));
     }
 
     public function reports()
@@ -95,7 +98,7 @@ class HomeController extends Controller
     public function purchaseMonthlySales()
     {
         $currentYear = Carbon::now()->year;
-
+        
         $records = PurchaseInvoice::selectRaw('DATE(created_at) as date, SUM(net_amount) as total')
             ->whereYear('created_at', $currentYear)
             ->groupBy('date')

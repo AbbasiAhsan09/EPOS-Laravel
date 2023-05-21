@@ -13,7 +13,7 @@ $(document).ready(function(){
                    $('#item_selection_list').append(
                    '<div class="selection_list_item" data-id="'+element.barcode+'">'+
                                '<h5>'+element.categories.field.name+' - '+element.categories.category+' - '+element.name+" - " + element.barcode + '</h5>'+
-                               '<p>Lorem ipsum dolor sit amet.</p>'+
+                            //    '<p>Lorem ipsum dolor sit amet.</p>'+
                            '</div>'
                    );
                });

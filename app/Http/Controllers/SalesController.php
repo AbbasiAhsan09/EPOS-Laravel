@@ -306,8 +306,11 @@ class SalesController extends Controller
             $sale = Sales::find($id);
             if($sale){
                 if($sale->delete()){
-                     SalesDetails::where('sale_id' , $id)->delete();
-                        Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
+                     $details = SalesDetails::where('sale_id' , $id);
+                     $this->deletedItemsOnOrderUpdate($details->get());
+                     $details->delete();
+                    
+                     Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
                         return redirect('/sales');
                     
                 }

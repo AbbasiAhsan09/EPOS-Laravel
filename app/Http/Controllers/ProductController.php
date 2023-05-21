@@ -14,11 +14,17 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        session()->forget('filter');
         $uom = MOU::all();
         $categories = ProductCategory::all();
-        $items = Products::with('categories')->with('uoms')->paginate(20);
+        $items = Products::with('categories','uoms')
+        ->when($request->has('filter') && $request->filter != null ,  function($query) use ($request){
+            $query->where('name', 'LIKE', '%'.$request->filter.'%');
+            session()->put('filter', $request->filter);
+        })
+        ->paginate(20)->withQueryString();
         // dd($items);
         // dd($items);
         $arrt = ProductArrtributes::all();
@@ -131,8 +137,15 @@ class ProductController extends Controller
             $item = Products::where('barcode' , $param)->with('uoms','categories.field')->first();
             return response()->json($item);
            }else{
-            $items = Products::where('name' , 'LIKE' , "$param%")
-            ->orwhere('barcode' , 'LIKE' , "$param%")->with('uoms','categories.field')->get();
+            $items = Products::where('name' , 'LIKE' , "%$param%")
+            ->orwhere('barcode' , 'LIKE' , "$param%")->with('uoms','categories.field')
+            ->orWhereHas('categories', function($query) use($param){
+                $query->where('category','LIKE', "%$param%");
+            })
+            ->orWhereHas('categories.field', function($query) use($param){
+                $query->where('name','LIKE', "%$param%");
+            })
+            ->get();
             return response()->json($items);
            }
         } catch (\Throwable $th) {

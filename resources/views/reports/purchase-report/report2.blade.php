@@ -4,7 +4,7 @@
 <div class="page-wrapper">
 <div class="container-fluid">
   <div class="row row-customized">
-    <div class="col-lg-4">
+    <div class="col-lg-3">
         <h1 class="page-title">Purchase Detail Report</h1>
     </div>
     <div class="col">
@@ -30,7 +30,9 @@
                     </div>
                    
                     {{-- Livewire Component--}}
-                    @livewire('category-product', ['selected_category' => session()->get('purchase-detail-report-category') ?? null,
+                    @livewire('category-product', 
+                    ['selected_field' => session()->get('purchase-detail-report-field') ?? null,
+                    'selected_category' => session()->get('purchase-detail-report-category') ?? null,
                      'selected_product' => session()->get('purchase-detail-report-product') ?? null]) 
                     {{-- Livewire Component--}} 
 
@@ -58,6 +60,7 @@
         <thead>
             <th>Inv ID</th>
             <th>Doc #</th>
+            <th>Field</th>
             <th>Category</th>
             <th>Product</th>
             <th>Rate</th>
@@ -74,8 +77,9 @@
                     <td>{{$item->inv_id}}</td>
                     <td>
                         <a href="{{url('purchase/invoice/'.$item->inv_id.'/edit')}}" class="text-primary">{{$item->invoice->doc_num}}</a></td>
-                    <td>{{$item->items->categories->category}}</td>
-                    <td>{{$item->items->name}}</td>
+                    <td>{{$item->items->categories->field->name ?? ""}}</td>
+                    <td>{{$item->items->categories->category ?? ""}}</td>
+                    <td>{{$item->items->name ?? ""}}</td>
                     <td>{{$item->rate}}</td>
                     <td>%{{$item->tax}}</td>
                     <td>%{{0}}</td>
@@ -85,11 +89,14 @@
                     <td>{{date('m-d-y', strtotime($item->created_at))}}</td>
                 </tr>
             @endforeach
+        
         </tbody>
+        <tfoot>
+            <th colspan="10">Total</th>
+            <th colspan="2">{{$records->sum('total')}}</th>
+        </tfoot>
     </table>
-    <div class="d-flex justify-content-center">
-      
-    </div>
+    {!! $records->links('pagination::bootstrap-4') !!}
 </div>
 </div>
 
