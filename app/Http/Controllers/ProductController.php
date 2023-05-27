@@ -137,8 +137,11 @@ class ProductController extends Controller
             $item = Products::where('barcode' , $param)->with('uoms','categories.field')->first();
             return response()->json($item);
            }else{
-            $items = Products::where('name' , 'LIKE' , "%$param%")
-            ->orwhere('barcode' , 'LIKE' , "$param%")->with('uoms','categories.field')
+            $items = Products::where(function($qyer) use($param){
+                $qyer->where('name' , 'LIKE' , "%$param%")
+                ->orWhere('brand', 'LIKE' , "%$param%");
+            })
+            ->with('uoms','categories.field')
             ->orWhereHas('categories', function($query) use($param){
                 $query->where('category','LIKE', "%$param%");
             })
