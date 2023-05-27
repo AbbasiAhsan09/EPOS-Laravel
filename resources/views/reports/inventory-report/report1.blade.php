@@ -62,6 +62,7 @@
         <th>Available Stock (Units)</th>
         <th>Base Unit Value</th>
         <th>Stock Alert</th>
+        
     </thead>
     <tbody>
        @foreach ($records as $key => $item)

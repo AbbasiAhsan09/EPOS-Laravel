@@ -82,6 +82,7 @@ class PurchaseOrderController extends Controller
                         $detail->po_id = $order->id;
                         $detail->item_id = $request->item_id[$i];
                         $detail->rate = $request->rate[$i];
+                        $detail->mrp = $request->mrp[$i];
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];
                         $detail->status = 1;
@@ -180,6 +181,7 @@ class PurchaseOrderController extends Controller
                         }
                         $detail->po_id = $order->id;
                         $detail->item_id = $request->item_id[$i];
+                        $detail->mrp = $request->mrp[$i];
                         $detail->rate = $request->rate[$i];
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];

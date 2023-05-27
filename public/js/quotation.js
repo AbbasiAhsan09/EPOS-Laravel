@@ -82,7 +82,8 @@ $(document).ready(function(){
                             '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
                             '</select>'+
                             '</td>'+
-                            '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+e.mrp+'"></td>'+
+                            '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+e.tp+'"></td>'+
+                            '<td><input name="mrp[]" type="number" step="0.01" placeholder="MRP" min="1" class="form-control mrp" value="'+e.mrp+'"></td>'+
                             '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+
                             '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
                             '<td class="total">'+(e.mrp * 1)+'</td>'+

@@ -73,7 +73,7 @@ class HomeController extends Controller
        
         $currentYear = Carbon::now()->year;
 
-        $records = Sales::selectRaw('DATE(created_at) as date, SUM(net_total) as total')
+        $records = Sales::selectRaw('MONTH(created_at) as date, SUM(net_total) as total')
             ->whereYear('created_at', $currentYear)
             ->groupBy('date')
             ->get();
@@ -82,7 +82,8 @@ class HomeController extends Controller
         $data = [];
 
         foreach ($records as  $record) {
-            array_push($label, date('M',strtotime($record->date)));
+         
+            array_push($label, Carbon::create()->day(1)->month($record->date)->format('F'));
             array_push($data, round($record->total));
         }
 
@@ -99,7 +100,7 @@ class HomeController extends Controller
     {
         $currentYear = Carbon::now()->year;
         
-        $records = PurchaseInvoice::selectRaw('DATE(created_at) as date, SUM(net_amount) as total')
+        $records = PurchaseInvoice::selectRaw('MONTH(created_at) as date, SUM(net_amount) as total')
             ->whereYear('created_at', $currentYear)
             ->groupBy('date')
             ->get();
@@ -108,7 +109,7 @@ class HomeController extends Controller
         $data = [];
 
         foreach ($records as  $record) {
-            array_push($label, date('M',strtotime($record->date)));
+            array_push($label, Carbon::create()->day(1)->month($record->date)->format('F'));
             array_push($data, round($record->total));
         }
 

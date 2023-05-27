@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/apple-icon.png')}}">
   <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
   <title>
-    {{$currenConfig->app_title ?? "POS"}} | Devdox Solution 
+    POS | Devdox Solution 
   </title>
   {{-- Custom CSS --}}
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
@@ -26,12 +26,12 @@
   <link href="{{asset('css/nucleo-icons.css')}}" rel="stylesheet" />
   <link href="{{asset('css/nucleo-svg.css')}}" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <script src="{{ asset('fontawesome/js/all.js') }}" ></script>
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <!-- CSS Files -->
   <link id="pagestyle" href="{{asset('css/material-dashboard.css?v=3.0.4')}}" rel="stylesheet" />
-  <script src="{{asset('js/jquery.min.js')}}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
   @livewireStyles
 </head>
 

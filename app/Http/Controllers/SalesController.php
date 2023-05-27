@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Trait\InventoryTrait;
+use App\Http\Trait\TransactionsTrait;
 use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PartyGroups;
@@ -15,7 +16,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class SalesController extends Controller
 {
-    use InventoryTrait;
+    use InventoryTrait ,TransactionsTrait;
     /**
      * Display a listing of the resource.
      *
@@ -118,6 +119,9 @@ class SalesController extends Controller
                 $order->user_id = Auth::user()->id;
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
                 $order->save();
+
+                $this->createOrderTransactionHistory($order->id,$order->customer_id,$order->recieved,date('Y-m-d'),'recieved');
+
                 if ($order && count($request->item_id)) {
                     for ($i = 0; $i < count($request->item_id); $i++) {
                         $details = new SalesDetails();
@@ -225,9 +229,12 @@ class SalesController extends Controller
 
             if ($validate) {
                 $order  =  Sales::find($id);
+                
                 if (!$order) {
                     return redirect()->back()->withErrors('error', 'Invalid Request');
                 }
+                $old_amount = $order->recieved;
+                // dd($old_amount,);
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
                 $order->other_charges = $request->other_charges;
@@ -246,8 +253,14 @@ class SalesController extends Controller
                 $order->user_id = Auth::user()->id;
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
                 $order->save();
+                
+
                 if ($order && count($request->item_id)) {
                     $deleteItems = SalesDetails::where('sale_id', $id)->whereNotIn('item_id', $request->item_id);
+                    if(count($deleteItems->get())){
+                        $transaction_description = (count($deleteItems->get()) ? 'Return Items in order'.$deleteItems->get()->pluck('item_details.name') : '');
+                    }
+                    $this->updateOrderTransaction($order->id,($order->customer_id ?? 0),$old_amount,$order->recieved,isset($transaction_description) ? $transaction_description :'');
                    if($this->allowInventoryCheck){
                     $this->deletedItemsOnOrderUpdate($deleteItems->get());
                    }
@@ -305,7 +318,9 @@ class SalesController extends Controller
         try {
             $sale = Sales::find($id);
             if($sale){
+                $this->updateOrderTransaction($sale->id,$sale->customer_id,$sale->recieved,0,'Deleted Order '.$sale->tran_no);
                 if($sale->delete()){
+                    
                      $details = SalesDetails::where('sale_id' , $id);
                      $this->deletedItemsOnOrderUpdate($details->get());
                      $details->delete();

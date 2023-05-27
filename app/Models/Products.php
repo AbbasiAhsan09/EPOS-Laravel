@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Products extends Model
 {
+    protected $fillable = ['mrp','tp','taxes','discount'];
      /**
      * Get the user that owns the ProductCategory
      *

@@ -66,6 +66,7 @@
                                 @if ($item->deleted_at === null)
                                 {{-- <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li> --}}
                                 <li><a class="dropdown-item" href="{{url("/purchase/invoice/$item->id/edit")}}"><i class="fa fa-edit"></i> Edit</a></li>
+                                <li><a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#paymentHistory{{$item->id}}"><i class="fa fa-dollar"></i> Transaction History</a></li>
                                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>
                                 @endif
                             </ul>
@@ -111,6 +112,35 @@
       </div>
   
       {{--Delete Modal --}}
+
+
+                      
+    {{--  paymentHistory Modal  --}}
+    
+    <div class="modal fade" id="paymentHistory{{$item->id}}" tabindex="-1" aria-labelledby="paymentHistory" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="paymentHistory">Transaction History: {{$item->doc_num}}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               @if (isset($item->transactions ) && count($item->transactions ))
+               <ul>
+                @foreach ($item->transactions as $transaction)
+                <li>{{$item->doc_num}} | {{date('m-d-y',strtotime($transaction->created_at))}} | {{env('CURRENCY').$transaction->amount}}</li>
+                @endforeach
+                </ul>
+            @else
+            <h6>There is no transaction currently for {{$item->doc_num}}.</h6>
+            @endif
+            </div>
+           
+          </div>
+        </div>
+      </div>
+  
+      {{--paymentHistory Modal --}}
 
             @endforeach
         </tbody>

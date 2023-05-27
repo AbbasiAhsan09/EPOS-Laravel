@@ -106,4 +106,30 @@ trait InventoryTrait
         } 
 
 
+        // Update Product Prices
+        public function updateProductPrice(int $item_id, int $sell, int $purchase, bool $is_base_unit = false)
+        {
+            try {
+                $item = Products::find($item_id);
+                    $tp = ($is_base_unit ? (isset($item->uoms->base_unit_value) && $item->uoms->base_unit_value ? $purchase * $item->uoms->base_unit_value : $purchase ) : $purchase );            
+                    $mrp = ($is_base_unit ? (isset($item->uoms->base_unit_value) && $item->uoms->base_unit_value ? $sell * $item->uoms->base_unit_value : $sell ) : $sell );            
+                if($item){
+
+                    $item->update([
+                        'mrp' => $mrp,
+                        'tp' => $tp
+                    ]);
+                    
+
+                    return true;
+                }
+
+                return false;
+
+            } catch (\Throwable $th) {
+                throw $th;
+            }
+        }
+
+
 }

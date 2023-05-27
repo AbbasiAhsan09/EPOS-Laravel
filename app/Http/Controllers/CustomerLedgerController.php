@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Trait\TransactionsTrait;
 use App\Models\CustomerLedger;
 use App\Models\Parties;
 use App\Models\PartyGroups;
@@ -12,6 +13,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class CustomerLedgerController extends Controller
 {
+    use TransactionsTrait;
     /**
      * Display a listing of the resource.
      *
@@ -123,9 +125,11 @@ class CustomerLedgerController extends Controller
                     if($amount >= $balance){
                         if($order->update(['recieved' =>$order->recieved + $balance , 'updated_at' => strtotime($request->date)])){
                             $amount = $amount - $balance;
+                            $this->createOrderTransactionHistory($order->id,$order->customer_id,$balance,$request->date,'recieved');
                         }
                     }else{
                         if($order->update(['recieved' =>$order->recieved + $amount, 'updated_at' => strtotime($request->date)])){
+                            $this->createOrderTransactionHistory($order->id,$order->customer_id,$amount,$request->date,'recieved');
                             $amount = 0;
                             break;
                         } 

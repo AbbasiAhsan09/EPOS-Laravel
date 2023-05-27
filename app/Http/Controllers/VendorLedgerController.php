@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Trait\TransactionsTrait;
 use App\Models\Parties;
 use App\Models\PartyGroups;
 use App\Models\PurchaseInvoice;
@@ -9,11 +10,13 @@ use App\Models\VendorLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+// use Symfony\Contracts\Translation\TranslatorTrait;
 
 use function PHPUnit\Framework\isNull;
 
 class VendorLedgerController extends Controller
 {
+    use TransactionsTrait;
     /**
      * Display a listing of the resource.
      *
@@ -126,9 +129,12 @@ class VendorLedgerController extends Controller
                     if($amount >= $balance){
                         if($invoice->update(['recieved' =>$invoice->recieved + $balance , 'updated_at' => strtotime($request->date)])){
                             $amount = $amount - $balance;
+                            // $this->create;
+                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$balance,$request->date,'paid');
                         }
                     }else{
                         if($invoice->update(['recieved' =>$invoice->recieved + $amount, 'updated_at' => strtotime($request->date)])){
+                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$amount,$request->date,'paid');
                             $amount = 0;
                             break;
                         } 

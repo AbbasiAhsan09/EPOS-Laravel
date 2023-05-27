@@ -39,6 +39,7 @@
                                     <th>Description</th>
                                     <th>UOM</th>
                                     <th>Rate</th>
+                                    <th>MRP</th>
                                     <th>Qty</th>
                                     <th>Tax</th>
                                     <th>Total</th>
@@ -64,6 +65,8 @@
                                             </td>
                                            <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                    min="1" class="form-control rate" value="{{$item->rate}}"></td>
+                                            <td><input name="mrp[]" type="number" step="0.01" placeholder="MRP"
+                                                    min="1" class="form-control mrp" value="{{$item->mrp}}"></td>
                                            <td><input name="qty[]" type="number" step="0.01" placeholder="Qty"
                                                    min="1" class="form-control pr_qty" value="{{$item->qty}}"></td>
                                            <td><input name="tax[]" type="number" step="0.01" placeholder="Tax"

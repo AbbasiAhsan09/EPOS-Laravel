@@ -27,6 +27,7 @@ class InventoryReportController extends Controller
             $records = Products::select(
                 '*',
                 'products.name',
+                'products.tp',
                 'product_categories.category',
                 'mou.uom',
                 'mou.base_unit',
