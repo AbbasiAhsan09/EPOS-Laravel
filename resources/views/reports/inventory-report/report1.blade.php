@@ -62,7 +62,11 @@
         <th>Available Stock (Units)</th>
         <th>Base Unit Value</th>
         <th>Stock Alert</th>
-        
+        <th>TP</th>
+        <th>Available Cost</th>
+        @php
+            $total = 0;
+        @endphp
     </thead>
     <tbody>
        @foreach ($records as $key => $item)
@@ -74,8 +78,14 @@
                     <td>{{(!empty($item->stock_qty) ? (round($item->stock_qty / (($item->base_unit_value) ?? 1))) : 0).' '.$item->uom}}</td>
                     <td>{{($item->uom) ? '1 '.($item->uom).' = '.$item->base_unit_value.' '.$item->base_unit : ''}}</td>
                     <td>{{$item->low_stock}}</td>
+                    <td>{{$item->tp ?? "0"}}</td>
+                    @php
+                        $total += (!empty($item->stock_qty) ? (round($item->stock_qty / (($item->base_unit_value) ?? 1))) : 0) * ($item->tp ?? 0);
+                    @endphp
+                    <td>{{ env('CURRENCY').(!empty($item->stock_qty) ? (round($item->stock_qty / (($item->base_unit_value) ?? 1))) : 0) * ($item->tp ?? 0)}}</td>
                 </tr>
                 @endforeach
+                
     </tbody>   
 </table>
 

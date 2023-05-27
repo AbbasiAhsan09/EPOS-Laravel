@@ -48,7 +48,7 @@ class Sales extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function transaction(): HasMany
+    public function transactions(): HasMany
     {
         return $this->hasMany(OrderTransactions::class, 'order_id', 'id');
     }
