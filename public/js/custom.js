@@ -1,9 +1,13 @@
 // Orders JS
 $(document).ready(function(){
     var total_amount = 0;
+
+    function redirectTosearchItemValue(){
+        $('#searchItemValue').focus();
+    }
     // Resting Item List 
     function removeItemsFromList(){
-        $('#item_selection_list > div').remove();
+        $('#item_selection_list > button').remove();
     }
 
     function addItemInList(array){
@@ -11,10 +15,11 @@ $(document).ready(function(){
         array.forEach(element => {
                    
                    $('#item_selection_list').append(
-                   '<div class="selection_list_item" data-id="'+element.barcode+'">'+
+                    
+                   '<button class="selection_list_item" data-id="'+element.barcode+'" >'+
                                '<h5>'+element.categories.field.name+' - '+element.categories.category+' - '+element.name+" - " + element.barcode + '</h5>'+
                             //    '<p>Lorem ipsum dolor sit amet.</p>'+
-                           '</div>'
+                           '</button>'
                    );
                });
     }
@@ -23,6 +28,8 @@ $(document).ready(function(){
         // console.log('working');
         var value = $(this).attr('data-id');
         addToCart(value);
+        removeItemsFromList();
+        redirectTosearchItemValue();
     })
 
     // Adding Product in Order Cart
@@ -138,7 +145,6 @@ $(document).ready(function(){
     // Caling Ajax Query for getting products
     $('#searchItemValue').keyup(function(e){
         var value = $('#searchItemValue').val();
-        console.log(value);
         removeItemsFromList();
        if(e.which == 40){
         $.ajax({
