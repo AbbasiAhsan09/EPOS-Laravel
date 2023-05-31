@@ -1,7 +1,7 @@
 // Orders JS
 $(document).ready(function(){
     var total_amount = 0;
-
+   
     function redirectTosearchItemValue(){
         $('#searchItemValue').focus();
     }

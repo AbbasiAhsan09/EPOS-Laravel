@@ -26,7 +26,7 @@
   <link href="{{asset('css/nucleo-icons.css')}}" rel="stylesheet" />
   <link href="{{asset('css/nucleo-svg.css')}}" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="{{asset('fontawesome-free-6.4.0-web/css/all.cssgit g')}}">
+  <link rel="stylesheet" href="{{asset('fontawesome-free-6.4.0-web/css/all.css')}}">
   {{-- <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> --}}
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -557,6 +557,15 @@
  @yield('scripts')
  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+ <script>
+   $(document).on('keydown', function(event) {
+        if (event.key === '/') {
+          setTimeout(() => {
+            $('#searchItemValue').focus();
+          }, 500);
+        }
+      });
+ </script>
 </body>
 
 </html>
