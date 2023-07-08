@@ -46,4 +46,14 @@ class PurchaseInvoice extends Model
     {
         return $this->hasMany(PurchaseInvoiceDetails::class, 'inv_id' , 'id');
     }
+
+    /**
+     * Get all of the transactions for the PurchaseInvoice
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(PurchaseTransactions::class, 'p_inv_id', 'id');
+    }
 }

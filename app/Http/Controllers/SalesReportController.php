@@ -64,6 +64,7 @@ class SalesReportController extends Controller
             session()->forget('sales-detail-report-start-date');
             session()->forget('sales-detail-report-end-date');
             session()->forget('sales-detail-report-category');
+            session()->forget('sales-detail-report-field');
             session()->forget('sales-detail-report-product');
             $products = Products::orderBy('name', 'ASC')->get();
 
@@ -74,9 +75,26 @@ class SalesReportController extends Controller
                 session()->put('sales-detail-report-start-date', $request->start_date);
                 session()->put('sales-detail-report-end-date', $request->end_date);
                 $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
-            })->when($request->has('product') && $request->product != null, function ($query) use ($request) {
+            })
+            ->when($request->has('field') && $request->field != null,function($query) use($request){
+                $query->whereHas('item_details.categories',  function($q) use($request){
+                    $q->where('parent_cat', $request->field);
+                    session()->put('sales-detail-report-field',$request->field  );
+
+                });
+            })
+            ->when($request->has('category') && $request->category != null,function($query) use($request){
+                $query->whereHas('item_details',  function($q) use($request){
+                    $q->where('category', $request->category);
+                    session()->put('sales-detail-report-category',$request->category);
+
+                });
+            })
+            ->when($request->has('product') && $request->product != null, function ($query) use ($request) {
                 session()->put('sales-detail-report-product', $request->product);
                 $query->where('item_id', $request->product);
+                session()->put('sales-detail-report-product',$request->product);
+
             });
 
             // dd($records->get());

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fields;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 
@@ -12,10 +13,18 @@ class ProductCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cat = ProductCategory::orderBy('id','DESC')->get();
-        return view('product_category.index',compact('cat'));
+        session()->forget('cat_filter');
+
+        $cat = ProductCategory::orderBy('id','DESC')
+        ->when($request->has('filter') && $request->filter != null ,  function($query) use ($request){
+            $query->where('category', 'LIKE', '%'.$request->filter.'%');
+            session()->put('cat_filter', $request->filter);
+        })
+        ->paginate(20)->withQueryString();
+        $fields = Fields::all();
+        return view('product_category.index',compact('cat','fields'));
     }
 
     /**
@@ -38,6 +47,7 @@ class ProductCategoryController extends Controller
     {
         $category = new ProductCategory();
         $category->category = $request->category;
+        $category->parent_cat = $request->field;
         // $category->description = $request->description;
         $category->save();
         toast('Added New Category','success');

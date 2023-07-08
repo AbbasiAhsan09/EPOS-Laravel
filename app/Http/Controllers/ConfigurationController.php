@@ -48,10 +48,6 @@ class ConfigurationController extends Controller
             ]);
 
             if($validate){
-
-               
-
-
                 $config = Configuration::latest()->first();
                 $config->app_title  = $request->business;
                 if($request->file('logo')){
@@ -66,6 +62,9 @@ class ConfigurationController extends Controller
                 $config->invoice_message = $request->inv_message;
                 $config->ntn = $request->ntn;
                 $config->ptn = $request->ptn;
+                $config->invoice_type = $request->invoice_type;
+                $config->invoice_template = $request->invoice_template;
+                $config->search_filter = $request->search_filter;
                 $config->show_ntn = ($request->has('show_ntn') ? $request->show_ntn : false);
                 $config->show_ptn = ($request->has('show_ptn') ? $request->show_ptn : false);
                 $config->mutltiple_sales_order = ($request->has('is_multi_order') ? $request->is_multi_order : false);

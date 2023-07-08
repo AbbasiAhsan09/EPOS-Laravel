@@ -14,15 +14,20 @@
                         <div class="new_order_item_selection">
                         <div class="item_selection_wrapper">
                             
-                                <div class="input-group input-group-outline">
-                                    <label class="form-label">Search</label>
-                                    <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" id="searchItemValue">
-                                </div> 
-                                <div class="item_selection">
-                                <div class="item_selection_list" id="item_selection_list">
-                                   {{-- Getting List From Ajax --}}
-                                </div>
+                            @if (isset($config) && $config->search_filter  == 'type')
+                            <div class="input-group input-group-outline">
+                                <label class="form-label">Search</label>
+                                <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" id="searchItemValue">
+                            </div> 
+                            <div class="item_selection">
+                            <div class="item_selection_list" id="item_selection_list">
+                               {{-- Getting List From Ajax --}}
                             </div>
+                            </div>
+                            @else
+                            @livewire('category-product-component-for-order-search',['col' => 12] )
+
+                            @endif
                            </div>
                            {{-- Form start --}}
                         @if (isset($order))
@@ -34,7 +39,8 @@
                                 <thead>
                                     <th>Description</th>
                                     <th>UOM</th>
-                                    <th>Rate</th>
+                                    <th>TP</th>
+                                    <th>MRP</th>
                                     <th>Qty</th>
                                     <th>Tax</th>
                                     <th>Total</th>
@@ -58,8 +64,10 @@
                                             </select>
                                             @endif
                                             </td>
-                                           <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
-                                                   min="1" class="form-control rate" value="{{$item->rate}}"></td>
+                                            <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
+                                                min="1" class="form-control rate" value="{{$item->rate}}"></td>
+                                                <td><input name="mrp[]" type="number" step="0.01" placeholder="Rate"
+                                                    min="1" class="form-control mrp" value="{{$item->mrp}}" required></td>
                                            <td><input name="qty[]" type="number" step="0.01" placeholder="Qty"
                                                    min="1" class="form-control pr_qty" value="{{$item->qty}}"></td>
                                            <td><input name="tax[]" type="number" step="0.01" placeholder="Tax"
@@ -252,7 +260,7 @@
                                 </h4>
                                 <div class="input-group input-group-outline">
                                    
-                                    <input type="number" name="recieved" id="received-amount" class="form-control"  value="0" min="1" onkeypress="validationForSubmit()" >
+                                    <input type="number" name="recieved" id="received-amount" class="form-control"  value="0"  onkeypress="validationForSubmit()" >
                                 </div> 
                                 <hr>
                                 <div class="row row-customized">

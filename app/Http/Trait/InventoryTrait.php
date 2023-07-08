@@ -91,5 +91,45 @@ trait InventoryTrait
         } 
 
 
+        // Deleted Items on purchase invoice 
+        public function deleteItemOnPurchaseInvoice($details)
+        {
+            if(isset($details) && count($details)){
+                foreach ($details as $key => $detail) {
+                    $dltItemRef = Products::where('id',$detail->item_id)->with('uoms')->first();
+                    $dltQty = $detail->is_base_unit ? $detail->qty : ($detail->qty * (isset($dltItemRef->uoms->base_unit_value) ? $dltItemRef->uoms->base_unit_value : 1));
+                    $item = Inventory::where('item_id', $detail->item_id)
+                    ->where('is_opnening_stock',0)->first();
+                    $item->update(['stock_qty' => $item->stock_qty - $dltQty]);
+                }
+            }
+        } 
+
+
+        // Update Product Prices
+        public function updateProductPrice(int $item_id, int $sell, int $purchase, bool $is_base_unit = false)
+        {
+            try {
+                $item = Products::find($item_id);
+                    $tp = ($is_base_unit ? (isset($item->uoms->base_unit_value) && $item->uoms->base_unit_value ? $purchase * $item->uoms->base_unit_value : $purchase ) : $purchase );            
+                    $mrp = ($is_base_unit ? (isset($item->uoms->base_unit_value) && $item->uoms->base_unit_value ? $sell * $item->uoms->base_unit_value : $sell ) : $sell );            
+                if($item){
+
+                    $item->update([
+                        'mrp' => $mrp,
+                        'tp' => $tp
+                    ]);
+                    
+
+                    return true;
+                }
+
+                return false;
+
+            } catch (\Throwable $th) {
+                throw $th;
+            }
+        }
+
 
 }

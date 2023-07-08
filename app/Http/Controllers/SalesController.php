@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Trait\InventoryTrait;
+use App\Http\Trait\TransactionsTrait;
 use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PartyGroups;
@@ -15,7 +16,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class SalesController extends Controller
 {
-    use InventoryTrait;
+    use InventoryTrait ,TransactionsTrait;
     /**
      * Display a listing of the resource.
      *
@@ -118,6 +119,9 @@ class SalesController extends Controller
                 $order->user_id = Auth::user()->id;
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
                 $order->save();
+
+                $this->createOrderTransactionHistory($order->id,$order->customer_id,$order->recieved,date('Y-m-d'),'recieved');
+
                 if ($order && count($request->item_id)) {
                     for ($i = 0; $i < count($request->item_id); $i++) {
                         $details = new SalesDetails();
@@ -181,6 +185,7 @@ class SalesController extends Controller
     public function edit(int $id, Sales $sales)
     {
         try {
+            $config = Configuration::first();
             $order = Sales::where('id', $id)->with('order_details.item_details')->first();
             if ($order) {
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
@@ -190,7 +195,7 @@ class SalesController extends Controller
                     $customers = [];
                 }
 
-                return view('sales.sale_orders.new_order', compact('order', 'customers'));
+                return view('sales.sale_orders.new_order', compact('order', 'customers','config'));
             }
 
 
@@ -225,9 +230,12 @@ class SalesController extends Controller
 
             if ($validate) {
                 $order  =  Sales::find($id);
+                
                 if (!$order) {
                     return redirect()->back()->withErrors('error', 'Invalid Request');
                 }
+                $old_amount = $order->recieved;
+                // dd($old_amount,);
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
                 $order->other_charges = $request->other_charges;
@@ -246,8 +254,14 @@ class SalesController extends Controller
                 $order->user_id = Auth::user()->id;
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
                 $order->save();
+                
+
                 if ($order && count($request->item_id)) {
                     $deleteItems = SalesDetails::where('sale_id', $id)->whereNotIn('item_id', $request->item_id);
+                    if(count($deleteItems->get())){
+                        $transaction_description = (count($deleteItems->get()) ? 'Return Items in order'.$deleteItems->get()->pluck('item_details.name') : '');
+                    }
+                    $this->updateOrderTransaction($order->id,($order->customer_id ?? 0),$old_amount,$order->recieved,isset($transaction_description) ? $transaction_description :'');
                    if($this->allowInventoryCheck){
                     $this->deletedItemsOnOrderUpdate($deleteItems->get());
                    }
@@ -305,9 +319,14 @@ class SalesController extends Controller
         try {
             $sale = Sales::find($id);
             if($sale){
+                $this->updateOrderTransaction($sale->id,$sale->customer_id,$sale->recieved,0,'Deleted Order '.$sale->tran_no);
                 if($sale->delete()){
-                     SalesDetails::where('sale_id' , $id)->delete();
-                        Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
+                    
+                     $details = SalesDetails::where('sale_id' , $id);
+                     $this->deletedItemsOnOrderUpdate($details->get());
+                     $details->delete();
+                    
+                     Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
                         return redirect('/sales');
                     
                 }
@@ -322,12 +341,13 @@ class SalesController extends Controller
     {
         try {
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
+            $config = Configuration::first();
             if ($group) {
                 $customers = Parties::where('group_id', $group->id)->get();
             } else {
                 $customers = [];
             }
-            return view('sales.sale_orders.new_order', compact('customers'));
+            return view('sales.sale_orders.new_order', compact('customers','config'));
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -337,9 +357,11 @@ class SalesController extends Controller
     {
         try {
             $config = Configuration::latest()->first();
+            $inv_type = $config->invoice_type;
+            $template  = $config->invoice_template;
             $order = Sales::where('id', $id)->with('order_details.item_details', 'customer', 'user')->first();
-            // dd($order);
-            return view('sales.invoices.thermal', compact('order', 'config'));
+            $viewName = 'sales.invoices.'.($inv_type == 0 ? 'web.' : 'thermal.' ).$template;
+            return view($viewName, compact('order', 'config'));
         } catch (\Throwable $th) {
             throw $th;
         }

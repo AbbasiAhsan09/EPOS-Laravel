@@ -18,18 +18,24 @@
                     </div>
 
                     <div class="new_order_item_selection_wrapper">
+                        
+
                         <div class="new_order_item_selection">
                         <div class="item_selection_wrapper">
                             
-                                <div class="input-group input-group-outline">
-                                    <label class="form-label">Search</label>
-                                    <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" id="searchItemValue">
-                                </div> 
-                                <div class="item_selection">
-                                <div class="item_selection_list" id="item_selection_list">
-                                   {{-- Getting List From Ajax --}}
-                                </div>
+                            @if ($config->search_filter == 'type' )     
+                            <div class="input-group input-group-outline" id="search_type_filter">
+                                <label class="form-label">Search</label>
+                                <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" id="searchItemValue">
+                            </div> 
+                            <div class="item_selection">
+                            <div class="item_selection_list" id="item_selection_list">
+                               {{-- Getting List From Ajax --}}
                             </div>
+                        </div>
+                        @else
+                        @livewire('category-product-component-for-order-search',['col' => 12] )
+                            @endif
                            </div>
                            {{-- Form start --}}
                         @if ($isEditMode)
@@ -206,7 +212,9 @@
                                 Received Amount:
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="number" name="recieved" id="received-amount" class="form-control" required value="{{$isEditMode ? $order->recieved : 0}}" min="1" onkeypress="validationForSubmit()" >
+                                <input type="number" name="recieved" id="received-amount" 
+                                class="form-control" required value="{{$isEditMode ? $order->recieved : 0}}" 
+                                min="0" onkeypress="validationForSubmit()" >
                             </div> 
                             <hr>
                             <div class="row row-customized">
@@ -232,6 +240,7 @@
             </div>
         </div>
     </div>
+   
 @section('scripts')
      {{-- Custom jS --}}
 <script src="{{asset('js/custom.js')}}"></script>

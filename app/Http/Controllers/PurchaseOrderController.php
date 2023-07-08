@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetails;
@@ -18,7 +19,7 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-        $orders = PurchaseOrder::with('invoices')->paginate(10);
+            $orders = PurchaseOrder::with('invoices')->paginate(10);
         // dd($orders);
         return view('purchase.orders.orders_list',compact('orders'));
     }
@@ -32,7 +33,9 @@ class PurchaseOrderController extends Controller
     {
         // dd('hi');
         $vendors = Parties::where('group_id' , 2)->get();
-        return view('purchase.orders.create_order',compact('vendors'));
+        $config = Configuration::first();
+
+        return view('purchase.orders.create_order',compact('vendors','config'));
     }
 
     /**
@@ -82,6 +85,7 @@ class PurchaseOrderController extends Controller
                         $detail->po_id = $order->id;
                         $detail->item_id = $request->item_id[$i];
                         $detail->rate = $request->rate[$i];
+                        $detail->mrp = $request->mrp[$i];
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];
                         $detail->status = 1;
@@ -111,8 +115,9 @@ class PurchaseOrderController extends Controller
      */
     public function show($id)
     {
+        $config = Configuration::first();
         $order = PurchaseOrder::find($id);
-        return view('purchase.orders.create_order',compact('order'));
+        return view('purchase.orders.create_order',compact('order','config'));
     }
 
     /**
@@ -180,6 +185,7 @@ class PurchaseOrderController extends Controller
                         }
                         $detail->po_id = $order->id;
                         $detail->item_id = $request->item_id[$i];
+                        $detail->mrp = $request->mrp[$i];
                         $detail->rate = $request->rate[$i];
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];

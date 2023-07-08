@@ -1,10 +1,13 @@
 // Orders JS
 $(document).ready(function(){
     calculateOrders();
+    function redirectTosearchItemValue(){
+        $('#searchItemValue').focus();
+    }
     var total_amount = 0;
     // Resting Item List 
     function removeItemsFromList(){
-        $('#item_selection_list > div').remove();
+        $('#item_selection_list > button').remove();
     }
 
     function addItemInList(array){
@@ -12,10 +15,10 @@ $(document).ready(function(){
         array.forEach(element => {
                    
                    $('#item_selection_list').append(
-                   '<div class="selection_list_item" data-id="'+element.barcode+'">'+
-                               '<h5>'+element.name+" - " + element.barcode + '</h5>'+
-                               '<p>Lorem ipsum dolor sit amet.</p>'+
-                           '</div>'
+                   '<button class="selection_list_item" data-id="'+element.barcode+'">'+
+                               '<h5>'+element.categories.field.name+' - '+element.categories.category+' - '+element.name+" - " + element.barcode + '</h5>'+
+                            //    '<p>Lorem ipsum dolor sit amet.</p>'+
+                           '</button>'
                    );
                });
     }
@@ -24,6 +27,7 @@ $(document).ready(function(){
         // console.log('working');
         var value = $(this).attr('data-id');
         addToCart(value);
+        redirectTosearchItemValue();
     })
 
     // Adding Product in Order Cart
@@ -75,14 +79,14 @@ $(document).ready(function(){
                 success : function(e){
                         $('#cartList').append(
                         '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
-                                    '<td>'+e.name+'</td>'+
+                                    '<td>'+e.categories.field.name+' '+e.categories.category+' '+e.name+'</td>'+
                                     '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
                                     '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
                                     '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
                                     '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
                                     '</select>'+
                                     '</td>'+
-                                    '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+e.mrp+'"></td>'+
+                                    '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+e.tp+'"></td>'+
                                     '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+
                                     '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
                                     '<td class="total">'+(e.mrp * 1)+'</td>'+

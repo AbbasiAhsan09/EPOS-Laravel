@@ -50,8 +50,15 @@
        @foreach ($parties as $item)
        <tr>
         <td>{{$item->id}}</td>
-        <td>{{$item->groups->group_name}}</td>
-        <td>{{$item->party_name}}</td>
+        <td>
+          {{$item->groups->group_name}}
+        
+          </td>
+        <td>
+          <a href="{{url((str_contains(strtolower($item->groups->group_name),'vendor') ? '/vendor-ledger?vendor_id='.$item->id.'' :  '/customer-ledger?customer_id='.$item->id.'' ))}}" class="text-primary">
+            {{$item->party_name}}
+          </a>
+        </td>
         <td>{{$item->phone}}</td>
         <td>{{$item->email}}</td>
         <td>
@@ -85,9 +92,9 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
        <div class="modal-body">
-            <form action="{{route('add.party')}}" method="POST">
+            <form action="{{route('edit.party',$item->id)}}" method="POST">
                 @csrf
-                @method('post')
+                @method('put')
                 <div class="row">
                     <div class="col-lg-6">
                         <label for="">Party  Name *</label>

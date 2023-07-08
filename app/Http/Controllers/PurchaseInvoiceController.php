@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Trait\InventoryTrait;
+use App\Http\Trait\TransactionsTrait;
+use App\Models\Configuration;
 use App\Models\Inventory;
 use App\Models\Parties;
 use App\Models\Products;
@@ -14,6 +17,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class PurchaseInvoiceController extends Controller
 {
+    use InventoryTrait, TransactionsTrait;
     /**
      * Display a listing of the resource.
      *
@@ -28,6 +32,8 @@ class PurchaseInvoiceController extends Controller
     public function create_inv(int $id)
     {
         try {
+            $config = Configuration::first();
+            
         $checkInv = PurchaseInvoice::where('po_id' , $id)->first();
 
         if($checkInv){
@@ -40,7 +46,7 @@ class PurchaseInvoiceController extends Controller
 
         $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
         $vendors = Parties::where('group_id' , 2)->get();
-        return view('purchase.invoices.p_create_inv',compact('order','vendors'));
+        return view('purchase.invoices.p_create_inv',compact('order','vendors','config'));
         } catch (\Throwable $th) {
             //throw $th;
         }
@@ -101,8 +107,12 @@ class PurchaseInvoiceController extends Controller
             $invoice->created_by = Auth::user()->id;
             $invoice->remarks = $request->remarks;
             $invoice->doc_date = $request->doc_date;
+            $invoice->recieved = $request->recieved;
             $invoice->due_date = $request->due_date;
             $invoice->save();
+
+            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$invoice->recieved,date('Y-m-d'),'paid');
+
 
             if($invoice && count($request->item_id)){
                 
@@ -111,13 +121,17 @@ class PurchaseInvoiceController extends Controller
                         $detail->inv_id = $invoice->id;
                         $detail->item_id = $request->item_id[$i];
                         $detail->rate = $request->rate[$i];
+                        $detail->mrp = $request->mrp[$i];
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];
                         $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                         $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                         $detail->save();
-// Inventory Manage
+
+                        
+                        // Inventory Manage
                         if($detail){
+                            $this->updateProductPrice($detail->item_id, $detail->mrp ,$detail->rate, $detail->is_base_unit);
                             $totalCost = 0;
                             $totalNewCost = 0;
                             $item = Products::find($detail->item_id);
@@ -179,8 +193,9 @@ class PurchaseInvoiceController extends Controller
         try {
             $invoice = PurchaseInvoice::find($id);
         $vendors = Parties::where('group_id' , 2)->get();
+        $config = Configuration::first();
             
-            return view('purchase.invoices.p_edit_inv',compact('invoice','vendors'));
+            return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config'));
         } catch (\Throwable $th) {
             //throw $th;
         }
@@ -208,6 +223,7 @@ class PurchaseInvoiceController extends Controller
 
             if($validate){
                 $invoice =  PurchaseInvoice::find($id);
+                $old_amount = $invoice->recieved;
                 $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. $invoice->id;
                 $invoice->party_id = $request->party_id;
                 $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id;
@@ -229,11 +245,17 @@ class PurchaseInvoiceController extends Controller
                 $invoice->created_by = Auth::user()->id;
                 $invoice->remarks = $request->remarks;
                 $invoice->doc_date = $request->doc_date;
+                $invoice->recieved = $request->recieved;
                 $invoice->due_date = $request->due_date;
                 $invoice->save();
     
                 if($invoice && count($request->item_id)){
                         $deleteItems = PurchaseInvoiceDetails::where('inv_id' , $invoice->id)->whereNotIn('item_id' , $request->item_id);
+                        if(count($deleteItems->get())){
+                            $transaction_description = (count($deleteItems->get()) ? 'Return Items in order'.$deleteItems->get()->pluck('item_details.name') : '');
+                        }
+                        $this->updatePurchaseTransaction($invoice->id,($invoice->party_id ?? 0),$old_amount,$invoice->recieved,isset($transaction_description) ? $transaction_description :'');
+                      
                         foreach ($deleteItems->get() as $key => $deletedItem) {
                             // dd($deleteItems->get());
                             $inventory = Inventory::where('item_id',$deletedItem->item_id)->where('is_opnening_stock',0)->first();
@@ -295,8 +317,21 @@ class PurchaseInvoiceController extends Controller
      * @param  \App\Models\PurchaseInvoice  $purchaseInvoice
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PurchaseInvoice $purchaseInvoice)
+    public function destroy(int $id)
     {
-        //
+        // dd('hi');
+      try {
+        $invoice = PurchaseInvoice::find($id);
+        if($invoice){
+            $details = PurchaseInvoiceDetails::where('inv_id', $invoice->id);
+            $this->deleteItemOnPurchaseInvoice($details->get());
+            $details->delete();
+            $invoice->delete();
+            Alert::toast('Purchase Invoice Deleted!', 'info');
+            return redirect()->back();
+        }
+      } catch (\Throwable $th) {
+        throw $th;
+      }
     }
 }

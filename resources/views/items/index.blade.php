@@ -13,10 +13,12 @@
              
                 <div class="row .row-customized">
                     <div class="col-lg-6">
+                       <form action="{{ url('products') }}" method="GET">
                         <div class="input-group input-group-outline">
                             <label class="form-label">Search</label>
-                            <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
+                            <input type="text" class="form-control" value="{{session()->get('filter')}}" onfocus="focused(this)" name="filter" onfocusout="defocused(this)">
                           </div>
+                       </form>
                       
                     </div>
                     <div class="col-lg-6">
@@ -49,7 +51,7 @@
            <tr>
             <td>{{$key+1}}</td>
             <td>{{$item->brand}}</td>
-            <td>{{$item->categories->category}}</td>
+            <td>{{$item->categories->category ?? ''}}</td>
             <td>{{$item->name}}</td>
             <td>{{$item->barcode}}</td>
             <td>{{$item->uom  ? $item->uoms->uom  : 'Default' }}</td>
@@ -113,7 +115,7 @@
                             <input type="text" class="form-control" name="product" required value="{{$item->name}}">
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    {{-- <div class="col-lg-6">
                         <label for="">Category *</label>
                         <div class="input-group input-group-outline">
                             <select name="category" id="" class="form-control">
@@ -123,8 +125,10 @@
                             @endforeach
                         </select>
                         </div>
+                    </div> --}}
+                    <div class="col-lg-6">
+                        @livewire('field-category', ['selectedCategory' => $item->category])
                     </div>
-                   
                     <div class="col-lg-3">
                         <label for="">Code *</label>
                         <div class="input-group input-group-outline">
@@ -238,7 +242,7 @@
                             <input type="text" class="form-control" name="product" required >
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    {{-- <div class="col-lg-6">
                         <label for="">Category *</label>
                         <div class="input-group input-group-outline">
                             <select name="category" id="" class="form-control">
@@ -248,8 +252,10 @@
                             @endforeach
                         </select>
                         </div>
+                    </div> --}}
+                    <div class="col-lg-6">
+                        @livewire('field-category')
                     </div>
-                   
                     <div class="col-lg-3">
                         <label for="">Code *</label>
                         <div class="input-group input-group-outline">

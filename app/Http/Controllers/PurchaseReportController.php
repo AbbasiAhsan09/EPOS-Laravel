@@ -104,7 +104,22 @@ class PurchaseReportController extends Controller
                 session()->put('purchase-detail-report-start-date', $request->start_date);
                 session()->put('purchase-detail-report-end-date', $request->end_date);
                 $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
-            })->when($request->has('product') && $request->product != null, function ($query) use ($request) {
+            })
+            ->when($request->has('field') && $request->field != null,function($query) use($request){
+                $query->whereHas('items.categories',  function($q) use($request){
+                    $q->where('parent_cat', $request->field);
+                    session()->put('purchase-detail-report-field',$request->field  );
+
+                });
+            })
+            ->when($request->has('category') && $request->category != null,function($query) use($request){
+                $query->whereHas('items',  function($q) use($request){
+                    $q->where('category', $request->category);
+                    session()->put('purchase-detail-report-category',$request->category);
+
+                });
+            })
+            ->when($request->has('product') && $request->product != null, function ($query) use ($request) {
                 session()->put('purchase-detail-report-product', $request->product);
                 $query->where('item_id', $request->product);
             });

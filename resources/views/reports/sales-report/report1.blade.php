@@ -93,6 +93,7 @@
                   @if ($item->deleted_at === null)
                   <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li>
                   <li><a class="dropdown-item" href="{{url('/sales/edit/'.$item->id.'')}}"><i class="fa fa-edit"></i> Edit</a></li>
+                  <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transactionHistory{{$item->id}}"><i class="fa fa-dollar"></i> Transaction History</a></li>
                   <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>
                   @endif
               </ul>
@@ -129,6 +130,35 @@
 </div>
 
 {{--Delete Modal --}}
+
+
+{{--  transaction  history  Modal  --}}
+
+<div class="modal fade" id="transactionHistory{{$item->id}}" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newStoreModalLabel">Transaction History: {{$item->tran_no}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-body">
+          @if (isset($item->transactions ) && count($item->transactions ))
+          <ul>
+           @foreach ($item->transactions as $transaction)
+           <li>{{$item->tran_no}} | {{date('m-d-y',strtotime($transaction->created_at))}} | {{env('CURRENCY').$transaction->amount}}</li>
+           @endforeach
+           </ul>
+       @else
+       <h6>There is no transaction currently for {{$item->doc_num}}.</h6>
+       @endif
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{--transactionHistory Modal --}}
 
        @endforeach
     </tbody>

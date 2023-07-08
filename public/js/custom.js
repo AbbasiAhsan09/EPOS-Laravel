@@ -1,9 +1,18 @@
 // Orders JS
 $(document).ready(function(){
     var total_amount = 0;
+    $('#product_id').change(function(){
+        var id  = $(this).val();
+        setTimeout(() => {
+            addToCart(id,true);
+        }, 500);
+    })
+    function redirectTosearchItemValue(){
+        $('#searchItemValue').focus();
+    }
     // Resting Item List 
     function removeItemsFromList(){
-        $('#item_selection_list > div').remove();
+        $('#item_selection_list > button').remove();
     }
 
     function addItemInList(array){
@@ -11,10 +20,11 @@ $(document).ready(function(){
         array.forEach(element => {
                    
                    $('#item_selection_list').append(
-                   '<div class="selection_list_item" data-id="'+element.barcode+'">'+
-                               '<h5>'+element.name+" - " + element.barcode + '</h5>'+
-                               '<p>Lorem ipsum dolor sit amet.</p>'+
-                           '</div>'
+                    
+                   '<button class="selection_list_item" data-id="'+element.barcode+'" >'+
+                               '<h5>'+element.categories.field.name+' - '+element.categories.category+' - '+element.name+" - " + element.barcode + '</h5>'+
+                            //    '<p>Lorem ipsum dolor sit amet.</p>'+
+                           '</button>'
                    );
                });
     }
@@ -23,6 +33,8 @@ $(document).ready(function(){
         // console.log('working');
         var value = $(this).attr('data-id');
         addToCart(value);
+        removeItemsFromList();
+        redirectTosearchItemValue();
     })
 
     // Adding Product in Order Cart
@@ -74,7 +86,7 @@ $(document).ready(function(){
                 success : function(e){
                         $('#cartList').append(
                         '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
-                                    '<td>'+e.name+'</td>'+
+                                    '<td>'+e.categories.field.name+' '+e.categories.category+' '+e.name+'</td>'+
                                     '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
                                     '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
                                     '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
@@ -89,7 +101,7 @@ $(document).ready(function(){
                         '</tr>'
                         );
                         removeItemsFromList();
-                        console.log(e.uoms.base_unit_value);
+                        // console.log(e.uoms.base_unit_value);
                         // swal('product');  
                 }
             });
@@ -138,7 +150,6 @@ $(document).ready(function(){
     // Caling Ajax Query for getting products
     $('#searchItemValue').keyup(function(e){
         var value = $('#searchItemValue').val();
-        console.log(value);
         removeItemsFromList();
        if(e.which == 40){
         $.ajax({

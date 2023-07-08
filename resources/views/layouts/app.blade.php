@@ -11,9 +11,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/apple-icon.png')}}">
-  <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
+  <link rel="icon" type="image/png" href="{{asset('images/icon.png')}}">
   <title>
-    POS | Devdox Solution
+    {{env('APP_TITLE')}}
   </title>
   {{-- Custom CSS --}}
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
@@ -26,12 +26,13 @@
   <link href="{{asset('css/nucleo-icons.css')}}" rel="stylesheet" />
   <link href="{{asset('css/nucleo-svg.css')}}" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{{asset('fontawesome-free-6.4.0-web/css/all.css')}}">
+  {{-- <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> --}}
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <!-- CSS Files -->
   <link id="pagestyle" href="{{asset('css/material-dashboard.css?v=3.0.4')}}" rel="stylesheet" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <script src="{{asset('js/plugins/jquery.min.js')}}"></script>
   @livewireStyles
 </head>
 
@@ -60,6 +61,15 @@
           </a>
         </li>
        
+        <li class="nav-item">
+          <a class="nav-link text-white {{request()->is('fields') ? 'active bg-gradient-primary' : ''}}" href="{{url('/fields')}}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">table_view</i>
+            </div>
+            <span class="nav-link-text ms-1">Fields</span>
+          </a>
+        </li>
+
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('product-category') ? 'active bg-gradient-primary' : ''}}" href="{{url('/product-category')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -201,8 +211,8 @@
     <div class="card shadow-lg">
       <div class="card-header pb-0 pt-3">
         <div class="float-start">
-          <h5 class="mt-3 mb-0">Material UI Configurator</h5>
-          <p>See our dashboard options.</p>
+          <h5 class="mt-3 mb-0">{{$currenConfig->app_title}}</h5>
+          {{-- <p>See our dashboard options.</p> --}}
         </div>
         <div class="float-end mt-4">
           <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
@@ -251,19 +261,6 @@
           <div class="form-check form-switch ps-0 ms-auto my-auto">
             <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
           </div>
-        </div>
-        <hr class="horizontal dark my-sm-4">
-        <a class="btn bg-gradient-info w-100" href="https://www.creative-tim.com/product/material-dashboard-pro">Free Download</a>
-        <a class="btn btn-outline-dark w-100" href="https://www.creative-tim.com/learning-lab/bootstrap/overview/material-dashboard">View documentation</a>
-        <div class="w-100 text-center">
-          <a class="github-button" href="https://github.com/creativetimofficial/material-dashboard" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/material-dashboard on GitHub">Star</a>
-          <h6 class="mt-3">Thank you for sharing!</h6>
-          <a href="https://twitter.com/intent/tweet?text=Check%20Material%20UI%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fsoft-ui-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-twitter me-1" aria-hidden="true"></i> Tweet
-          </a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/material-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-facebook-square me-1" aria-hidden="true"></i> Share
-          </a>
         </div>
       </div>
     </div>
@@ -559,6 +556,16 @@
 
  @yield('scripts')
  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+ <script>
+   $(document).on('keydown', function(event) {
+        if (event.key === '/') {
+          setTimeout(() => {
+            $('#searchItemValue').focus();
+          }, 500);
+        }
+      });
+ </script>
 
 </body>
 
