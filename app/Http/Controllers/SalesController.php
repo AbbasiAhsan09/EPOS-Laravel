@@ -185,6 +185,7 @@ class SalesController extends Controller
     public function edit(int $id, Sales $sales)
     {
         try {
+            $config = Configuration::first();
             $order = Sales::where('id', $id)->with('order_details.item_details')->first();
             if ($order) {
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
@@ -194,7 +195,7 @@ class SalesController extends Controller
                     $customers = [];
                 }
 
-                return view('sales.sale_orders.new_order', compact('order', 'customers'));
+                return view('sales.sale_orders.new_order', compact('order', 'customers','config'));
             }
 
 
@@ -340,12 +341,13 @@ class SalesController extends Controller
     {
         try {
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
+            $config = Configuration::first();
             if ($group) {
                 $customers = Parties::where('group_id', $group->id)->get();
             } else {
                 $customers = [];
             }
-            return view('sales.sale_orders.new_order', compact('customers'));
+            return view('sales.sale_orders.new_order', compact('customers','config'));
         } catch (\Throwable $th) {
             throw $th;
         }

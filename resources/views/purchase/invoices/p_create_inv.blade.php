@@ -14,15 +14,20 @@
                         <div class="new_order_item_selection">
                         <div class="item_selection_wrapper">
                             
-                                <div class="input-group input-group-outline">
-                                    <label class="form-label">Search</label>
-                                    <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" id="searchItemValue">
-                                </div> 
-                                <div class="item_selection">
-                                <div class="item_selection_list" id="item_selection_list">
-                                   {{-- Getting List From Ajax --}}
-                                </div>
+                            @if (isset($config) && $config->search_filter  == 'type')
+                            <div class="input-group input-group-outline">
+                                <label class="form-label">Search</label>
+                                <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" id="searchItemValue">
+                            </div> 
+                            <div class="item_selection">
+                            <div class="item_selection_list" id="item_selection_list">
+                               {{-- Getting List From Ajax --}}
                             </div>
+                            </div>
+                            @else
+                            @livewire('category-product-component-for-order-search',['col' => 12] )
+
+                            @endif
                            </div>
                            {{-- Form start --}}
                         @if (isset($order))
@@ -255,7 +260,7 @@
                                 </h4>
                                 <div class="input-group input-group-outline">
                                    
-                                    <input type="number" name="recieved" id="received-amount" class="form-control"  value="0" min="1" onkeypress="validationForSubmit()" >
+                                    <input type="number" name="recieved" id="received-amount" class="form-control"  value="0"  onkeypress="validationForSubmit()" >
                                 </div> 
                                 <hr>
                                 <div class="row row-customized">

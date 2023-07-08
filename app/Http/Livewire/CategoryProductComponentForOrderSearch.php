@@ -2,12 +2,13 @@
 
 namespace App\Http\Livewire;
 
+
 use App\Models\Fields;
 use App\Models\ProductCategory;
 use App\Models\Products;
 use Livewire\Component;
 
-class CategoryProduct extends Component
+class CategoryProductComponentForOrderSearch extends Component
 {
     public $selected_category = null;
     public $categories = [];
@@ -38,6 +39,7 @@ class CategoryProduct extends Component
         
         $fields = Fields::all();
         
-        return view('livewire.category-product',compact('fields'));
+        return view('livewire.category-product-component-for-order-search',compact('fields'));
     }
+  
 }

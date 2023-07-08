@@ -33,7 +33,7 @@
              
                 <option value="">All Products</option>
                 @foreach ($live_products as $product)
-                    <option value="{{$product->id}}" {{$selected_product != null && $selected_product == $product->id ? 'selected' : ''  }}>{{$product->name}}</option>
+                    <option value="{{$product->barcode}}" {{$selected_product != null && $selected_product == $product->barcode ? 'selected' : ''  }}>{{$product->name}}</option>
                 @endforeach
      
     

@@ -13,7 +13,7 @@
                     <div class="new_order_item_selection_wrapper">
                         <div class="new_order_item_selection">
                         <div class="item_selection_wrapper">
-                            
+                                @if (isset($config) && $config->search_filter  == 'type')
                                 <div class="input-group input-group-outline">
                                     <label class="form-label">Search</label>
                                     <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" id="searchItemValue">
@@ -22,7 +22,12 @@
                                 <div class="item_selection_list" id="item_selection_list">
                                    {{-- Getting List From Ajax --}}
                                 </div>
-                            </div>
+                                </div>
+                                @else
+                                @livewire('category-product-component-for-order-search',['col' => 12] )
+
+                                @endif
+                                
                            </div>
                            {{-- Form start --}}
                         @if (isset($order))

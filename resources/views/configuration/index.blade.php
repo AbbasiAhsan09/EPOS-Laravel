@@ -78,13 +78,23 @@
                       </div>
                     </div>
 
-
                     <div class="col-lg-3">
-                        <label for="">Invoice Type:</label>
+                      <label for="">Search Filter:</label>
+                      <div class="input-group input-group-outline">
+                        <select name="search_filter"  id="" class="form-control">
+                          <option value="search"  {{isset($currenConfig) && $currenConfig->search_filter === 'search' ? 'selected'  : '' }}>Selection</option>
+                          <option value="type"  {{isset($currenConfig) && $currenConfig->search_filter === 'type' ? 'selected'  : '' }}>Typing</option>
+                        </select>
+                      </div>
+                  </div>
+                    <div class="col-lg-3">
+                        <label for="">Invoice Message:</label>
                     <div class="input-group input-group-outline">
                       <textarea name="inv_message"   class="form-control">{{isset($currenConfig) ? $currenConfig->invoice_message : '' }}</textarea>
                     </div>
                     </div>
+
+                 
 
                     
                     

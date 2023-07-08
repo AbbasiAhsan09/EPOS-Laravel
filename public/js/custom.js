@@ -1,7 +1,12 @@
 // Orders JS
 $(document).ready(function(){
     var total_amount = 0;
-   
+    $('#product_id').change(function(){
+        var id  = $(this).val();
+        setTimeout(() => {
+            addToCart(id,true);
+        }, 500);
+    })
     function redirectTosearchItemValue(){
         $('#searchItemValue').focus();
     }
@@ -96,7 +101,7 @@ $(document).ready(function(){
                         '</tr>'
                         );
                         removeItemsFromList();
-                        console.log(e.uoms.base_unit_value);
+                        // console.log(e.uoms.base_unit_value);
                         // swal('product');  
                 }
             });

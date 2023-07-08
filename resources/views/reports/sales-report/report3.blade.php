@@ -69,7 +69,7 @@
                 <tr>
                     <th width="40%">Party Name: </th>
                     <td>
-                <a href="{{url('/reports/sale-report?customer='.$item->id.'&start_date='.session()->get('sale-summary-report-start-date').'&end_date='.session()->get('sale-summary-report-end-date').'')}}" >{{$item->party_name}} </a>
+                <a href="{{url('/reports/sales-report?customer='.$item->id.'&start_date='.session()->get('sale-summary-report-start-date').'&end_date='.session()->get('sale-summary-report-end-date').'')}}" >{{$item->party_name}} </a>
             </td>
                     
                 </tr>

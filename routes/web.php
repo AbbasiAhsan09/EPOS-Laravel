@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
+use App\Http\Controllers\DBBackupController;
 use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
@@ -158,7 +159,7 @@ Route::resources([
     'customer-ledger' => CustomerLedgerController::class,
     'vendor-ledger'  => VendorLedgerController::class,
 ]);
-
+Route::get('db-backup', [DBBackupController::class, 'DbBackup']);
 
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
 });

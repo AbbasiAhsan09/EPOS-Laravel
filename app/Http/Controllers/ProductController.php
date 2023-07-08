@@ -134,7 +134,7 @@ class ProductController extends Controller
     {
         try {
            if($exact == 1){
-            $item = Products::where('barcode' , $param)->with('uoms','categories.field')->first();
+            $item = Products::where('barcode' , $param)->orWhere('id',$param)->with('uoms','categories.field')->first();
             return response()->json($item);
            }else{
             $items = Products::where(function($qyer) use($param){

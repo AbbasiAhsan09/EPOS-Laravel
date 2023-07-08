@@ -67,7 +67,7 @@ class InventoryReportController extends Controller
 
                 })
                 ->when($request->has('filterBy') && $request->filterBy == 'lowStock', function($query) use($request){
-                    $query->where('inventories.stock_qty', '=<', DB::raw('products.low_stock * mou.base_unit_value'));
+                    $query->where(DB::raw('inventories.stock_qty / IFNULL(mou.base_unit_value,1)'), '<=', DB::raw('products.low_stock'));
                     session()->put('inventory_filterBy', true);
                 });
                 

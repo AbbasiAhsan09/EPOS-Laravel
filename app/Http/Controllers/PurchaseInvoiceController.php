@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Trait\InventoryTrait;
 use App\Http\Trait\TransactionsTrait;
+use App\Models\Configuration;
 use App\Models\Inventory;
 use App\Models\Parties;
 use App\Models\Products;
@@ -31,6 +32,8 @@ class PurchaseInvoiceController extends Controller
     public function create_inv(int $id)
     {
         try {
+            $config = Configuration::first();
+            
         $checkInv = PurchaseInvoice::where('po_id' , $id)->first();
 
         if($checkInv){
@@ -43,7 +46,7 @@ class PurchaseInvoiceController extends Controller
 
         $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
         $vendors = Parties::where('group_id' , 2)->get();
-        return view('purchase.invoices.p_create_inv',compact('order','vendors'));
+        return view('purchase.invoices.p_create_inv',compact('order','vendors','config'));
         } catch (\Throwable $th) {
             //throw $th;
         }
@@ -190,8 +193,9 @@ class PurchaseInvoiceController extends Controller
         try {
             $invoice = PurchaseInvoice::find($id);
         $vendors = Parties::where('group_id' , 2)->get();
+        $config = Configuration::first();
             
-            return view('purchase.invoices.p_edit_inv',compact('invoice','vendors'));
+            return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config'));
         } catch (\Throwable $th) {
             //throw $th;
         }

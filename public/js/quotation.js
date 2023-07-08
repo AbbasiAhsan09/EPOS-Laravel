@@ -2,6 +2,12 @@
 $(document).ready(function(){
     calculateOrders();
     var total_amount = 0;
+    $('#product_id').change(function(){
+        var id  = $(this).val();
+        setTimeout(() => {
+            addToCart(id,true);
+        }, 500);
+    })
     function redirectTosearchItemValue(){
         $('#searchItemValue').focus();
     }

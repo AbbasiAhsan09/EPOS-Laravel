@@ -16,6 +16,7 @@
         "livewire/livewire": "^2.10",
         "maatwebsite/excel": "^3.1",
         "realrashid/sweet-alert": "^5.1",
+        "spatie/dropbox-api": "^1.21",
         "spatie/laravel-backup": "^8.1"
     },
     "require-dev": {
