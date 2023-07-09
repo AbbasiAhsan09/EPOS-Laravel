@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Configuration;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ConfigurationController extends Controller
@@ -16,11 +17,11 @@ class ConfigurationController extends Controller
     public function index()
     {
        try {
-        $currenConfig = Configuration::latest()->first();
+        $currenConfig = Configuration::latest()->filterByStore()->first();
         // dd($currenConfig);
         return view('configuration.index',compact('currenConfig'));
        } catch (\Throwable $th) {
-        //throw $th;
+        throw $th;
        }
     }
 
@@ -48,7 +49,7 @@ class ConfigurationController extends Controller
             ]);
 
             if($validate){
-                $config = Configuration::latest()->first();
+                $config = Configuration::latest()->filterByStore()->first();
                 $config->app_title  = $request->business;
                 if($request->file('logo')){
                     $file = $request->file('logo');

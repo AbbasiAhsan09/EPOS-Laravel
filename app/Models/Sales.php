@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Trait\UniversalScopeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sales extends Model
 {
-    use HasFactory , SoftDeletes;
+    use HasFactory , SoftDeletes, UniversalScopeTrait;
     protected $table = 'sales';
     protected $fillable = ['customer_id' , 'recieved' ,'net_total','created_at','updated_at'];
 
