@@ -33,6 +33,7 @@ class ConfigurationSeeder extends Seeder
         'inv_dev_message' => 'kch bh',
         'dev_contact' => '03113092942',
         'added_by' => 1,
+        'store_id' => 1
        ];
 
        Configuration::create($config);

@@ -240,7 +240,13 @@
             </div>
         </div>
     </div>
-   
+    @if (session('openNewWindow'))
+        <script>
+            $(document).ready(function(){
+                window.open("{{url("/invoice/".session('openNewWindow')."")}}","popupWindow", "width=300,height=600,scrollbars=yes,left="+($(window).width()-400)+",top=50");
+            })
+        </script>
+    @endif
 @section('scripts')
      {{-- Custom jS --}}
 <script src="{{asset('js/custom.js')}}"></script>

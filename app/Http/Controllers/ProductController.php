@@ -24,6 +24,7 @@ class ProductController extends Controller
             $query->where('name', 'LIKE', '%'.$request->filter.'%');
             session()->put('filter', $request->filter);
         })
+        ->byUser()
         ->paginate(20)->withQueryString();
         // dd($items);
         // dd($items);

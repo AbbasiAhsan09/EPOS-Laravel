@@ -29,7 +29,7 @@ class SalesController extends Controller
             session()->forget('canceled');
             session()->forget('end_date');
             session()->forget('start_date');
-        $items = Sales::orderBy('id', 'DESC')
+        $items = Sales::orderBy('id', 'DESC')->byUser()->filterByStore()
         ->when($request->has('type')  && $request->type == 'all' , function($query){
             session()->forget('canceled' );
             session()->forget('sales');
@@ -155,7 +155,8 @@ class SalesController extends Controller
                         }
                     }
                     toast('Order Created!', 'success');
-                    return redirect('/sales');
+                    
+                    return redirect()->back()->with('openNewWindow',$order->id);
                 } else {
                     return 'error';
                 }
@@ -337,9 +338,10 @@ class SalesController extends Controller
         }
     }
 
-    public function addNewOrder()
+    public function addNewOrder($orderid = null) //$orderid if pass show the invoice popup
     {
         try {
+           
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
             $config = Configuration::first();
             if ($group) {
@@ -347,7 +349,7 @@ class SalesController extends Controller
             } else {
                 $customers = [];
             }
-            return view('sales.sale_orders.new_order', compact('customers','config'));
+            return view('sales.sale_orders.new_order', compact('customers','config','orderid'));
         } catch (\Throwable $th) {
             throw $th;
         }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Trait\UniversalScopeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,8 +29,7 @@ class Products extends Model
     {
         return $this->belongsTo(ProductCategory::class, 'category', 'id');
     }
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory,SoftDeletes, UniversalScopeTrait;
     protected $table = 'products';
     
 }
