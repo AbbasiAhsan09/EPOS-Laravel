@@ -191,7 +191,7 @@ class SalesController extends Controller
             if ($order) {
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
                 if ($group) {
-                    $customers = Parties::where('group_id', $group->id)->get();
+                    $customers = Parties::where('group_id', $group->id)->byUser()->get();
                 } else {
                     $customers = [];
                 }
@@ -345,7 +345,7 @@ class SalesController extends Controller
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
             $config = Configuration::first();
             if ($group) {
-                $customers = Parties::where('group_id', $group->id)->get();
+                $customers = Parties::where('group_id', $group->id)->byUser()->get();
             } else {
                 $customers = [];
             }

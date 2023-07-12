@@ -19,7 +19,7 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-            $orders = PurchaseOrder::with('invoices')->paginate(10);
+            $orders = PurchaseOrder::with('invoices')->byUser()->paginate(10);
         // dd($orders);
         return view('purchase.orders.orders_list',compact('orders'));
     }
@@ -32,7 +32,7 @@ class PurchaseOrderController extends Controller
     public function create()
     {
         // dd('hi');
-        $vendors = Parties::where('group_id' , 2)->get();
+        $vendors = Parties::where('group_id' , 2)->byUser()->get();
         $config = Configuration::first();
 
         return view('purchase.orders.create_order',compact('vendors','config'));
@@ -129,7 +129,7 @@ class PurchaseOrderController extends Controller
     public function edit(int $id)
     {
         $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
-        $vendors = Parties::where('group_id' , 2)->get();
+        $vendors = Parties::where('group_id' , 2)->byUser()->get();
         return view('purchase.orders.create_order',compact('order','vendors'));
     }
 

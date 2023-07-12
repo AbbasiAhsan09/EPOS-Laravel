@@ -37,7 +37,7 @@ class CategoryProductComponentForOrderSearch extends Component
     {
         
         
-        $fields = Fields::all();
+        $fields = Fields::byUser()->get();
         
         return view('livewire.category-product-component-for-order-search',compact('fields'));
     }

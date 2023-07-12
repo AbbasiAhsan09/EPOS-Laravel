@@ -78,7 +78,7 @@ class PurchaseReportController extends Controller
                     )
                     ->paginate(20)->withQueryString();
                 $group = PartyGroups::where('group_name', 'LIKE',  'vendor%')->first();
-                $vendors = Parties::where('group_id', $group->id)->get();
+                $vendors = Parties::where('group_id', $group->id)->byUser()->get();
 
                 return view('reports.purchase-report.report1', compact('records', 'from', 'to', 'vendors'));
             }
@@ -156,8 +156,8 @@ class PurchaseReportController extends Controller
             $to = $request->end_date;
 
             $group = PartyGroups::where('group_name', 'LIKE' ,'vendor%')->first();
-            $vendors = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->get();
-            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)
+            $vendors = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()->get();
+            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()
             ->when($request->has('vendor') && $request->vendor !== null, function($query) use($request){
                session()->put('purchase-summary-vendor',  $request->vendor);
                 $query->where('id' , $request->vendor);

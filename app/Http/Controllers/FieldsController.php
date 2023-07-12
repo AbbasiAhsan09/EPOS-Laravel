@@ -15,7 +15,7 @@ class FieldsController extends Controller
      */
     public function index()
     {
-        $fields = Fields::paginate(20);
+        $fields = Fields::byUser()->paginate(20);
         return view('fields.fields-view', compact('fields'));
     }
 
@@ -78,7 +78,7 @@ class FieldsController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $field = Fields::find($id);
+            $field = Fields::where('id',$id)->byUser()->first();
             $field->update(['name' => $request->field]);
             Alert::toast('Field Updated!', 'info');
             return redirect()->back();
@@ -96,7 +96,7 @@ class FieldsController extends Controller
     public function destroy($id)
     {
         try {
-            $field = Fields::find($id);
+            $field = Fields::where('id',$id)->byUser()->first();
             $field->delete();
             Alert::toast('Field Deleted!', 'success');
             return redirect()->back();

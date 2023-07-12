@@ -14,9 +14,8 @@ class UsersController extends Controller
     public function index()
     {
         try {
-            $users = User::with(['userroles'])->get();
+            $users = User::with(['userroles'])->byUser()->get();
             $user_roles = UserRoles::all();
-            // dump($users);
             $stores = Stores::all();
             return view('users.index',compact('users','user_roles','stores'));
         } catch (\Throwable $th) {
@@ -48,26 +47,25 @@ class UsersController extends Controller
     public function update(int $id, Request $request)
     {
         try {
-            $user =  User::find($id);
+            $user =  User::where('id',$id)->byUser()->first();
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->phone;
             $user->role_id = $request->role_id;
-            $user->business_id = $request->business_id;
             $user->isActive = $request->status;
             $user->save();
             
             toast('User Updated!','info');
             return redirect()->back();
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
     public function destroy(int $id)
     {
         try {
-            $user = User::find($id);
+            $user = User::where('id',$id)->byUser()->first();
             $user->isActive = 0;
             $user->isDeleted = 1;
             $user->save();

@@ -29,8 +29,8 @@ class VendorLedgerController extends Controller
         session()->forget('l_vendor_id');
         // dd($request->all());
         $group_id  = PartyGroups::where('group_name', 'LIKE', "Vendo%")->first()->id;
-        $vendors = Parties::where('group_id', $group_id)->orderBy('party_name','ASC')->get();
-        $items = Parties::where('group_id', $group_id)
+        $vendors = Parties::where('group_id', $group_id)->orderBy('party_name','ASC')->byUser()->get();
+        $items = Parties::where('group_id', $group_id)->byUser()
             ->with(['purchases' => function($query) use($request){
                 $query->when(($request->has('start_date') && $request->has('end_date')) && ($request->start_date != null) && ($request->end_date != null),function($query) use($request){
                     session()->put('p_start_date', $request->start_date);
@@ -76,7 +76,7 @@ class VendorLedgerController extends Controller
      */
     public function show( int $id)
     {
-        $vendor = Parties::find($id);
+        $vendor = Parties::where('id',$id)->byUser()->get();
         if ($vendor) {
             $items = PurchaseInvoice::where('party_id', $id)
                 ->whereRaw('net_amount - recieved > (0.99)')

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Http\Trait\UniversalScopeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -13,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, UniversalScopeTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -53,5 +55,9 @@ class User extends Authenticatable
     public function userroles(): BelongsTo
     {
         return $this->belongsTo(UserRoles::class, 'role_id', 'id');
+    }
+
+    public function store() {
+        return $this->belongsTo(Stores::class,'store_id','id');
     }
 }

@@ -17,9 +17,9 @@ trait UniversalScopeTrait
         $user = Auth::user();
         $role = Auth::user()->userroles->role_name;
         // dd($role);
-        if ($role == 'SuperAdmin'){
+        if ($role === 'SuperAdmin'){
             return $query;
-        } else if($role == 'admin'){
+        } else if($role === 'Admin' || $role === 'Manager'){
             return $query->where('store_id' ,$user->store_id);
         }
         return $query->where('user_id' ,$user->id);

@@ -19,7 +19,7 @@ class FieldCategory extends Component
     
     public function render()
     {
-        $fields = Fields::all();
+        $fields = Fields::byUser()->get();
         if ($this->selectedCategory) {
             $this->selectedField = Fields::find(ProductCategory::find($this->selectedCategory)->parent_cat)->id;
             $this->changeField();

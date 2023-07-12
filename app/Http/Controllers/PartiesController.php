@@ -18,13 +18,13 @@ class PartiesController extends Controller
         try {
         if(!$group_id){
             $party_groups = PartyGroups::all();
-            $parties = Parties::orderby('group_id','DESC')->paginate(20);
+            $parties = Parties::orderby('group_id','DESC')->byUser()->paginate(20);
             
             return view('parties.index',compact('party_groups','parties','group_id'));
         }
 
         $party_groups = PartyGroups::all();
-        $parties = Parties::orderby('group_id','DESC')->where('group_id',$group_id)->paginate(20);
+        $parties = Parties::orderby('group_id','DESC')->byUser()->where('group_id',$group_id)->paginate(20);
         return view('parties.index',compact('party_groups','parties','group_id'));
         
         } catch (\Throwable $th) {
@@ -106,7 +106,7 @@ class PartiesController extends Controller
     {
         try {
             // dd($request);
-            $party =  Parties::find($id);
+            $party =  Parties::where('id',$id)->byUser()->get();
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;

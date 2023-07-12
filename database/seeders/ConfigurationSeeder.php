@@ -17,8 +17,8 @@ class ConfigurationSeeder extends Seeder
     public function run()
     {
        $config = [
-        'app_title' => 'EPOS-LARAVEL',
-        'logo' => 'null.jpg',
+        'app_title' => 'TradeWisePOS',
+        'logo' => null,
         'address' => 'demo stree',
         'phone' => '0311-309202',
         'ntn' => '11',

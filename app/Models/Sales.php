@@ -17,7 +17,7 @@ class Sales extends Model
 
     /**
      * Get the user that owns the Sales
-     *
+     *F
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function customer(): BelongsTo
