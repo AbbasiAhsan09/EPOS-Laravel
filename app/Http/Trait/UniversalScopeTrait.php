@@ -14,6 +14,7 @@ trait UniversalScopeTrait
     }
 
     public function scopeByUser($query){
+       if (Auth::check()) {
         $user = Auth::user();
         $role = Auth::user()->userroles->role_name;
         // dd($role);
@@ -23,5 +24,6 @@ trait UniversalScopeTrait
             return $query->where('store_id' ,$user->store_id);
         }
         return $query->where('user_id' ,$user->id);
+       }
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use App\Models\MOU;
 use App\Models\ProductCategory;
 use App\Models\Products;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -24,11 +25,11 @@ class ProductImport implements ToModel, WithHeadingRow
         if (array_key_exists('category', $row) && array_key_exists('product', $row) && array_key_exists('code', $row) && array_key_exists('mrp', $row) && array_key_exists('tp', $row) && array_key_exists('taxes', $row) && array_key_exists('discount', $row) && array_key_exists('description', $row)) {
 
 
-            $field = Fields::firstOrCreate(['name' => $row["field"]]);
-            $category = ProductCategory::firstOrCreate(['category' => $row["category"], 'parent_cat' => $field->id]);
+            $field = Fields::firstOrCreate(['name' => $row["field"],'store_id'=> Auth::user()->store_id]);
+            $category = ProductCategory::firstOrCreate(['category' => $row["category"], 'parent_cat' => $field->id,'store_id'=> Auth::user()->store_id]);
 
             if(!empty(trim($row["units"])) && (!empty($row["base_unit_value"]) && ($row["base_unit_value"]) > 1)){
-               $uom = MOU::firstOrCreate(['uom' => 'PKT', 'base_unit' => $row["units"], 'base_unit_value' => $row["base_unit_value"]]);
+               $uom = MOU::firstOrCreate(['uom' => 'PKT', 'base_unit' => $row["units"], 'base_unit_value' => $row["base_unit_value"],'store_id'=> Auth::user()->store_id]);
             }
 
             $item = new Products();
@@ -41,7 +42,7 @@ class ProductImport implements ToModel, WithHeadingRow
             $item->discount = $row["discount"];
             $item->taxes = $row["taxes"];
             $item->low_stock = !empty($row["alert_stock"]) ? $row["alert_stock"] : 1;
-            $item->store_id =  1;
+            $item->store_id =  Auth::user()->store_id;
             $item->uom =  isset($uom) ? $uom->id : 0;
             $item->description = $row["description"];
             $item->opening_stock = $row["in_hand"];

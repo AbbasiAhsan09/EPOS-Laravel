@@ -1,6 +1,6 @@
 @php
     use App\Models\Configuration;
-    $currenConfig = Configuration::latest()->first();
+    $currenConfig = Configuration::latest()->byUser()->first();
 @endphp
 
 <!DOCTYPE html>
