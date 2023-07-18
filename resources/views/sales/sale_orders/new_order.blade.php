@@ -6,7 +6,10 @@
     
 
 @endphp
+@include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/xcJtL7QggTI'])
+
     <div class="page-wrapper">
+       
         <div class="container-fluid">
             <div class="row ">
                 <div class="col-lg-8">
