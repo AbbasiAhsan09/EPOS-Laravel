@@ -3,7 +3,7 @@
 @section('content')
 @php
     $is_trial = isset(Auth::user()->store->is_trial) ? Auth::user()->store->is_trial:  false;
-    $renewalDate = Auth::user()->store->renewal_date ? Carbon\Carbon::parse(Auth::user()->store->renewal_date) : false;
+    $renewalDate = isset(Auth::user()->store->renewal_date) ? Carbon\Carbon::parse(Auth::user()->store->renewal_date) : false;
 @endphp
 <div class="container-fluid">
     <h2 class="pb-4">
@@ -27,7 +27,8 @@
     </div>
   </div>
    @endif
-   @if ((Auth::check() && !$is_trial && ($renewalDate->lessThanOrEqualTo(\Carbon\Carbon::now()->addDays(15)) ) ))
+   @if ($renewalDate != false)
+   @if (((Auth::check() && !$is_trial && ($renewalDate->lessThanOrEqualTo(\Carbon\Carbon::now()->addDays(15)))) ))
    <div class="card mb-5">
     <div class="card-body">
       <div class="row">
@@ -41,7 +42,9 @@
       </div>
     </div>
   </div>
+   @endif    
    @endif
+   
     <div class="row">
       <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4">
         <div class="card">
