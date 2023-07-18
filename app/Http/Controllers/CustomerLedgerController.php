@@ -25,7 +25,7 @@ class CustomerLedgerController extends Controller
         session()->forget('l_end_date');
 
         $group_id  = PartyGroups::where('group_name', 'LIKE', "Customer%")->first()->id;
-        $items = Parties::where('group_id', $group_id)
+        $items = Parties::where('group_id', $group_id)->byUser()
             ->with(['sales' => function($query) use($request){
                 $query->when($request->has('start_date') && $request->has('end_date') && ($request->start_date != null) && ($request->end_date != null) ,function($query) use($request){
                     session()->put('l_start_date', $request->start_date);
@@ -73,7 +73,7 @@ class CustomerLedgerController extends Controller
      */
     public function show(int $id)
     {
-        $customer = Parties::find($id);
+        $customer = Parties::where('id',$id)->byUser()->get();
         if ($customer) {
             $items = Sales::where('customer_id', $id)
                 ->whereRaw('net_total - recieved > (0.99)')

@@ -1,27 +1,47 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
-
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    {{ __('You are logged in!') }}
-                </div>
-            </div>
+@php
+    $is_trial = isset(Auth::user()->store->is_trial) ? Auth::user()->store->is_trial:  false;
+    $renewalDate = Auth::user()->store->renewal_date ? Carbon\Carbon::parse(Auth::user()->store->renewal_date) : false;
+@endphp
+<div class="container-fluid">
+    <h2 class="pb-4">
+      Hello, {{ Auth::check() ? strtoupper(Auth::user()->name) : "" }} 😊
+      <p><b>
+        Store: {{Auth::check() ? Auth::user()->store->store_name ?? "": ''}}
+      </b></p>
+    </h2>
+   @if ((Auth::check() && $is_trial ))
+   <div class="card mb-5">
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <h3 class="text-primary">{{\Carbon\Carbon::now()->diffInDays(Auth::user()->store->created_at->addDays(14))}} Days' Remaining</h3>
+          <p>Your 14 days trial is expiring on <b class="text-danger">{{date('D d M,Y',strtotime(Auth::user()->store->created_at->addDays(14)))}}</b></p>    
         </div>
+        <div class="col d-flex justify-content-end align-items-center">
+          <a class="btn btn-primary" target="_blank" href="{{url("/payment")}}">Subscribe Now</a>
+        </div>
+      </div>
     </div>
-</div> --}}
-
-<div class="container-fluid py-4">
+  </div>
+   @endif
+   @if ((Auth::check() && !$is_trial && ($renewalDate->lessThanOrEqualTo(\Carbon\Carbon::now()->addDays(15)) ) ))
+   <div class="card mb-5">
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <h3 class="text-primary">{{\Carbon\Carbon::now()->diffInDays($renewalDate)}} Days' Remaining</h3>
+          <p>Your annual subscription is expiring on <b class="text-danger">{{$renewalDate->format('D, d M, Y')}}</b></p>    
+        </div>
+        <div class="col d-flex justify-content-end align-items-center">
+          <a class="btn btn-primary" target="_blank" href="{{url("/payment")}}">Re-Subscribe Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+   @endif
     <div class="row">
       <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4">
         <div class="card">

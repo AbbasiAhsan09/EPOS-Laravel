@@ -36,7 +36,7 @@ class CategoryProduct extends Component
     {
         
         
-        $fields = Fields::all();
+        $fields = Fields::byUser()->get();
         
         return view('livewire.category-product',compact('fields'));
     }

@@ -33,7 +33,9 @@
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            @if (Auth::user()->userroles->role_name == 'SuperAdmin')
             <th>Role</th>
+            @endif
             <th>Store</th>
             <th>Status</th>
           
@@ -46,8 +48,10 @@
             <td>{{$item->id}}</td>
             <td>{{$item->name}}</td>
             <td>{{$item->email}}</td>
-            <td>{{$item->userroles->role_name}}</td>
-            <td>{{$item->business_id}}</td>
+            <td>{{$item->userroles->role_name ?? ""}}</td>
+            @if (Auth::user()->userroles->role_name == 'SuperAdmin')
+            <td>{{($item->store ? $item->store->store_name : 'TradeWise')}}</td>
+            @endif
             <td>
                 @if ($item->isActive == 1)
                   <div class="badge badge-sm bg-gradient-success">Active</div>
@@ -125,9 +129,7 @@
                     </div>
                 </div>
                 
-
                
-
                 <div class="col-lg-6">
                     <label for="">Role *</label>
                     <div class="input-group input-group-outline">
@@ -140,6 +142,7 @@
                     </div>
                 </div>
 
+                @if (Auth::user()->userroles->role_name == 'SuperAdmin')
                 <div class="col-lg-6">
                     <label for="">Store *</label>
                     <div class="input-group input-group-outline">
@@ -151,6 +154,9 @@
                         </select>
                     </div>
                 </div>
+                @endif
+
+                
 
                 <div class="col-lg-6">
                     <label for="">Status *</label>
@@ -228,7 +234,7 @@
                             </select>
                         </div>
                     </div>
-    
+                    @if (Auth::user()->userroles->role_name == 'SuperAdmin')
                     <div class="col-lg-6">
                         <label for="">Store *</label>
                         <div class="input-group input-group-outline">
@@ -240,6 +246,7 @@
                             </select>
                         </div>
                     </div>
+                    @endif
     
                
                 </div>

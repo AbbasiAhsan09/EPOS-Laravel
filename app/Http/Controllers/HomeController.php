@@ -28,13 +28,13 @@ class HomeController extends Controller
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
-        $saleBalance = Sales::select('net_total','recieved')->where('customer_id',0)->get();
-        $saleBalanceParties = Sales::select('net_total','recieved')->where('customer_id','!=',0)->get();
-        $purchaseBalance = PurchaseInvoice::select('net_amount','recieved',)->get();
+        $saleBalance = Sales::select('net_total','recieved')->byUser()->where('customer_id',0)->get();
+        $saleBalanceParties = Sales::select('net_total','recieved')->where('customer_id','!=',0)->byUser()->get();
+        $purchaseBalance = PurchaseInvoice::select('net_amount','recieved',)->byUser()->get();
 
-        $sales = Sales::whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)
+        $sales = Sales::whereMonth('created_at', $currentMonth)->byUser()->whereYear('created_at', $currentYear)
             ->orderBy('id', 'DESC')->get();
-        $purchases = PurchaseInvoice::whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)->get();
+        $purchases = PurchaseInvoice::whereMonth('created_at', $currentMonth)->byUser()->whereYear('created_at', $currentYear)->get();
         return view('home', compact('sales', 'purchases','saleBalance', 'purchaseBalance','saleBalanceParties'));
     }
 
@@ -49,7 +49,7 @@ class HomeController extends Controller
     {
         $currentWeekStart = Carbon::now()->startOfWeek();
         $currentWeekEnd = Carbon::now()->endOfWeek();
-        $sales = Sales::selectRaw('DATE_FORMAT(created_at, "%a") as day, SUM(net_total) as total')
+        $sales = Sales::selectRaw('DATE_FORMAT(created_at, "%a") as day, SUM(net_total) as total')->byUser()
             ->whereBetween('created_at', [$currentWeekStart, $currentWeekEnd])
             ->groupBy('day')
             ->get();
@@ -73,7 +73,7 @@ class HomeController extends Controller
        
         $currentYear = Carbon::now()->year;
 
-        $records = Sales::selectRaw('MONTH(created_at) as date, SUM(net_total) as total')
+        $records = Sales::selectRaw('MONTH(created_at) as date, SUM(net_total) as total')->byUser()
             ->whereYear('created_at', $currentYear)
             ->groupBy('date')
             ->get();
@@ -100,7 +100,7 @@ class HomeController extends Controller
     {
         $currentYear = Carbon::now()->year;
         
-        $records = PurchaseInvoice::selectRaw('MONTH(created_at) as date, SUM(net_amount) as total')
+        $records = PurchaseInvoice::selectRaw('MONTH(created_at) as date, SUM(net_amount) as total')->byUser()
             ->whereYear('created_at', $currentYear)
             ->groupBy('date')
             ->get();

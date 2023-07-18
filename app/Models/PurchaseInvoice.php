@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Trait\UniversalScopeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseInvoice extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, UniversalScopeTrait;
     protected $fillable = ['updated_at' , 'created_at' ,'recieved' ,'net_amount'];
     /**
      * Get the order that owns the PurchaseInvoice

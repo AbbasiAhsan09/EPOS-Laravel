@@ -50,6 +50,9 @@ class ConfigurationController extends Controller
 
             if($validate){
                 $config = Configuration::latest()->filterByStore()->first();
+                if(!$config){
+                    $config = new Configuration();
+                }
                 $config->app_title  = $request->business;
                 if($request->file('logo')){
                     $file = $request->file('logo');

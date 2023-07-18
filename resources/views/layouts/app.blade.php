@@ -1,6 +1,6 @@
 @php
     use App\Models\Configuration;
-    $currenConfig = Configuration::latest()->first();
+    $currenConfig = Configuration::filterByStore()->first();
 @endphp
 
 <!DOCTYPE html>
@@ -43,15 +43,19 @@
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="/" >
+        @if (!empty($currenConfig->logo))
         <img src="{{asset("images/logo/$currenConfig->logo")}}" class="navbar-brand-img h-100" alt="main_logo">
+        @endif
         @if (empty($currenConfig->logo))
-        <span class="ms-1 font-weight-bold text-white">{{$currenConfig->app_title ?? ''}}</span>
+        <img src="{{asset("images/logo.png")}}" class="navbar-brand-img h-100" alt="main_logo">
+
         @endif
       </a>
     </div>
     <hr class="horizontal light mt-0 mb-2">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
+        @if (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin' || Auth::user()->userroles->role_name == 'Manager' )
         <li class="nav-item">
           <a class="nav-link text-white   {{request()->is('/') ? 'active bg-gradient-primary' : ''}}" href="{{url('/')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -60,7 +64,8 @@
             <span class="nav-link-text ms-1">Dashboard</span>
           </a>
         </li>
-       
+        @endif
+        @if (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin' || Auth::user()->userroles->role_name == 'Manager' )
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('fields') ? 'active bg-gradient-primary' : ''}}" href="{{url('/fields')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -69,7 +74,6 @@
             <span class="nav-link-text ms-1">Fields</span>
           </a>
         </li>
-
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('product-category') ? 'active bg-gradient-primary' : ''}}" href="{{url('/product-category')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -94,6 +98,7 @@
             <span class="nav-link-text ms-1">Items</span>
           </a>
         </li>
+        @endif
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('sales') || request()->segment(1) === 'sales' ? 'active bg-gradient-primary' : ''}} " href="/sales">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -103,6 +108,7 @@
           </a>
         </li>
 
+        @if (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin' || Auth::user()->userroles->role_name == 'Manager' )
         
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('purchase') || request()->segment(1) === 'purchase' ? 'active bg-gradient-primary' : ''}}" href="/purchase">
@@ -164,7 +170,7 @@
           </a>
         </li>
        
-
+        @endif
         <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>
         </li>
@@ -211,7 +217,7 @@
     <div class="card shadow-lg">
       <div class="card-header pb-0 pt-3">
         <div class="float-start">
-          <h5 class="mt-3 mb-0">{{$currenConfig->app_title}}</h5>
+          <h5 class="mt-3 mb-0">{{$currenConfig->app_title ?? ""}}</h5>
           {{-- <p>See our dashboard options.</p> --}}
         </div>
         <div class="float-end mt-4">

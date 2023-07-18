@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
 use App\Http\Controllers\DBBackupController;
@@ -7,8 +8,11 @@ use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PurchaseReportController;
+use App\Http\Controllers\RegisterStoreController;
 use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\StoresController;
 use App\Http\Controllers\VendorLedgerController;
 use App\Models\CustomerLedger;
 use Illuminate\Support\Facades\Route;
@@ -28,12 +32,16 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::middleware('auth')->group(function () {
-    
+Route::resource('/register',RegisterStoreController::class);
+Route::get('/payment',[PaymentMethodController::class, 'index']);
+
+Route::middleware(['auth','is_trial.check'])->group(function () {
 Route::get('logout-auth', function(){
      Auth::logout();
      return redirect()->route('login');
 })->name('auth.logout');
+
+
 
 
 Route::middleware('manager.role')->prefix('charts')->group(function(){
@@ -45,7 +53,7 @@ Route::middleware('manager.role')->prefix('charts')->group(function(){
 Route::middleware('manager.role')->get('/',  [App\Http\Controllers\HomeController::class, 'index']);
 Route::middleware('manager.role')->get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //
-Route::middleware('manager.role')->prefix('store','App\Http\Controllers\StoresController')->group(function(){
+Route::middleware('super.role')->prefix('store','App\Http\Controllers\StoresController')->group(function(){
 Route::get('/','App\Http\Controllers\StoresController@index');
 Route::post('/add','App\Http\Controllers\StoresController@store')->name('add.stores');
 Route::put('/edit/{id}','App\Http\Controllers\StoresController@edit')->name('update.stores');

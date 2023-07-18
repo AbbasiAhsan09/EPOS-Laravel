@@ -17,7 +17,7 @@ class PurchaseRequestController extends Controller
      */
     public function index()
     {
-        $requests = PurchaseRequest::orderby('status','ASC')->paginate(10);
+        $requests = PurchaseRequest::orderby('status','ASC')->byUser()->paginate(10);
 
         return view('purchase.request.list',compact('requests'));
     }

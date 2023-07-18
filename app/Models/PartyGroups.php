@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class PartyGroups extends Model
 {
+    protected $fillable = ['group_name'];
     use HasFactory;
 }

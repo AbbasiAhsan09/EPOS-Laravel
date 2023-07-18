@@ -135,20 +135,20 @@ class ProductController extends Controller
     {
         try {
            if($exact == 1){
-            $item = Products::where('barcode' , $param)->orWhere('id',$param)->with('uoms','categories.field')->first();
+            $item = Products::where('barcode' , $param)->orWhere('id',$param)->with('uoms','categories.field')->byUser()->first();
             return response()->json($item);
            }else{
             $items = Products::where(function($qyer) use($param){
-                $qyer->where('name' , 'LIKE' , "%$param%")
+                $qyer->where('name' , 'LIKE' , "%$param%")  
                 ->orWhere('brand', 'LIKE' , "%$param%");
-            })
+            })->filterByStore()
             ->with('uoms','categories.field')
             ->orWhereHas('categories', function($query) use($param){
-                $query->where('category','LIKE', "%$param%");
-            })
+                    $query->where('category','LIKE', "%$param%")->filterByStore();
+                })
             ->orWhereHas('categories.field', function($query) use($param){
-                $query->where('name','LIKE', "%$param%");
-            })
+                    $query->where('name','LIKE', "%$param%")->filterByStore();
+                })
             ->get();
             return response()->json($items);
            }

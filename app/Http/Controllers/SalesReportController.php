@@ -26,7 +26,7 @@ class SalesReportController extends Controller
         $from = $request->start_date;
         $to = $request->end_date;
         $party = PartyGroups::where('group_name', 'LIKE', 'customer%')->first();
-        $customers = Parties::where('group_id', $party->id)->get();
+        $customers = Parties::where('group_id', $party->id)->byUser()->get();
         $records = Sales::orderBy('id', 'DESC')
             ->when(($request->has('start_date') && $request->start_date != null) && ($request->has('end_date') && $request->end_date != null), function ($query) use ($request) {
                 $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
@@ -131,8 +131,8 @@ class SalesReportController extends Controller
             $to = $request->end_date;
 
             $group = PartyGroups::where('group_name', 'LIKE' ,'customer%')->first();
-            $customers = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->get();
-            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)
+            $customers = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()->get();
+            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()
             ->when($request->has('customer') && $request->customer !== null, function($query) use($request){
                session()->put('sale-summary-customer',  $request->customer);
                 $query->where('id' , $request->customer);

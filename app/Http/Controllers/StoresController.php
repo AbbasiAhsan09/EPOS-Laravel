@@ -6,6 +6,8 @@ use App\Models\Stores;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Alert;
+use App\Models\Configuration;
+use Illuminate\Support\Facades\Auth;
 
 class StoresController extends Controller
 {
@@ -18,6 +20,9 @@ class StoresController extends Controller
     {
         try {
             $stores = Stores::with('users')->get();
+            if(Auth::user()->store_id){
+            $stores = Stores::with('users')->where('id',Auth::user()->store_id)->get();
+            }
             $users = User::paginate(10);
             return view('stores.index',compact('stores','users'));
         } catch (\Throwable $th) {
@@ -64,6 +69,20 @@ class StoresController extends Controller
                 $store->email = $request->email;
                 $store->phone = $request->phone;
                 $store->save();
+
+                if($store){
+                    Configuration::firstOrCreate([
+                        'store_id' => $store->id,
+                    ],[
+                        'app_title' => $store->store_name,
+                        'phone' => $store->store_phone,
+                        'address' => $store->store_location,
+                        'start_date' => date('Y-m-d',strtotime($store->created_at)),
+                        'contract_duration' => 12,
+                        'added_by' => Auth::user()->id,
+                        'store_id' => $store->id,
+                    ]);
+                }
                 
                  toast('Added New Store','success');
                 return Redirect('/store');

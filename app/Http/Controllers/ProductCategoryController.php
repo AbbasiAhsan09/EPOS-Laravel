@@ -17,13 +17,13 @@ class ProductCategoryController extends Controller
     {
         session()->forget('cat_filter');
 
-        $cat = ProductCategory::orderBy('id','DESC')
+        $cat = ProductCategory::byUser()->orderBy('id','DESC')
         ->when($request->has('filter') && $request->filter != null ,  function($query) use ($request){
             $query->where('category', 'LIKE', '%'.$request->filter.'%');
             session()->put('cat_filter', $request->filter);
         })
         ->paginate(20)->withQueryString();
-        $fields = Fields::all();
+        $fields = Fields::byUser()->get();
         return view('product_category.index',compact('cat','fields'));
     }
 

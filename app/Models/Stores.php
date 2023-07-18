@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Trait\UniversalScopeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,10 +10,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Stores extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory,SoftDeletes,  UniversalScopeTrait;
+    
 
     protected $table = 'stores';
+    protected $fillable = ['id','store_name','store_phone','business_size','store_location','type','store_supervisor',
+    'renewal_date','domain','email','is_locked','phone','is_trial','created_at','deleted_at'];
     
     /**
      * Get the user that owns the Stores

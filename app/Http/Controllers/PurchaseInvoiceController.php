@@ -25,14 +25,14 @@ class PurchaseInvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = PurchaseInvoice::with('created_by_user','party','order')->paginate(15);
+        $invoices = PurchaseInvoice::with('created_by_user','party','order')->byUser()->paginate(15);
         return view('purchase.invoices.p_inv',compact('invoices'));
     }
 
     public function create_inv(int $id)
     {
         try {
-            $config = Configuration::first();
+            $config = Configuration::filterByStore()->first();
             
         $checkInv = PurchaseInvoice::where('po_id' , $id)->first();
 
@@ -45,7 +45,7 @@ class PurchaseInvoiceController extends Controller
         }
 
         $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
-        $vendors = Parties::where('group_id' , 2)->get();
+        $vendors = Parties::where('group_id' , 2)->byUser()->get();
         return view('purchase.invoices.p_create_inv',compact('order','vendors','config'));
         } catch (\Throwable $th) {
             //throw $th;
@@ -192,8 +192,8 @@ class PurchaseInvoiceController extends Controller
     {
         try {
             $invoice = PurchaseInvoice::find($id);
-        $vendors = Parties::where('group_id' , 2)->get();
-        $config = Configuration::first();
+        $vendors = Parties::where('group_id' , 2)->byUser()->get();
+        $config = Configuration::filterByStore()->first();
             
             return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config'));
         } catch (\Throwable $th) {

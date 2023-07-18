@@ -19,7 +19,7 @@ class PurchaseQuotationController extends Controller
      */
     public function index()
     {
-        $quotations = PurchaseQuotation::where('type' , 'PURCHASE')->paginate(10);
+        $quotations = PurchaseQuotation::where('type' , 'PURCHASE')->byUser()->paginate(10);
         return view('purchase.quotation.quotation_list',compact('quotations'));
     }
 
@@ -32,8 +32,8 @@ class PurchaseQuotationController extends Controller
     {
         $group_v = PartyGroups::where('group_name', 'LIKE' , "vendor%")->first();
         $group_c = PartyGroups::where('group_name', 'LIKE' , "custo%")->first();
-        $vendors = Parties::where('group_id',$group_v->id ?? '')->get();
-        $customers = Parties::where('group_id',$group_c->id ?? '')->get();
+        $vendors = Parties::where('group_id',$group_v->id ?? '')->byUser()->get();
+        $customers = Parties::where('group_id',$group_c->id ?? '')->byUser()->get();
         return view("purchase.quotation.create_quotation", compact('vendors','customers'));
     }
 
@@ -128,8 +128,8 @@ class PurchaseQuotationController extends Controller
         $quotation = PurchaseQuotation::where('id',$id)->with('details.items')->first();
         $group_v = PartyGroups::where('group_name', 'LIKE' , "vendor%")->first();
         $group_c = PartyGroups::where('group_name', 'LIKE' , "custo%")->first();
-        $vendors = Parties::where('group_id',$group_v->id ?? '')->get();
-        $customers = Parties::where('group_id',$group_c->id ?? '')->get();
+        $vendors = Parties::where('group_id',$group_v->id ?? '')->byUser()->get();
+        $customers = Parties::where('group_id',$group_c->id ?? '')->byUser()->get();
         return view("purchase.quotation.create_quotation", compact('vendors','customers','quotation'));
     }
 

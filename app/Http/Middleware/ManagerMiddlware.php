@@ -18,10 +18,10 @@ class ManagerMiddlware
     public function handle(Request $request, Closure $next)
     {
         if(Auth::check()){
-            if(Auth::user()->role_id == 3 || Auth::user()->role_id == 1){
+            if(Auth::user()->userroles->role_name == 'Manager' || Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin'){
                 return $next($request);
             }
         }
-        abort(403);
+        return redirect('/sales');
     }
 }

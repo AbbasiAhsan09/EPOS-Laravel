@@ -14,7 +14,7 @@ class MOUController extends Controller
      */
     public function index()
     {
-        $items = MOU::all();
+        $items = MOU::byUser()->get();
         return view('uom.index',compact('items'));
     }
 
