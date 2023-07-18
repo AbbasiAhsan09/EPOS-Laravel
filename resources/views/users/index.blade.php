@@ -48,7 +48,7 @@
             <td>{{$item->id}}</td>
             <td>{{$item->name}}</td>
             <td>{{$item->email}}</td>
-            <td>{{$item->userroles->role_name}}</td>
+            <td>{{$item->userroles->role_name ?? ""}}</td>
             @if (Auth::user()->userroles->role_name == 'SuperAdmin')
             <td>{{($item->store ? $item->store->store_name : 'TradeWise')}}</td>
             @endif

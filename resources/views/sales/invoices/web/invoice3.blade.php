@@ -231,7 +231,7 @@
                
                     <p class="sign-line">Receiver's Signature</p>
 					<p style="font-size: 12px">
-						<b>This Software is Developed By DevDox Solution | {{isset($config)  ? $config->dev_contact : ''}}</b>
+						<b>This Software is Developed By TradeWisePOS  {{isset($config)  ? $config->dev_contact : ''}}</b>
 					</p>
 
             </div>

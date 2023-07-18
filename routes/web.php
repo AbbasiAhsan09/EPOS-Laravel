@@ -8,6 +8,7 @@ use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\RegisterStoreController;
 use App\Http\Controllers\SalesReportController;
@@ -32,12 +33,9 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::resource('/register',RegisterStoreController::class);
+Route::get('/payment',[PaymentMethodController::class, 'index']);
 
-
-Route::middleware('auth')->group(function () {
-    
-
-    
+Route::middleware(['auth','is_trial.check'])->group(function () {
 Route::get('logout-auth', function(){
      Auth::logout();
      return redirect()->route('login');

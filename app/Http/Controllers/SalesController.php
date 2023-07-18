@@ -186,7 +186,7 @@ class SalesController extends Controller
     public function edit(int $id, Sales $sales)
     {
         try {
-            $config = Configuration::first();
+            $config = Configuration::filterByStore()->first();
             $order = Sales::where('id', $id)->with('order_details.item_details')->first();
             if ($order) {
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
@@ -343,7 +343,7 @@ class SalesController extends Controller
         try {
            
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
-            $config = Configuration::first();
+            $config = Configuration::filterByStore()->first();
             if ($group) {
                 $customers = Parties::where('group_id', $group->id)->byUser()->get();
             } else {
@@ -358,7 +358,7 @@ class SalesController extends Controller
     public function receipt(int $id)
     {
         try {
-            $config = Configuration::latest()->first();
+            $config = Configuration::filterByStore()->first();
             $inv_type = $config->invoice_type;
             $template  = $config->invoice_template;
             $order = Sales::where('id', $id)->with('order_details.item_details', 'customer', 'user')->first();

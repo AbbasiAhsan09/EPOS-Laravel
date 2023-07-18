@@ -33,7 +33,7 @@ class PurchaseOrderController extends Controller
     {
         // dd('hi');
         $vendors = Parties::where('group_id' , 2)->byUser()->get();
-        $config = Configuration::first();
+        $config = Configuration::filterByStore()->first();
 
         return view('purchase.orders.create_order',compact('vendors','config'));
     }
@@ -115,8 +115,8 @@ class PurchaseOrderController extends Controller
      */
     public function show($id)
     {
-        $config = Configuration::first();
-        $order = PurchaseOrder::find($id);
+        $config = Configuration::filterByStore()->first();
+        $order = PurchaseOrder::byUser()->where('id',$id)->first();
         return view('purchase.orders.create_order',compact('order','config'));
     }
 

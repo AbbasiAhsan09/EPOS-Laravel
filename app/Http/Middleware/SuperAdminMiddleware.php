@@ -22,6 +22,7 @@ class SuperAdminMiddleware
                 return $next($request);
             }
         }
+        
         return redirect('/');
     }
 }

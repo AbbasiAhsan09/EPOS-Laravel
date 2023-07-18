@@ -14,6 +14,8 @@ class Stores extends Model
     
 
     protected $table = 'stores';
+    protected $fillable = ['id','store_name','store_phone','business_size','store_location','type','store_supervisor',
+    'renewal_date','domain','email','is_locked','phone','is_trial','created_at','deleted_at'];
     
     /**
      * Get the user that owns the Stores

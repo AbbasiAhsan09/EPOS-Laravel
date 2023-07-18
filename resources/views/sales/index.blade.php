@@ -37,7 +37,7 @@
             <th>Created at</th>
             <th>User</th>
             <th>Net Amount</th>
-            @if (Auth::user()->role_id == 1)
+            @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2 )
             <th>Actions</th>
             @endif
         </thead>
@@ -50,7 +50,7 @@
         <td>{{date('d-M-y | h:m' , strtotime($item->created_at))}}</td>
         <td>{{$item->user->name}}</td>   
         <td> {{env('CURRENCY').$item->net_total}}</td> 
-            @if (Auth::user()->role_id ==1 )
+            @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2 )
             <td>
                 <div class="s-btn-grp">
                   <div class="dropdown">

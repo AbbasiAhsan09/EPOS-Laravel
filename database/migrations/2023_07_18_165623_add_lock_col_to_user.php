@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('stores',function(Blueprint $table){
-            $table->boolean('is_trial')->default(false);
-            $table->string('business_size')->default('1-5');
+        Schema::table('stores', function (Blueprint $table) {
+            $table->boolean('is_locked')->default(0);
         });
     }
 
@@ -27,8 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('stores', function (Blueprint $table) {
-            $table->dropColumn('is_trial');
-            $table->dropColumn('business_size');
+            $table->dropColumn('is_locked');
         });
     }
 };

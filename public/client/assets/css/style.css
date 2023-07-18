@@ -69,3 +69,15 @@ input[type=checkbox] {
   .p-btn:hover{
     opacity: 0.9;
   }
+
+  .title-sub{
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.acc-item{
+    border: solid 1px var(--primary-color);
+    padding: 10px;
+}

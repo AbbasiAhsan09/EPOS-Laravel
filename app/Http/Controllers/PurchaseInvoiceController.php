@@ -32,7 +32,7 @@ class PurchaseInvoiceController extends Controller
     public function create_inv(int $id)
     {
         try {
-            $config = Configuration::first();
+            $config = Configuration::filterByStore()->first();
             
         $checkInv = PurchaseInvoice::where('po_id' , $id)->first();
 
@@ -193,7 +193,7 @@ class PurchaseInvoiceController extends Controller
         try {
             $invoice = PurchaseInvoice::find($id);
         $vendors = Parties::where('group_id' , 2)->byUser()->get();
-        $config = Configuration::first();
+        $config = Configuration::filterByStore()->first();
             
             return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config'));
         } catch (\Throwable $th) {

@@ -22,6 +22,6 @@ class ManagerMiddlware
                 return $next($request);
             }
         }
-        abort(403);
+        return redirect('/sales');
     }
 }
