@@ -15,9 +15,13 @@
                 <div class="row .row-customized">
                     <div class="col-lg-8">
                         <div class="input-group input-group-outline">
-                            <label class="form-label">Search</label>
-                            <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
-                          </div>
+                            <select name="" id="type_search" class="form-control">
+                                <option value="all" {{session()->get('store_all') ? 'selected' : ''}}>All</option>
+                                <option value="expired"  {{session()->get('expired') ? 'selected' : ''}}>Expired</option>
+                             <option value="running" {{session()->get('running') ? 'selected' : ''}}>Running</option>
+                             <option value="trial" {{session()->get('trial') ? 'selected' : ''}}>Trial</option>
+                            </select>
+                           </div>  
                       
                     </div>
                     <div class="col-lg-4">
@@ -144,7 +148,7 @@
                     <div class="col-lg-6 mb-2">
                         <label for="">Supervisor</label>
                         <div class="input-group input-group-outline">
-                            <select id="" class="form-control" name="store_supervisor" required  onfocus="focused(this)" onfocusout="defocused(this)">
+                            <select id="" class="form-control" readonly name="store_supervisor" required  onfocus="focused(this)" onfocusout="defocused(this)">
                                 <option value="">Select Supervisor</option>
                                 @foreach ($users as $user)
                                     <option value="{{$user->id}}" {{$user->id == $item->store_supervisor ? 'selected' : '' }}>{{$user->name}}</option>
@@ -155,6 +159,28 @@
                        
                         
                     </div>
+
+                    <div class="col-lg-6 mb-2">
+                        <label for="">Stauts</label>
+                        <div class="input-group input-group-outline">
+                            <select id="" class="form-control" readonly name="status" required  onfocus="focused(this)" onfocusout="defocused(this)">
+                                <option value="1" {{$item->is_locked ? 'selected' : ''}}>Locked</option>
+                                <option value="0" {{!$item->is_locked ? 'selected' : ''}}>Running</option>
+                                <option value="0" {{!$item->is_locked && $item->renewal_date == null ? 'selected' : ''}}>Trial</option>
+                            </select>
+                           
+                        </div>
+                       
+                        
+                    </div>
+
+                    <div class="col-lg-6 mb-2">
+                        <label for="">Renewal Date</label>
+                        <div class="input-group input-group-outline">
+                           <input type="date" required name="renewal_date" value="{{$item->renewal_date}}" class="form-control">
+                        </div>
+                    </div>
+
                 </div>
            
         </div>
@@ -264,9 +290,32 @@
                        
                         
                     </div>
+                    
+                <div class="col-lg-6 mb-2">
+                    <label for="">Stauts</label>
+                    <div class="input-group input-group-outline">
+                        <select id="" class="form-control" readonly name="status" required  onfocus="focused(this)" onfocusout="defocused(this)">
+                            <option value="1" >Locked</option>
+                            <option value="0" >Running</option>
+                            <option value="trial" >Trial</option>
+                        </select>
+                       
+                    </div>
+                   
+                    
+                </div>
+
+                <div class="col-lg-6 mb-2">
+                    <label for="">Renewal Date</label>
+                    <div class="input-group input-group-outline">
+                       <input type="date" required name="renewal_date" value="{{date('Y-m-d')}}" class="form-control">
+                    </div>
+                </div>
                 </div>
 
 
+            </div>
+       
            
            
         </div>
@@ -279,4 +328,19 @@
     </div>
   </div>
   {{-- Modal --}}
+
+  @section('scripts')
+  <script>
+    $('#type_search').change(function(){
+      window.location.replace('/store?filter='+$(this).val());
+    });
+
+
+$('.popup').click(function(event) {
+    event.preventDefault();
+    window.open($(this).attr("href"), "popupWindow", "width=300,height=600,scrollbars=yes,left="+($(window).width()-400)+",top=50");
+});
+
+  </script>
+@endsection
 @endsection

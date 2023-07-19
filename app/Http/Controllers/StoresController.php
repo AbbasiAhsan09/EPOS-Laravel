@@ -9,6 +9,8 @@ use Alert;
 use App\Models\Configuration;
 use Illuminate\Support\Facades\Auth;
 
+use function PHPUnit\Framework\isEmpty;
+
 class StoresController extends Controller
 {
     /**
@@ -16,10 +18,42 @@ class StoresController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $stores = Stores::with('users')->get();
+            $stores = Stores::with('users')
+            ->when($request->filter == 'expired',function($query){
+                $query->where('renewal_date','<=',date('Y-m-d'))->orderBy('renewal_date','DESC');
+                session()->put('expired',true);
+                session()->forget('all');
+                session()->forget('running');
+                session()->forget('trial');
+            })
+            ->when($request->filter == 'trial',function($query){
+                $query->where('is_trial','=',1)->orderBy('created_at','DESC');
+                session()->forget('expired');
+                session()->forget('all');
+                session()->forget('running');
+                session()->put('trial',true);
+            })
+            ->when($request->filter == 'running',function($query){
+                $query->where('renewal_date','>',date('Y-m-d'))->orderBy('renewal_date','DESC');
+                session()->forget('expired');
+                session()->forget('all');
+                session()->put('running',true);
+                session()->forget('trial');
+            })
+            ->when($request->filter == 'all',function($query){
+                
+                session()->forget('expired');
+                session()->put('all',true);
+                session()->forget('running');
+                session()->forget('trial');
+            })
+            ->get();
+
+
+
             if(Auth::user()->store_id){
             $stores = Stores::with('users')->where('id',Auth::user()->store_id)->get();
             }
@@ -68,6 +102,12 @@ class StoresController extends Controller
                 $store->domain = $request->domain;
                 $store->email = $request->email;
                 $store->phone = $request->phone;
+                if($request->status == 'trial'){
+                    $store->is_trial = 1;
+                }else{
+                    $store->is_locked = $request->status;
+                }
+                $store->renewal_date = isEmpty($request->renewal_date) ? null : $request->renewal_date;
                 $store->save();
 
                 if($store){
@@ -130,6 +170,13 @@ class StoresController extends Controller
                 $store->domain = $request->domain;
                 $store->email = $request->email;
                 $store->phone = $request->phone;
+                if($request->status == 'trial'){
+                    $store->is_trial = 1;
+                }else{
+                    $store->is_locked = $request->status;
+                }
+                $store->renewal_date = $request->renewal_date;
+              
                 $store->save();
                 toast('Updated Store','info');
 
