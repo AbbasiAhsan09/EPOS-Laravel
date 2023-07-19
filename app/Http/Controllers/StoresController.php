@@ -173,6 +173,7 @@ class StoresController extends Controller
                 if($request->status == 'trial'){
                     $store->is_trial = 1;
                 }else{
+                    $store->is_trial = 0;
                     $store->is_locked = $request->status;
                 }
                 $store->renewal_date = $request->renewal_date;
