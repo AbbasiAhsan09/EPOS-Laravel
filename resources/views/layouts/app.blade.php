@@ -37,6 +37,8 @@
 </head>
 
 <body class="g-sidenav-show  bg-gray-200">
+  <input type="hidden" id="checkInventory" value="{{$currenConfig->inventory_tracking ?? 0}}">
+  <input type="hidden" id="storeId" value="{{Auth::user()->store->id ?? 0}}">
   @include('sweetalert::alert')
   @if (Auth::check())
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
@@ -195,7 +197,7 @@
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">
       <div class="mx-3">
-        <a class="btn bg-gradient-primary mt-4 w-100"  type="button">Need Help?</a>
+        <a class="btn bg-gradient-primary mt-4 w-100" target="_blank" href="https://wa.me/03200681969?text=Hello,%20%0AName:%20{{Auth::check() ? Auth::user()->name : ''}}%0AStore:%20{{Auth::check() && isset(Auth::user()->store)? Auth::user()->store->store_name : ''}}%0AUser%20Role:%20{{Auth::check() && isset(Auth::user()->userroles->role_name) ? Auth::user()->userroles->role_name : ''}}%0AI%20need%20help%20regarding...."  type="button">Need Help?</a>
       </div>
     </div>
   </aside>

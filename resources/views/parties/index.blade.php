@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+@include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/SQvssnygJS8'])
 
 <div class="page-wrapper">
 <div class="container-fluid">
@@ -44,7 +45,9 @@
         <th>Phone</th>
         <th>Email</th>
         <th>Status</th>
-        <th>Actions</th>
+        @if (Auth::user()->userroles->role_name == "Admin")
+        <th>Actions</th>            
+        @endif
     </thead>
     <tbody>
        @foreach ($parties as $item)
@@ -68,7 +71,7 @@
                 <div class="badge badge-sm bg-gradient-success">Active</div>
             @endif
         </td>
-        @if (Auth::user()->role_id ==1 )
+        @if (Auth::user()->userroles->role_name == "Admin")
             <td>
                 <div class="s-btn-grp">
                   <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#edit{{$item->id}}">

@@ -6,7 +6,7 @@
     
 
 @endphp
-@include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/xcJtL7QggTI'])
+@include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/eNhzTjJ2rIE'])
 
     <div class="page-wrapper">
        

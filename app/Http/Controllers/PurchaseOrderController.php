@@ -116,7 +116,7 @@ class PurchaseOrderController extends Controller
     public function show($id)
     {
         $config = Configuration::filterByStore()->first();
-        $order = PurchaseOrder::byUser()->where('id',$id)->first();
+        $order = PurchaseOrder::filterByStore()->where('id',$id)->first();
         return view('purchase.orders.create_order',compact('order','config'));
     }
 
@@ -128,7 +128,11 @@ class PurchaseOrderController extends Controller
      */
     public function edit(int $id)
     {
-        $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
+        $order = PurchaseOrder::where('id',$id)->with('details.items')->filterByStore()->first();
+        if(!$order){
+            Alert::toast('Invalid Request','error');
+            return redirect()->back();
+        }
         $vendors = Parties::where('group_id' , 2)->byUser()->get();
         return view('purchase.orders.create_order',compact('order','vendors'));
     }
@@ -155,7 +159,11 @@ class PurchaseOrderController extends Controller
     
             if($validate){
                 // dd($request->all());
-                $order =  PurchaseOrder::find($id);
+                $order =  PurchaseOrder::where('id',$id)->filterByStore()->first();
+                if(!$order){
+                    Alert::toast('Invalid Request','error');
+                    return redirect()->back();
+                }
                 $order->doc_num = date('d',time())."/PO"."/".date('m/y',time()).'/'.$order->id;
                 $order->quotation_num = $request->q_num;
                 $order->party_id = $request->party_id;
@@ -202,7 +210,7 @@ class PurchaseOrderController extends Controller
             }else{
     
             }
-                dd($request->all());
+                
            } catch (\Throwable $th) {
             throw $th;
            }

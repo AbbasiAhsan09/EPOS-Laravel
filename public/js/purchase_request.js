@@ -1,5 +1,6 @@
 // Orders JS
 $(document).ready(function(){
+    var storeId = $("#storeId").val();
     calculateOrders();
     function redirectTosearchItemValue(){
         $('#searchItemValue').focus();
@@ -74,7 +75,7 @@ $(document).ready(function(){
    
         if (!CheckProductIsExist(id)) {
             $.ajax({
-                url : '/api/items/1/'+id,
+                url : '/api/items/1/'+id+'/'+storeId,
                 type : 'GET',
                 success : function(e){
                         $('#cartList').append(
@@ -123,7 +124,7 @@ $(document).ready(function(){
         if(e.which == 13){
             var value = $(this).val();
             $.ajax({
-                url : '/api/items/1/'+value,
+                url : '/api/items/1/'+value+'/'+storeId,
                 type : 'GET',
                 success : function(res){
                     // console.log(res);
@@ -147,7 +148,7 @@ $(document).ready(function(){
         removeItemsFromList();
        if(e.which == 40){
         $.ajax({
-            url : '/api/items/0/'+value,
+            url : '/api/items/0/'+value+'/'+storeId,
             type: 'GET',
             success : function(res){
                 if(res.length < 1){

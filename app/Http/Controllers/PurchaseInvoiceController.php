@@ -191,13 +191,17 @@ class PurchaseInvoiceController extends Controller
     public function edit($id)
     {
         try {
-            $invoice = PurchaseInvoice::find($id);
-        $vendors = Parties::where('group_id' , 2)->byUser()->get();
-        $config = Configuration::filterByStore()->first();
-            
-            return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config'));
+        $invoice = PurchaseInvoice::where('id',$id)->filterByStore()->first();
+            if($invoice){
+                $vendors = Parties::where('group_id' , 2)->filterByStore()->get();
+                $config = Configuration::filterByStore()->first();
+                    
+                    return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config'));
+            }
+            Alert::toast('Invalid Request','error');
+            return redirect()->back();
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
@@ -222,7 +226,11 @@ class PurchaseInvoiceController extends Controller
             ]);
 
             if($validate){
-                $invoice =  PurchaseInvoice::find($id);
+                $invoice =  PurchaseInvoice::where('id',$id)->filterByStore()->first();
+                if(!$invoice){
+                    Alert::toast('Invalid Request','error');
+                    return redirect()->back();
+                }
                 $old_amount = $invoice->recieved;
                 $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. $invoice->id;
                 $invoice->party_id = $request->party_id;
@@ -319,9 +327,8 @@ class PurchaseInvoiceController extends Controller
      */
     public function destroy(int $id)
     {
-        // dd('hi');
       try {
-        $invoice = PurchaseInvoice::find($id);
+        $invoice = PurchaseInvoice::where('id',$id)->filterByStore()->first();
         if($invoice){
             $details = PurchaseInvoiceDetails::where('inv_id', $invoice->id);
             $this->deleteItemOnPurchaseInvoice($details->get());
@@ -330,6 +337,8 @@ class PurchaseInvoiceController extends Controller
             Alert::toast('Purchase Invoice Deleted!', 'info');
             return redirect()->back();
         }
+        Alert::toast('Invalid Request','error');
+        return redirect()->back();
       } catch (\Throwable $th) {
         throw $th;
       }

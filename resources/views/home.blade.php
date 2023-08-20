@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+@include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/hGkaaHxzxlo'])
+
 @php
     $is_trial = isset(Auth::user()->store->is_trial) ? Auth::user()->store->is_trial:  false;
     $renewalDate = isset(Auth::user()->store->renewal_date) ? Carbon\Carbon::parse(Auth::user()->store->renewal_date) : false;

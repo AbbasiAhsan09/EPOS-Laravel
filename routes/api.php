@@ -20,4 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-Route::get('items/{exact}/{param}', 'App\Http\Controllers\ProductController@getProductApi')->middleware("throttle:1000000:1");
+Route::get('items/{exact}/{param}/{storeId}', 'App\Http\Controllers\ProductController@getProductApi')->middleware("throttle:1000000:1");

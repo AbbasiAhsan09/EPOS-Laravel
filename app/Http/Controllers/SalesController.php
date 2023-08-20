@@ -158,7 +158,7 @@ class SalesController extends Controller
                     
                     return redirect()->back()->with('openNewWindow',$order->id);
                 } else {
-                    return 'error';
+                    return 'Un-autorized Action';
                 }
             }
         } catch (\Throwable $th) {
@@ -186,8 +186,9 @@ class SalesController extends Controller
     public function edit(int $id, Sales $sales)
     {
         try {
+
             $config = Configuration::filterByStore()->first();
-            $order = Sales::where('id', $id)->with('order_details.item_details')->first();
+            $order = Sales::where('id', $id)->with('order_details.item_details')->filterByStore()->first();
             if ($order) {
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
                 if ($group) {
@@ -198,8 +199,7 @@ class SalesController extends Controller
 
                 return view('sales.sale_orders.new_order', compact('order', 'customers','config'));
             }
-
-
+            Alert::toast('invalid_request','error');
             return redirect()->back()->withErrors('invalid_request', 'Ooops! Your Request is Invalid!');
         } catch (\Throwable $th) {
             throw $th;
@@ -230,9 +230,10 @@ class SalesController extends Controller
             ]);
 
             if ($validate) {
-                $order  =  Sales::find($id);
+                $order  =  Sales::where('id',$id)->filterByStore()->first();
                 
                 if (!$order) {
+                    Alert::toast('Invalid Request','error');
                     return redirect()->back()->withErrors('error', 'Invalid Request');
                 }
                 $old_amount = $order->recieved;
@@ -318,7 +319,7 @@ class SalesController extends Controller
     public function destroy(int $id)
     {
         try {
-            $sale = Sales::find($id);
+            $sale = Sales::where('id',$id)->filterByStore()->first();
             if($sale){
                 $this->updateOrderTransaction($sale->id,$sale->customer_id,$sale->recieved,0,'Deleted Order '.$sale->tran_no);
                 if($sale->delete()){
@@ -332,6 +333,7 @@ class SalesController extends Controller
                     
                 }
             }
+            Alert::toast('invalid_request','error');
             return redirect()->back()->withErrors('error' , 'Invalid Request');
         } catch (\Throwable $th) {
             throw $th;
@@ -345,7 +347,7 @@ class SalesController extends Controller
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
             $config = Configuration::filterByStore()->first();
             if ($group) {
-                $customers = Parties::where('group_id', $group->id)->byUser()->get();
+                $customers = Parties::where('group_id', $group->id)->filterByStore()->get();
             } else {
                 $customers = [];
             }
@@ -361,7 +363,7 @@ class SalesController extends Controller
             $config = Configuration::filterByStore()->first();
             $inv_type = $config->invoice_type;
             $template  = $config->invoice_template;
-            $order = Sales::where('id', $id)->with('order_details.item_details', 'customer', 'user')->first();
+            $order = Sales::where('id', $id)->with('order_details.item_details', 'customer', 'user')->filterByStore()->first();
             $viewName = 'sales.invoices.'.($inv_type == 0 ? 'web.' : 'thermal.' ).$template;
             return view($viewName, compact('order', 'config'));
         } catch (\Throwable $th) {

@@ -127,7 +127,7 @@ class PurchaseReportController extends Controller
 
             if ($request->has('type') && $request->type === 'pdf') {
 
-                $records = $records->get();
+                $records = $records->filterByStore()->get();
                 $data = [
                     'records' => $records,
                     'from' => $from,
@@ -137,7 +137,7 @@ class PurchaseReportController extends Controller
                 return $pdf->stream();
             } else {
 
-                $records = $records->paginate(20);
+                $records = $records->filterByStore()->paginate(20);
                 return view('reports.purchase-report.report2', compact('records', 'from', 'to', 'products'));
             }
         } catch (\Throwable $th) {
@@ -156,8 +156,8 @@ class PurchaseReportController extends Controller
             $to = $request->end_date;
 
             $group = PartyGroups::where('group_name', 'LIKE' ,'vendor%')->first();
-            $vendors = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()->get();
-            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()
+            $vendors = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->filterByStore()->get();
+            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->filterByStore()
             ->when($request->has('vendor') && $request->vendor !== null, function($query) use($request){
                session()->put('purchase-summary-vendor',  $request->vendor);
                 $query->where('id' , $request->vendor);

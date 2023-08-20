@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+@include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/eNhzTjJ2rIE'])
 
 <div class="page-wrapper">
 <div class="container-fluid">

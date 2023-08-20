@@ -105,12 +105,12 @@ class PurchaseRequestController extends Controller
      */
     public function edit(int $id)
     {
-        $purchaseRequest = PurchaseRequest::where('id',$id)->with('details.items')->first();
+        $purchaseRequest = PurchaseRequest::where('id',$id)->with('details.items')->filterByStore()->first();
         if($purchaseRequest){
             // dump(($purchaseRequest));
             return view('purchase.request.create',compact('purchaseRequest'));
         }else{
-            Alert::toast('Something went wrong!','error');
+            Alert::toast('Invalid Request','error');
             return redirect()->route("request.index");
         }
     }
@@ -133,7 +133,7 @@ class PurchaseRequestController extends Controller
 
             if($validate)
             {
-                $pr =  PurchaseRequest::find($id);
+                $pr =  PurchaseRequest::where('id',$id)->filterByStore()->first();;
                 $pr->requested_by = Auth::user()->id;
                 $pr->type = $request->order_tyoe;
                 $pr->required_on = $request->required_on;
@@ -164,7 +164,7 @@ class PurchaseRequestController extends Controller
                 Alert::toast('Purchase Requisition Updated!','info');
                 return redirect('/purchase/request');
             }else{
-                Alert::toast('Something Went Wrong','error');
+                Alert::toast('Invalid Request','error');
                 return redirect('/purchase/request');
             }
         } catch (\Throwable $th) {
