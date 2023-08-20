@@ -1,5 +1,6 @@
 // Orders JS
 $(document).ready(function(){
+    var storeId = $("#storeId").val();
     var total_amount = 0;
     $('#product_id').change(function(){
         var id  = $(this).val();
@@ -30,7 +31,6 @@ $(document).ready(function(){
     }
 
     $('#item_selection_list').on('click','.selection_list_item',function(){
-        // console.log('working');
         var value = $(this).attr('data-id');
         addToCart(value);
         removeItemsFromList();
@@ -39,7 +39,6 @@ $(document).ready(function(){
 
     // Adding Product in Order Cart
    function addToCart(id, addMulti){
-    // console.log(addMulti);
     if(!addMulti){
         searchAndAppendProduct(id);
     }else{
@@ -56,8 +55,6 @@ $(document).ready(function(){
                 searchAndAppendProduct(id);
                 return CheckProductIsExist(id);
 
-                // console.log('run');
-                // return false;
             }
             });
       }, 200);
@@ -81,7 +78,7 @@ $(document).ready(function(){
    
         if (!CheckProductIsExist(id)) {
             $.ajax({
-                url : '/api/items/1/'+id,
+                url : '/api/items/1/'+id+'/'+storeId,
                 type : 'GET',
                 success : function(e){
                         $('#cartList').append(
@@ -101,8 +98,7 @@ $(document).ready(function(){
                         '</tr>'
                         );
                         removeItemsFromList();
-                        // console.log(e.uoms.base_unit_value);
-                        // swal('product');  
+                        
                 }
             });
            } 
@@ -111,7 +107,7 @@ $(document).ready(function(){
 
     // Check if Product is Already Added
     function CheckProductIsExist(value){
-        // console.log(value);
+       
         var check = false;
         $('.itemsInCart').each(function(){
           var barcode = $(this).attr('data-id');
@@ -130,10 +126,10 @@ $(document).ready(function(){
         if(e.which == 13){
             var value = $(this).val();
             $.ajax({
-                url : '/api/items/1/'+value,
+                url : '/api/items/1/'+value+'/'+storeId,
                 type : 'GET',
                 success : function(res){
-                    // console.log(res);
+                    
                     if(res.id){
                         setTimeout(() => {
                             addToCart(res.barcode,true);
@@ -153,11 +149,11 @@ $(document).ready(function(){
         removeItemsFromList();
        if(e.which == 40){
         $.ajax({
-            url : '/api/items/0/'+value,
+            url : '/api/items/0/'+value+'/'+storeId,
             type: 'GET',
             success : function(res){
                 if(res.length < 1){
-                    // console.log('not found');
+                    
                     removeItemsFromList();
                 }else{
                     addItemInList(res);
@@ -183,7 +179,7 @@ $(document).ready(function(){
 
             $('td.total',this).text(total.toFixed(2));
         })
-        // console.log(grand_total);
+      
         total_amount =  grand_total;
         $('.foot_g_total').text(grand_total.toFixed(2));
        $('#gross_total').val(grand_total.toFixed(2));
@@ -198,7 +194,7 @@ $(document).ready(function(){
     // Calculate on change 
     $('.itemsInCart').on('click', '.rate', function(){
         calculateOrders();
-        console.log('input');
+        
     });
     $('.order-type-item').click(function(){
         orderType();
@@ -228,7 +224,7 @@ $(document).ready(function(){
     })
     
     $('body').on('change','select.uom',function(){
-        console.log('working');
+       
         var value = $(this).val();
         var parent = $(this).parent().parent();
         var rate = parent.find('input.rate').val();
@@ -288,18 +284,23 @@ $(document).ready(function(){
         calculateOrders();
     });
 
+    var checkInventory = $('#checkInventory').val();
+    checkInventory = +checkInventory;
+
     $('body').on('change', '.uom',function(){
+
         var curr = $(this);
         var qty_ins = $(this).parent().parent().find('.pr_qty');
         var qty = $(this).parent().parent().find('.pr_qty').val();
       var is_base_unit =  curr.val() > 1 ? true : false;
        var item_id = $(this).parent().parent().find('.pr_qty').attr('data-item-id');
       
+      if (checkInventory != 0) {
         $.ajax({
             url : '/check-inventory/'+item_id+'/'+(is_base_unit ? 1: 0),
             type : 'GET',
             success : function(res){
-                console.log(res, qty);
+               
                 if((res * 1) < qty){
                     swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
                     qty_ins.val(Math.round(res));
@@ -310,6 +311,7 @@ $(document).ready(function(){
                 }
             }
         });
+      }
     })
     
     $('body').on('keyup', '.pr_qty',function(){
@@ -317,12 +319,12 @@ $(document).ready(function(){
         var qty = $(this).val();
       var is_base_unit =  curr.parent().parent().find('.uom').val() > 1 ? true : false;
        var item_id = curr.attr('data-item-id');
-      
+
+       if(checkInventory != 0){
         $.ajax({
             url : '/check-inventory/'+item_id+'/'+(is_base_unit ? 1: 0),
             type : 'GET',
             success : function(res){
-                console.log(res, qty);
                 if((res * 1) < qty){
                     swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
                     curr.val(Math.round(res));
@@ -333,6 +335,7 @@ $(document).ready(function(){
                 }
             }
         });
+       }
     })
   
 });

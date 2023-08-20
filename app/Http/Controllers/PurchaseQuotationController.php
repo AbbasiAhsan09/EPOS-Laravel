@@ -30,10 +30,10 @@ class PurchaseQuotationController extends Controller
      */
     public function create()
     {
-        $group_v = PartyGroups::where('group_name', 'LIKE' , "vendor%")->first();
+        $group_v = PartyGroups::where('group_name', 'LIKE' , "vendo%")->first();
         $group_c = PartyGroups::where('group_name', 'LIKE' , "custo%")->first();
-        $vendors = Parties::where('group_id',$group_v->id ?? '')->byUser()->get();
-        $customers = Parties::where('group_id',$group_c->id ?? '')->byUser()->get();
+        $vendors = Parties::where('group_id',$group_v->id ?? '')->filterByStore()->get();
+        $customers = Parties::where('group_id',$group_c->id ?? '')->filterByStore()->get();
         return view("purchase.quotation.create_quotation", compact('vendors','customers'));
     }
 
@@ -125,12 +125,17 @@ class PurchaseQuotationController extends Controller
      */
     public function edit(int $id)
     {
-        $quotation = PurchaseQuotation::where('id',$id)->with('details.items')->first();
-        $group_v = PartyGroups::where('group_name', 'LIKE' , "vendor%")->first();
+        $quotation = PurchaseQuotation::where('id',$id)->with('details.items')->filterByStore()->first();
+        if($quotation){
+            $group_v = PartyGroups::where('group_name', 'LIKE' , "vendor%")->first();
         $group_c = PartyGroups::where('group_name', 'LIKE' , "custo%")->first();
-        $vendors = Parties::where('group_id',$group_v->id ?? '')->byUser()->get();
-        $customers = Parties::where('group_id',$group_c->id ?? '')->byUser()->get();
+        $vendors = Parties::where('group_id',$group_v->id ?? '')->filterByStore()->get();
+        $customers = Parties::where('group_id',$group_c->id ?? '')->filterByStore()->get();
         return view("purchase.quotation.create_quotation", compact('vendors','customers','quotation'));
+        }
+        
+        Alert::toast('Invalid Request','error');
+        return redirect()->back();
     }
 
     /**
@@ -155,7 +160,11 @@ class PurchaseQuotationController extends Controller
     
             if($validate){
                 // dd($request->all());
-                $quotation =  PurchaseQuotation::find($id);
+                $quotation =  PurchaseQuotation::where('id',$id)->filterByStore()->first();
+                if(!$quotation){
+                    Alert::toast('Invalid Request','error');
+                    return redirect()->back();
+                }
                 $quotation->doc_num = date('d',time())."/".($request->order_tyoe == 'normal' ? 'PR' : 'SA').'/'.date('m/y',time()).'/'.$id;
                 $quotation->req_num = $request->req_num;
                 $quotation->party_id = $request->party_id;

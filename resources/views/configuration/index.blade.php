@@ -125,7 +125,7 @@
 
 
                   <div class="mt-3 d-flex">
-                    <label for="" class="mb-0">Track Inventory: </label>
+                    <label for="" class="mb-0">Use Inventory: </label>
                     <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
                         <input type="checkbox" class="form-check-input" id="" name="track_inventory" value="1" {{isset($currenConfig) ? ($currenConfig->inventory_tracking ? 'checked' : '') : '' }}> 
                     </div>

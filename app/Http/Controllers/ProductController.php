@@ -10,6 +10,8 @@ use App\Models\ProductCategory;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Excel;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ProductController extends Controller
@@ -35,38 +37,46 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
-            $product = new Products();
-            
-            $product->name = $request->product;
-            $product->barcode = $request->code;
-            $product->uom = $request->uom;
-            $product->category = $request->category;
-            $product->mrp = $request->mrp;
-            $product->low_stock = $request->low_stock;
-            $product->tp = $request->tp;
-            $product->taxes = $request->tax;
-            $product->store_id = 1;
-            $product->img = $request->img;
-            $product->brand = $request->brand;
-            $product->description = $request->description;
-            $product->opening_stock = $request->opening_stock;
-            $product->save();
-
-            if($product){
-                $uom = MOU::find($request->uom);
-
-                $inventory = Inventory::firstOrCreate([
-                    'is_opnening_stock' => 0,
-                    'item_id' => $product->id
-                ]);
-
-                $inventory->update([
-                    'stock_qty' => ($inventory->stock_qty + ($product->opening_stock * (isset($uom->base_unit_value) ? $uom->base_unit_value : 1)))
-                ]);
+            $validate = $request->validate([
+                'code' => 'required|unique:products,barcode,id,store_id',
+                'category' => 'required',
+            ]);
+            if($validate){
+                $product = new Products();
+                $product->name = $request->product;
+                $product->barcode = $request->code;
+                $product->uom = $request->uom;
+                $product->category = $request->category;
+                $product->mrp = $request->mrp;
+                $product->low_stock = $request->low_stock;
+                $product->tp = $request->tp;
+                $product->taxes = $request->tax;
+                $product->store_id = 1;
+                $product->img = $request->img;
+                $product->brand = $request->brand;
+                $product->description = $request->description;
+                $product->opening_stock = $request->opening_stock;
+                $product->save();
+    
+                if($product){
+                    $uom = MOU::find($request->uom);
+    
+                    $inventory = Inventory::firstOrCreate([
+                        'is_opnening_stock' => 0,
+                        'item_id' => $product->id
+                    ]);
+    
+                    $inventory->update([
+                        'stock_qty' => ($inventory->stock_qty + ($product->opening_stock * (isset($uom->base_unit_value) ? $uom->base_unit_value : 1)))
+                    ]);
+                }
+    
+                toast('Product Added!','success');
+                return redirect()->back();
+            }else{
+                toast('Product Code Cannot Be Duplicated!','error');
+                return redirect()->withErrors($validate)->back()->withInput(); 
             }
-
-            toast('Product Added!','success');
-            return redirect()->back();
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -131,24 +141,27 @@ class ProductController extends Controller
 
 
     // API CONTROLLER FOR PRODUCTS
-    public function getProductApi($exact,$param)
+    public function getProductApi($exact,$param,$storeId)
     {
         try {
            if($exact == 1){
-            $item = Products::where('barcode' , $param)->orWhere('id',$param)->with('uoms','categories.field')->byUser()->first();
+            $item = Products::where(function($query) use ($param){
+                $query->where('barcode' , $param)->orWhere('id',$param);
+            })->with('uoms','categories.field')->where('store_id',$storeId)->first();
+            
             return response()->json($item);
            }else{
             $items = Products::where(function($qyer) use($param){
                 $qyer->where('name' , 'LIKE' , "%$param%")  
-                ->orWhere('brand', 'LIKE' , "%$param%");
-            })->filterByStore()
-            ->with('uoms','categories.field')
-            ->orWhereHas('categories', function($query) use($param){
+                ->orWhere('brand', 'LIKE' , "%$param%")
+                ->orWhereHas('categories', function($query) use($param){
                     $query->where('category','LIKE', "%$param%")->filterByStore();
                 })
-            ->orWhereHas('categories.field', function($query) use($param){
+                ->orWhereHas('categories.field', function($query) use($param){
                     $query->where('name','LIKE', "%$param%")->filterByStore();
-                })
+                });
+            })->where('store_id',$storeId)
+            ->with('uoms','categories.field')
             ->get();
             return response()->json($items);
            }
