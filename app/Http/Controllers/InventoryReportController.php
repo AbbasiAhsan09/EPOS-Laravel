@@ -42,7 +42,7 @@ class InventoryReportController extends Controller
                 ->leftJoin('mou', 'products.uom', '=', 'mou.id')
                 ->orderBy('product_categories.category')
                 ->orderBy('products.name')
-                ->byUser()
+                // ->byUser()
                 ->when(($request->has('name') && $request->name != null)
                     ,function ($query) use ($request) {
                        $query->where('products.name', 'LIKE', '%'.$request->name.'%')
