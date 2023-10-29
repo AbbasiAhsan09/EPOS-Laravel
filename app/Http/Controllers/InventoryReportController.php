@@ -42,6 +42,7 @@ class InventoryReportController extends Controller
                 ->leftJoin('mou', 'products.uom', '=', 'mou.id')
                 ->orderBy('product_categories.category')
                 ->orderBy('products.name')
+                ->where('products.store_id' , Auth::user()->store_id ?? 0)
                 // ->byUser()
                 ->when(($request->has('name') && $request->name != null)
                     ,function ($query) use ($request) {
