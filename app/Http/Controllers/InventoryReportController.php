@@ -6,6 +6,7 @@ use App\Models\Inventory;
 use App\Models\Products;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class InventoryReportController extends Controller
@@ -24,6 +25,7 @@ class InventoryReportController extends Controller
             session()->forget('inventory-report-field');
             session()->forget('inventory-report-category');
             session()->forget('inventory-report-product');
+            
             $records = Products::select(
                 '*',
                 'products.name',
@@ -40,6 +42,7 @@ class InventoryReportController extends Controller
                 ->leftJoin('mou', 'products.uom', '=', 'mou.id')
                 ->orderBy('product_categories.category')
                 ->orderBy('products.name')
+                ->byUser()
                 ->when(($request->has('name') && $request->name != null)
                     ,function ($query) use ($request) {
                        $query->where('products.name', 'LIKE', '%'.$request->name.'%')

@@ -131,8 +131,8 @@ class SalesReportController extends Controller
             $to = $request->end_date;
 
             $group = PartyGroups::where('group_name', 'LIKE' ,'customer%')->first();
-            $customers = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()->get();
-            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->byUser()
+            $customers = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()->get();
+            $records  = Parties::where('group_id',(isset($group->id) && $group->id) ? $group->id : 0)->byUser()
             ->when($request->has('customer') && $request->customer !== null, function($query) use($request){
                session()->put('sale-summary-customer',  $request->customer);
                 $query->where('id' , $request->customer);
