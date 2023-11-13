@@ -160,7 +160,7 @@
                         <label for="">UOM *</label>
                         <div class="input-group input-group-outline">
                             
-                        <select name="uom" id="" class="form-control" {{Auth::user()->role_id != 1 ? 'disabled' : ''}}>
+                        <select name="uom" id="" class="form-control" {{Auth::user()->role_id != 1 ? 'readonly' : ''}}>
                             <option value="0" {{$item->uom == 0 ? 'selected' : ''}}>Default</option>
                       
                             @foreach ($uom as $unit_of_m)

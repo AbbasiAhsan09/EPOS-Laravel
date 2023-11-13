@@ -62,4 +62,14 @@ class User extends Authenticatable
     public function store() {
         return $this->belongsTo(Stores::class,'store_id','id');
     }
+
+    /**
+     * Get the storeConfig that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function storeConfig(): BelongsTo
+    {
+        return $this->belongsTo(Configuration::class, 'store_id', 'store_id');
+    }
 }
