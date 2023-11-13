@@ -113,6 +113,11 @@ class SalesController extends Controller
                 $order->recieved = $request->recieved;
                 $order->payment_method = $request->payment_method;
                 $order->note = $request->note;
+                if($request->has('bill_date')){
+                    $order->bill_date = $request->bill_date;
+                }else{
+                    $order->bill_date = date('Y-m-d',time());
+                }
                 $discount = 0;
                 $order->password = Str::random(10);
                 if($config->order_processing){
@@ -262,6 +267,11 @@ class SalesController extends Controller
                 $order->other_charges = $request->other_charges;
                 $order->recieved = $request->recieved;
                 $order->note = $request->note;
+                if($request->has('bill_date')){
+                    $order->bill_date = $request->bill_date;
+                }else{
+                    $order->bill_date = date('Y-m-d',time());
+                }
                 $order->payment_method = $request->payment_method;
                 $discount = 0;
                 if ($request->has('discount') && (substr($request->discount, 0, 1) == '%')) {

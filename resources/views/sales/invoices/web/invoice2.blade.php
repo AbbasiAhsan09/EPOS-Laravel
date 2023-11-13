@@ -150,7 +150,7 @@
 
 								<td>
 									Order #: {{$order->tran_no}}  <br />
-									Invoice Date: {{date('D, d M Y', strtotime($order->created_at))}} <br />
+									Invoice Date: {{$order->bill_date !== null ? date('D, d M Y',strtotime($order->bill_date )) :date('D, d M Y', strtotime($order->created_at))}} <br />
 									Printed On:{{date('D, d M Y', time())}}
 								</td>
 							</tr>
