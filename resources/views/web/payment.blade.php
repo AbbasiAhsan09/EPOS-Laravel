@@ -8,7 +8,7 @@
             <div class="card-body p-md-5">
             <img src="{{asset('images/logo.png')}}" width="180px" style="display: block; margin :auto " alt="">
             
-            <h1 class="text-center h1 fw-bold mb-4 mx-1 mx-md-4 mt-4 title">Annual Subscription (Rs. 5000/-)</h1>
+            <h1 class="text-center h1 fw-bold mb-4 mx-1 mx-md-4 mt-4 title">Annual Subscription (Rs. 50000/-)</h1>
             <div class="">
                 <h3 class="title">Account Details:</h3>
                 <div class="row mb-3">
