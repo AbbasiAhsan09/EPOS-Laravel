@@ -114,6 +114,17 @@
                     {{-- ORder TYpe --}}
                     <div class="order_create_details_wrapper">
                         <div class="order_create_details">
+                           @if ($config->bill_date_changeable)
+                           <div class="bill-date-wrapper">
+                            <h3 class="order_section_sub_title">
+                                Bill Date
+                            </h3>
+                            <div class="input-group input-group-outline">
+                            <input type="date" name="bill_date" class="form-control" id="" value="{{$isEditMode ? $order->bill_date : date('Y-m-d',time())}}">
+                            </div>
+                           </div>
+                           <hr>
+                           @endif
                             <div class="order_type_wrapper">
                                 <div class="order_type">
                                     <h3 class="order_section_sub_title">
