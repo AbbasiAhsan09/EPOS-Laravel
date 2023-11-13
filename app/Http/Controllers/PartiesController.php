@@ -106,7 +106,7 @@ class PartiesController extends Controller
     {
         try {
             // dd($request);
-            $party =  Parties::where('id',$id)->byUser()->get();
+            $party =  Parties::where('id',$id)->byUser()->first();
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;

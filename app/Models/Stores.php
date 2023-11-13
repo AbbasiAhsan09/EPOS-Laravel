@@ -18,6 +18,15 @@ class Stores extends Model
     'renewal_date','domain','email','is_locked','phone','is_trial','created_at','deleted_at'];
     
     /**
+     * Get the config that owns the Stores
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function config(): BelongsTo
+    {
+        return $this->belongsTo(Configuration::class, 'store_id', 'id');
+    }
+    /**
      * Get the user that owns the Stores
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -96,7 +96,7 @@ class ProductController extends Controller
             $product->opening_stock = $request->opening_stock;
             $product->tp = $request->tp;
             $product->taxes = $request->tax;
-            $product->store_id = 1;
+            // $product->store_id = 1;
             $product->img = $request->img;
             $product->brand = $request->brand;
             $product->description = $request->description;

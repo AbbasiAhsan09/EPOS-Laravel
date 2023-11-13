@@ -13,7 +13,7 @@ class Sales extends Model
 {
     use HasFactory , SoftDeletes, UniversalScopeTrait;
     protected $table = 'sales';
-    protected $fillable = ['customer_id' , 'recieved' ,'net_total','created_at','updated_at'];
+    protected $fillable = ['customer_id' , 'recieved','order_process_status','password' ,'net_total','created_at','updated_at', 'note'];
 
     /**
      * Get the user that owns the Sales

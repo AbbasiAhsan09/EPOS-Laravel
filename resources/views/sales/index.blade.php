@@ -30,6 +30,28 @@
         </div>
     </div>
 </div>
+@if (Auth::check() && Auth::user()->storeConfig->order_processing)
+<ul class="nav nav-pills my-2 " id="process_status_parent">
+  <li class="nav-item">
+    <span class="nav-link cursor-pointer   {{!request()->has('status') || request('status') == "" ? "text-primary" : '' }}"  data-value="">All</span>
+  </li>
+
+  <li class="nav-item active">
+    <span class="nav-link cursor-pointer  {{ request('status') == 'pending' ? "text-primary" : '' }}"   data-value="pending" >Pending</span>
+  </li>
+  <li class="nav-item active">
+    <span class="nav-link cursor-pointer  {{ request('status') == 'proceed' ? "text-primary" : '' }}"   data-value="proceed" >Proceed</span>
+  </li>
+  <li class="nav-item">
+    <span class="nav-link cursor-pointer {{ request('status') == 'shipped' ? "text-primary" : '' }}"   data-value="shipped">Shipped</span>
+  </li>
+  <li class="nav-item">
+    <span class="nav-link cursor-pointer {{ request('status') == 'delivered' ? "text-primary" : '' }}"   data-value="delivered">Delivered</span>
+  </li>
+  
+</ul>
+
+@endif
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
             <th>ID</th>
@@ -37,6 +59,10 @@
             <th>Customer</th>
             <th>Created at</th>
             <th>User</th>
+          
+          @if (Auth::check() && Auth::user()->storeConfig->order_processing)
+          <th>Status</th>
+          @endif
             <th>Net Amount</th>
             @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2 )
             <th>Actions</th>
@@ -49,7 +75,23 @@
          <td  class="{{$item->deleted_at !== null ? 'text-danger' : ''}}">{{$item->tran_no}}</td>
          <td>{{isset($item->customer) ? $item->customer->party_name : 'Cash'}}</td>    
         <td>{{date('d-M-y | h:m' , strtotime($item->created_at))}}</td>
-        <td>{{$item->user->name}}</td>   
+        <td>{{$item->user->name}}</td>  
+         {{--Status  --}}
+            @if (Auth::check() && Auth::user()->storeConfig->order_processing)
+              <td>
+                
+                <div class="input-group input-group-outline">
+                    <select class="process_status_select form-control" data-sales-id="{{$item->id ?? ""}}" style="font-weight: 800">
+                      <option value="pending" {{$item->order_process_status === 'pending' ? 'selected' : ''}}>Pending</option>
+                      <option value="proceed" {{$item->order_process_status === 'proceed' ? 'selected' : ''}}>Proceed</option>
+                      <option value="shipped" {{$item->order_process_status === 'shipped' ? 'selected' : ''}}>Shipped</option>
+                      <option value="delivered" {{$item->order_process_status === 'delivered' ? 'selected' : ''}}>Delivered</option>
+                    </select>
+                </div>
+
+              </td>
+            @endif
+         {{--Status  --}}
         <td> {{env('CURRENCY').$item->net_total}}</td> 
             @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2 )
             <td>
@@ -167,6 +209,47 @@
         window.open($(this).attr("href"), "popupWindow", "width=300,height=600,scrollbars=yes,left="+($(window).width()-400)+",top=50");
     });
 
+    $('.process_status_select').change(function(){
+      var current  = $(this);
+      var order_id = current.attr('data-sales-id');
+      var status = current.val();
+
+      var params = `sales/change-status?status=${status}&order_id=${order_id}`;
+      var url = `{{url('${params}')}}`;
+      window.location = url;
+      console.log(url);
+      
+    })
+
+    $("#process_status_parent .nav-link").click(function(){
+    
+      
+            // Get the current URL
+            var currentUrl = window.location.href;
+
+            // Check if the "status" parameter is already present
+            var statusParam = 'status=';
+            var statusIndex = currentUrl.indexOf(statusParam);
+
+            if (statusIndex !== -1) {
+                // Extract the value of the existing "status" parameter
+                var statusValue = currentUrl.substring(statusIndex + statusParam.length);
+                var ampersandIndex = statusValue.indexOf('&');
+                if (ampersandIndex !== -1) {
+                    statusValue = statusValue.substring(0, ampersandIndex);
+                }
+
+                // Remove the existing "status" parameter
+                currentUrl = currentUrl.replace(new RegExp('[?&]' + statusParam + statusValue), '');
+            }
+
+            // Add the "status=pending" parameter
+            var newUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') + 'status='+$(this).attr('data-value');
+
+            // Redirect to the new URL
+            window.location.href = newUrl;
+
+    })
       </script>
   @endsection
 

@@ -220,6 +220,13 @@
                                 min="0" onkeypress="validationForSubmit()" >
                             </div> 
                             <hr>
+                            <h4 class="order_section_sub_title">
+                                Note:
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <textarea name="note" id="" class="d-block form-control" rows="3">{{$isEditMode ? $order->note : ""}}</textarea>
+                            </div>
+                            <hr>
                             <div class="row row-customized">
                                 <div class="col">
                                     <h4 class="order_section_sub_title">

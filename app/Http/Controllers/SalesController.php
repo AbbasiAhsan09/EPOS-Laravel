@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Str;
 
 class SalesController extends Controller
 {
@@ -58,6 +59,9 @@ class SalesController extends Controller
             session()->put('end_date', $request->end_date);
             return $query->whereBetween('created_at', [$request->start_date , $request->end_date]);
         })
+        ->when($request->has('status') && !empty($request->status) ,function ($query) use($request) {
+            $query->where('order_process_status',$request->status);
+        })
         ->paginate(15)->withQueryString();
        
         return view('sales.index', compact('items'));
@@ -93,11 +97,13 @@ class SalesController extends Controller
                 'recieved' => 'required',
                 'gross_total' => 'required',
                 'discount' => 'required',
-                'other_charges' => 'required'
+                'other_charges' => 'required',
+                'note' => 'string | nullable'
             ]);
 
             if ($validate) {
 
+                $config = Configuration::filterByStore()->first();
                 $store_prefix = 'SA';
                 $order  = new Sales();
                 $order->tran_no = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(Sales::latest()->first()->id) ? (Sales::latest()->first()->id + 1) : 1);
@@ -106,7 +112,14 @@ class SalesController extends Controller
                 $order->other_charges = $request->other_charges;
                 $order->recieved = $request->recieved;
                 $order->payment_method = $request->payment_method;
+                $order->note = $request->note;
                 $discount = 0;
+                $order->password = Str::random(10);
+                if($config->order_processing){
+                    $order->order_process_status = 'pending';
+                }else{
+                    $order->order_process_status = 'delivered'; 
+                }
                 if ($request->has('discount') && (substr($request->discount, 0, 1) == '%')) {
                     $order->discount_type = 'PERCENT';
                     $order->discount = ((int)ltrim($request->discount, '%'));
@@ -139,7 +152,7 @@ class SalesController extends Controller
                         }
                         $details->save();
 
-                        if ($this->allowInventoryCheck) {
+                        if ($config->inventory_tracking) {
                             // dd('hi');
                             if ($this->allowLowInventory) {
                                 // dd($this->checkAvaialableInventory($details->item_id, $details->is_base_unit));
@@ -186,9 +199,13 @@ class SalesController extends Controller
     public function edit(int $id, Sales $sales)
     {
         try {
+            DB::enableQueryLog();
+
 
             $config = Configuration::filterByStore()->first();
             $order = Sales::where('id', $id)->with('order_details.item_details')->filterByStore()->first();
+            // dump($order);
+            // dd(DB::getQueryLog());
             if ($order) {
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
                 if ($group) {
@@ -226,7 +243,9 @@ class SalesController extends Controller
                 'recieved' => 'required',
                 'gross_total' => 'required',
                 'discount' => 'required',
-                'other_charges' => 'required'
+                'other_charges' => 'required',
+                'note' => 'string | nullable'
+
             ]);
 
             if ($validate) {
@@ -242,6 +261,7 @@ class SalesController extends Controller
                 $order->gross_total = $request->gross_total;
                 $order->other_charges = $request->other_charges;
                 $order->recieved = $request->recieved;
+                $order->note = $request->note;
                 $order->payment_method = $request->payment_method;
                 $discount = 0;
                 if ($request->has('discount') && (substr($request->discount, 0, 1) == '%')) {
@@ -369,5 +389,16 @@ class SalesController extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    function changeOrderStatus(Request $request)  {
+        
+        if($request->has('order_id') && $request->has('status')){
+            $order = Sales::find($request->order_id);
+            $order->update(['order_process_status' => $request->status]);
+            return redirect()->back();
+        }
+    
+        return redirect()->back();
     }
 }
