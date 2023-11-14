@@ -343,7 +343,7 @@ $(document).ready(function(){
         var rcvdAmountElem = $("#received-amount");
         var rcvPrcentage = $("#received-amount-in-percentage").val();
         
-        if(typeof (1*rcvPrcentage) === 'number' && rcvPrcentage !== ''){
+        if(typeof (1*rcvPrcentage) === 'number' && rcvPrcentage > 0){
             rcvPrcentage = 1*rcvPrcentage;
             var bill_total = $(".g_total").text();
             var calulatedAmountRecieved = ((1*bill_total / 100)* rcvPrcentage) .toFixed(2);
@@ -358,9 +358,12 @@ $(document).ready(function(){
             }
 
         }else{
-
             rcvdAmountElem.prop('readonly', false);
-            
+            if(rcvPrcentage === '0'){
+                rcvdAmountElem.val(0);
+
         }
+        }
+
     }
 });
