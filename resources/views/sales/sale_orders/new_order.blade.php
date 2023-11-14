@@ -228,7 +228,7 @@
                             </h4>
                             <div class="input-group input-group-outline">
                                 <input type="number"  id="received-amount-in-percentage" 
-                                class="form-control" required value="0" 
+                                class="form-control" required value="" 
                                 min="0"  onkeypress="validationForSubmit()">
                             </div>
                             <hr>
