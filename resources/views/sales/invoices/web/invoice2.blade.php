@@ -221,6 +221,7 @@
                     <th colspan="2">{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : env('CURRENCY').Round($order->discount)}}</th>
                   </tr>
 				  @endif
+
                   @if ( $order->other_charges > 0)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
@@ -233,6 +234,19 @@
                     <th colspan="5">Net Total</th>
                     <th colspan="2">{{env('CURRENCY').round($order->net_total)}}</th>
                   </tr>
+				  <tr class="footer-total">
+                    {{-- <th colspan="7"></th> --}}
+                    <th colspan="5">Received</th>
+                    <th colspan="2">{{env('CURRENCY').round($order->recieved ?? 0)}}</th>
+                  </tr>
+
+				  @if ($order->recieved)
+				  <tr class="footer-total">
+                    {{-- <th colspan="7"></th> --}}
+                    <th colspan="5">Balance</th>
+                    <th colspan="2">{{env('CURRENCY').round((($order->net_total ?? 0) - ($order->recieved ?? 0)) ?? 0)}}</th>
+                  </tr>
+				  @endif
 
                 </tbody>
             </table>
