@@ -184,8 +184,8 @@ $(document).ready(function(){
         $('.foot_g_total').text(grand_total.toFixed(2));
        $('#gross_total').val(grand_total.toFixed(2));
         checkDiscount();
-
     }, 500);
+    CalculateRecievedAmountInPercentage();
     
     validationForSubmit();
     }
@@ -240,6 +240,7 @@ $(document).ready(function(){
           calculateOrders();
     })
     function validationForSubmit(){
+        
         var returningVal = $('#returning-amount').val();
         if(returningVal < 0.00 && $('#posOrder').is(':checked')){
             $('#saveOrderBtn').prop('disabled' , true);
@@ -337,5 +338,29 @@ $(document).ready(function(){
         });
        }
     })
-  
+//   Calculate Recieved Amount in percentage
+    function CalculateRecievedAmountInPercentage(){
+        var rcvdAmountElem = $("#received-amount");
+        var rcvPrcentage = $("#received-amount-in-percentage").val();
+        
+        if(typeof (1*rcvPrcentage) === 'number' && rcvPrcentage !== ''){
+            rcvPrcentage = 1*rcvPrcentage;
+            var bill_total = $(".g_total").text();
+            var calulatedAmountRecieved = ((1*bill_total / 100)* rcvPrcentage) .toFixed(2);
+            console.log({calulatedAmountRecieved});
+            
+            rcvdAmountElem.prop('readonly', true);
+            rcvdAmountElem.val(calulatedAmountRecieved);
+           
+            if(rcvPrcentage > 100){
+                $("#received-amount-in-percentage").val(100);
+                CalculateRecievedAmountInPercentage();
+            }
+
+        }else{
+
+            rcvdAmountElem.prop('readonly', false);
+            
+        }
+    }
 });
