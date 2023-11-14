@@ -114,7 +114,7 @@
                     {{-- ORder TYpe --}}
                     <div class="order_create_details_wrapper">
                         <div class="order_create_details">
-                           @if ($config->bill_date_changeable)
+                           @if ($config->bill_date_changeable && Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')
                            <div class="bill-date-wrapper">
                             <h3 class="order_section_sub_title">
                                 Bill Date
@@ -222,6 +222,17 @@
                                 <input type="number" name="other_charges" id="otherCharges" class="form-control" required value="{{$isEditMode ? $order->other_charges : 0}}" min="0" onkeypress="validationForSubmit()" >
                             </div>
                             <hr>
+                            @if (!$isEditMode)
+                            <h4 class="order_section_sub_title">
+                                Received Amount In %:
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="number"  id="received-amount-in-percentage" 
+                                class="form-control" required value="0" 
+                                min="0"  onkeypress="validationForSubmit()">
+                            </div>
+                            <hr>
+                            @endif
                             <h4 class="order_section_sub_title">
                                 Received Amount:
                             </h4>
