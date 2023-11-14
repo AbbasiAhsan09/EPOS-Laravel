@@ -136,7 +136,9 @@
                         <select name="role_id" id="" class="form-control">
                             <option value="">Select Role</option>
                             @foreach ($user_roles as $us_role)
-                                <option value="{{$us_role->id}}" {{$us_role->id == $item->role_id ? 'selected' : ''}}>{{$us_role->role_name}}</option>
+                               @if ($us_role->id !== 1)
+                               <option value="{{$us_role->id}}" {{$us_role->id == $item->role_id ? 'selected' : ''}}>{{$us_role->role_name}}</option>
+                               @endif
                             @endforeach
                         </select>
                     </div>
