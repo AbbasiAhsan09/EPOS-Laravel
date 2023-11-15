@@ -56,6 +56,7 @@ class PartiesController extends Controller
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;
+            $party->business_name = $request->business_name;
             // $party->country = $request->country;
             // $party->city = $request->city;
             $party->website = $request->website;
@@ -110,6 +111,7 @@ class PartiesController extends Controller
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;
+            $party->business_name = $request->business_name;
             // $party->country = $request->country;
             // $party->city = $request->city;
             $party->website = $request->website;

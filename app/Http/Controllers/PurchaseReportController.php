@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Trait\UniversalScopeTrait;
 use App\Models\Parties;
 use App\Models\PartyGroups;
 use App\Models\Products;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 
 class PurchaseReportController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      *
@@ -137,7 +139,7 @@ class PurchaseReportController extends Controller
                 return $pdf->stream();
             } else {
 
-                $records = $records->filterByStore()->paginate(20);
+                $records = $records->filterByStore()->paginate(10);
                 return view('reports.purchase-report.report2', compact('records', 'from', 'to', 'products'));
             }
         } catch (\Throwable $th) {

@@ -90,7 +90,7 @@
                     <div class="col-lg-6">
                       <label for="">Base Unit Value</label>
                   <div class="input-group input-group-outline">
-                    <input type="text" class="form-control" name="base_unit_value" required  value="{{$item->base_unit_value}}">
+                    <input type="number" min="1" step="0.01" class="form-control" name="base_unit_value" required  value="{{$item->base_unit_value}}">
                   </div>
                   </div>
                 
@@ -173,7 +173,7 @@
                     <div class="col-lg-6">
                       <label for="">Base Unit Value</label>
                   <div class="input-group input-group-outline">
-                    <input type="text" class="form-control" name="base_unit_value" required >
+                    <input type="number" min="1" step="0.01" class="form-control" name="base_unit_value" required >
                   </div>
                   </div>
                    

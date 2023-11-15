@@ -73,7 +73,7 @@ class CustomerLedgerController extends Controller
      */
     public function show(int $id)
     {
-        $customer = Parties::where('id',$id)->byUser()->get();
+        $customer = Parties::where('id',$id)->byUser()->first();
         if ($customer) {
             $items = Sales::where('customer_id', $id)
                 ->whereRaw('net_total - recieved > (0.99)')

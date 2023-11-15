@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Trait\UniversalScopeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseInvoiceDetails extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, UniversalScopeTrait;
 
     /**
      * Get the items that owns the PurchaseInvoiceDetails

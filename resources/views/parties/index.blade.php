@@ -116,20 +116,26 @@
                         </select>
                     </div>
                     </div> 
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="">Party  Email</label>
                     <div class="input-group input-group-outline">
                       <input type="email" class="form-control" name="email" value="{{$item->email}}" required>
                     </div>
                     </div>  
 
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="">Party  Phone *</label>
                     <div class="input-group input-group-outline">
                       <input type="text" class="form-control" name="phone" value="{{$item->phone}}" required>
                     </div>
                     </div>  
-
+                    
+                    <div class="col-lg-4">
+                      <label for="">Party  Business Name </label>
+                  <div class="input-group input-group-outline">
+                    <input type="text" class="form-control" name="business_name" value="{{$item->business_name ?? ""}}" placeholder="Demo Trades">
+                  </div>
+                  </div>
 
                     <div class="col-lg-4">
                         <label for="">Party  Country *</label>
@@ -149,10 +155,12 @@
                     </div>
                     </div> 
 
+                   
+
                     <div class="col-lg-4">
                         <label for="">Party  Website </label>
                     <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" value="{{$item->website}}" name="website" required placeholder="example.com">
+                      <input type="text" class="form-control" value="{{$item->website}}" name="website"  placeholder="example.com">
                     </div>
                     </div> 
 
@@ -215,20 +223,27 @@
                         </select>
                     </div>
                     </div> 
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="">Party  Email</label>
                     <div class="input-group input-group-outline">
                       <input type="email" class="form-control" name="email" required>
                     </div>
                     </div>  
 
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="">Party  Phone *</label>
                     <div class="input-group input-group-outline">
                       <input type="text" class="form-control" name="phone" required>
                     </div>
                     </div>  
 
+
+                    <div class="col-lg-4">
+                      <label for="">Party  Business Name </label>
+                  <div class="input-group input-group-outline">
+                    <input type="text" class="form-control" name="business_name"  placeholder="Demo Trades">
+                  </div>
+                  </div>
 
                     <div class="col-lg-4">
                         <label for="">Party  Country *</label>
@@ -251,9 +266,11 @@
                     <div class="col-lg-4">
                         <label for="">Party  Website </label>
                     <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" name="website" required placeholder="example.com">
+                      <input type="text" class="form-control" name="website"  placeholder="example.com">
                     </div>
-                    </div> 
+                    </div>
+                    
+                    
 
                     <div class="col-lg-12">
                         <label for="">Party  Address </label>
