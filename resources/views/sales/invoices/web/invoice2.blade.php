@@ -262,7 +262,7 @@
 				<tr>
 					<td>
 						<b>Track Your Order</b><br />
-						Goto : https://moon-fabrics.com/check-status<br />
+						Goto : https://pos.moon-fabrics.com/check-status<br />
 						Inv No : {{$order->tran_no}} <br>
 						Password : {{$order->password ?? ""}}
 						
