@@ -411,4 +411,27 @@ class SalesController extends Controller
     
         return redirect()->back();
     }
+
+
+    function cliendCheckStatusView()  {
+
+        return view('sales.sale_orders.check-order-form');
+    }
+
+    function showOrderDetailsClient(Request $request) {
+        try {
+            if($request->has('password') && $request->has('tran_no')){
+                $order = Sales::where("password", $request->password)->where('tran_no',$request->tran_no)->with('store.config')->first();
+                if(!$order){
+                Alert::toast('Invalid Credentials','error');
+                return redirect()->back();
+                }
+                return view("sales.sale_orders.check-order", compact("order"));
+            }
+            Alert::toast('Invalid Credentials','error');
+            return redirect()->back();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

@@ -55,4 +55,13 @@ class Sales extends Model
     }
 
     
+    /**
+     * Get the store that owns the Sales
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Stores::class, 'store_id', 'id');
+    }
 }

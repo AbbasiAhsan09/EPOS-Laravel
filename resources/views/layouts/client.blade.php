@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{asset('client/assets/css/style.css')}}">
 </head>
   <body>
+    @include('sweetalert::alert')
     <main>
         @yield('content')
     </main>

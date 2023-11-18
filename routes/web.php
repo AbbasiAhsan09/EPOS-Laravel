@@ -11,6 +11,7 @@ use App\Http\Controllers\InventoryReportController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\RegisterStoreController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\StoresController;
 use App\Http\Controllers\VendorLedgerController;
@@ -34,6 +35,8 @@ Auth::routes();
 
 Route::resource('/register',RegisterStoreController::class);
 Route::get('/payment',[PaymentMethodController::class, 'index']);
+Route::get('/check-order',[SalesController::class, 'showOrderDetailsClient']);
+Route::get('/check-status',[SalesController::class, 'cliendCheckStatusView']);
 
 Route::middleware(['auth','is_trial.check'])->group(function () {
 Route::get('logout-auth', function(){

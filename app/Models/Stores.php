@@ -24,7 +24,7 @@ class Stores extends Model
      */
     public function config(): BelongsTo
     {
-        return $this->belongsTo(Configuration::class, 'store_id', 'id');
+        return $this->belongsTo(Configuration::class, 'id', 'store_id');
     }
     /**
      * Get the user that owns the Stores
