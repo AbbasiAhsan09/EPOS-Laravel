@@ -382,7 +382,7 @@
 						<div class="print" style="font-size: 14px">
 							<td>
                                 <b>Track Your Order</b><br />
-                                Goto : https://pos.moon-fabrics.com/check-status<br />
+                                Goto : https://moon-fabrics.com/<br />
                                 Inv No : {{$order->tran_no}} <br>
                                 Password : {{$order->password ?? ""}}
                                 
@@ -405,7 +405,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-{{-- 
+
 			<script>
 				$(document).ready(function() {
 			  // print the window when a button is clicked
@@ -423,4 +423,4 @@
 					window.close();
 				}, 1000);
 			});
-			</script> --}}
+			</script>
