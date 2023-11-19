@@ -3,11 +3,11 @@
 <style>
     .receipt-content .logo a:hover {
   text-decoration: none;
-  color: #7793C4; 
+  /* color: #7793C4;  */
 }
 
 .receipt-content .invoice-wrapper {
-  background: #FFF;
+  background: white !important;
   border: 1px solid #CDD3E2;
   box-shadow: 0px 0px 1px #CCC;
   padding: 40px 40px 60px;
@@ -212,14 +212,50 @@
   color: #969CAD; 
 }            
 .inv_logo{
-    filter: grayscale(1);
+    /* filter: grayscale(1); */
 }       
+.inv-main-bg{
+    position: relative;
+    background: transparent !important;
+    z-index: 1;
+
+}
+
+.inv-main-bg::after{
+    position: absolute;
+    top: 0;
+    right: 0;
+    content:  "";
+    background: url("{{asset('images/inv.png')}}");
+    width: 100%;
+    height: 180px;
+    z-index: -1;
+    rotate: 180deg;
+    background-repeat: no-repeat;
+
+}
+
+.inv-main-bg::before{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    content:  "";
+    background: url("{{asset('images/inv.png')}}");
+    width: 100%;
+    height: 180px;
+    z-index: -1;
+    rotate: 0deg;
+    background-repeat: no-repeat;
+
+}
 </style>
 <div class="receipt-content">
-    <div class="container bootstrap snippets bootdey">
+    
+    <div class="container bootstrap snippets bootdey ">
+        {{-- <img src="{{asset("images/inv.jpg")}}" alt="" class="bg-inv"> --}}
 		<div class="row">
 			<div class="col-md-12">
-				<div class="invoice-wrapper">
+				<div class="invoice-wrapper inv-main-bg">
 					<div class="intro">
 						@if (isset($config) && $config->logo)
 									<img src="{{asset("images/logo/$config->logo")}}"  alt="Not Available" style="margin-top : 20px" width="120px" class="inv_logo">
@@ -369,7 +405,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
+{{-- 
 			<script>
 				$(document).ready(function() {
 			  // print the window when a button is clicked
@@ -387,4 +423,4 @@
 					window.close();
 				}, 1000);
 			});
-			</script>
+			</script> --}}
