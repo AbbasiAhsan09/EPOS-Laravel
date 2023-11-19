@@ -115,6 +115,7 @@ class SalesController extends Controller
                 $order->note = $request->note;
                 if($request->has('bill_date')){
                     $order->bill_date = $request->bill_date;
+                    $order->created_at = strtotime($request->bill_date);
                 }else{
                     $order->bill_date = date('Y-m-d',time());
                 }
@@ -269,6 +270,8 @@ class SalesController extends Controller
                 $order->note = $request->note;
                 if($request->has('bill_date')){
                     $order->bill_date = $request->bill_date;
+                    $order->created_at = strtotime($request->bill_date);
+
                 }else{
                     $order->bill_date = date('Y-m-d',time());
                 }
