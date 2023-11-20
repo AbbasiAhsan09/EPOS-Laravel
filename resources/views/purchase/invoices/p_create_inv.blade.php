@@ -154,17 +154,19 @@
                                     Inv Date 
                                 </h4>
                                 <div class="input-group input-group-outline">
-                                    <input type="date" name="doc_date" class="form-control" value="{{isset($order) ? $order->doc_date : date('Y-m-d',time())}}" >
+                                    <input type="date" name="doc_date" required class="form-control" value="{{isset($order) ? $order->doc_date : date('Y-m-d',time())}}" >
                                   </div> 
                             </div>
 
                             <div class="col">
-                                <h4 class="order_section_sub_title">
-                                    Due Date
-                                </h4>
-                                <div class="input-group input-group-outline">
-                                    <input type="date" name="due_date" class="form-control" value="{{isset($order) ? $order->due_date : date('Y-m-d',strtotime(\Carbon\Carbon::now()->addDays(10)))}}" >
-                                  </div> 
+                               @if (isset($config) && $config->due_date_enabled )
+                               <h4 class="order_section_sub_title">
+                                Due Date
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="date" name="due_date" class="form-control" value="{{isset($order) ? $order->due_date : date('Y-m-d',strtotime(\Carbon\Carbon::now()->addDays(10)))}}" >
+                              </div>
+                               @endif 
                             </div>
                         </div>
 
@@ -244,7 +246,8 @@
                                 Other Charges:
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" onkeypress="validationForSubmit()"  value="{{$order->other_charges  ?? 0}}">
+                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" 
+                                onkeypress="validationForSubmit()"  value="{{isset($order) ? $order->shipping_cost : 0}}">
                             </div>
 
                             <hr>

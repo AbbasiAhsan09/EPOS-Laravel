@@ -83,7 +83,7 @@ class PurchaseInvoiceController extends Controller
             ]);
 
             if($validate){
-                
+                // dd(!empty($request->doc_date));
             $invoice = new PurchaseInvoice();
             $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. (PurchaseInvoice::latest()->first()->id ?? 0) + 1;
             $invoice->party_id = $request->party_id;
@@ -106,17 +106,20 @@ class PurchaseInvoiceController extends Controller
             $invoice->net_amount = (($request->gross_total + $request->other_charges) - ($discount));
             $invoice->created_by = Auth::user()->id;
             $invoice->remarks = $request->remarks;
-            $invoice->doc_date = $request->doc_date;
-            if( $request->doc_date && Auth::check() && (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')){
+            
+            if( $request->doc_date && !empty($request->doc_date) && Auth::check() && (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')){
               $invoice->created_at =  strtotime($request->doc_date);
+              $invoice->doc_date = $request->doc_date;
             }
             if($request->recieved){
                 $invoice->recieved = $request->recieved;
             }
-            $invoice->due_date = $request->due_date;
+            if($request->due_date){
+                $invoice->due_date = $request->due_date;
+              }
             $invoice->save();
 
-            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$invoice->recieved,date('Y-m-d'),'paid');
+            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,($invoice->recieved ?? 0),date('Y-m-d'),'paid');
 
 
             if($invoice && count($request->item_id)){
@@ -251,20 +254,23 @@ class PurchaseInvoiceController extends Controller
                     $invoice->discount = $request->discount;
                     $discount =  $request->discount;
                 }
+                // dd($request->doc_date);
                 $invoice->others = $request->other_charges;
                 $invoice->tax = 0;
                 $invoice->shipping = 0;
                 $invoice->net_amount = (($request->gross_total + $request->other_charges) - ($discount));
                 $invoice->created_by = Auth::user()->id;
                 $invoice->remarks = $request->remarks;
-                if( $request->doc_date && Auth::check() && (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')){
+                if( $request->doc_date && !empty($request->doc_date) && Auth::check() && (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')){
                     $invoice->created_at =  strtotime($request->doc_date);
                     $invoice->doc_date = $request->doc_date;
                   }
                   if($request->recieved){
                       $invoice->recieved = $request->recieved;
                   }
-                $invoice->due_date = $request->due_date;
+                  if($request->due_date){
+                    $invoice->due_date = $request->due_date;
+                  }
                 $invoice->save();
     
                 if($invoice && count($request->item_id)){
@@ -272,7 +278,7 @@ class PurchaseInvoiceController extends Controller
                         if(count($deleteItems->get())){
                             $transaction_description = (count($deleteItems->get()) ? 'Return Items in order'.$deleteItems->get()->pluck('item_details.name') : '');
                         }
-                        $this->updatePurchaseTransaction($invoice->id,($invoice->party_id ?? 0),$old_amount,$invoice->recieved,isset($transaction_description) ? $transaction_description :'');
+                        $this->updatePurchaseTransaction($invoice->id,($invoice->party_id ?? 0),($old_amount ?? 0),($invoice->recieved ?? 0),isset($transaction_description) ? $transaction_description :'');
                       
                         foreach ($deleteItems->get() as $key => $deletedItem) {
                             // dd($deleteItems->get());

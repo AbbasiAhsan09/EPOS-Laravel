@@ -70,7 +70,7 @@
                                 @if (count($item->invoices))
                                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#newStoreModal{{$item->id}}"><i class="fa fa-file-invoice" ></i> Invoices</a></li>
                                 @endif
-                                {{-- <li><a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a></li> --}}
+                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>
                             </ul>
                             </div>
                          
@@ -104,6 +104,35 @@
                 </div>
                 {{-- Modal --}}
 
+
+
+                                
+    {{--  Delete Modal  --}}
+    
+    <div class="modal fade" id="dltModal{{$item->id}}" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="newStoreModalLabel">Delete P.O: {{$item->doc_num}}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('order.destroy',$item->id)}}" method="POST">
+                    @csrf
+                    @method('delete')
+                   <label class="form-label">Are you sure you want to delete {{$item->doc_num}}</label>
+                   <label for="form-label text-danger"><p class="text-danger " style="color: red; font-weight: 600">{{$item->invoices  ? "There are purchase invoices created for this order!" : ""}}</p></label>
+            </div>
+            <div class="modal-footer">
+              {{-- <button type="button" class="btn btn-outline-primary">No</button> --}}
+              <button type="submit" class="btn btn-primary" {{$item->invoices  ? "disabled" : ""}}>Yes</button>
+            </div>
+        </form>
+          </div>
+        </div>
+      </div>
+  
+      {{--Delete Modal --}}
 
 
 

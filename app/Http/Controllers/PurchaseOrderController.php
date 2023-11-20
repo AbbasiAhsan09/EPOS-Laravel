@@ -230,8 +230,21 @@ class PurchaseOrderController extends Controller
      * @param  \App\Models\PurchaseOrder  $purchaseOrder
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PurchaseOrder $purchaseOrder)
+    public function destroy($id)
     {
-        //
+        try {
+            $order = PurchaseOrder::where('id',$id)->filterByStore()->first();
+            if($order){
+                $order->delete();
+                Alert::toast("Deleted Purchase Order!",'success');
+                
+            }else{
+            Alert::toast("Invalid Request!",'error');
+            }
+
+            return redirect()->back();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

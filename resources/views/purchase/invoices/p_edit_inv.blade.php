@@ -149,17 +149,19 @@
                                     Inv Date 
                                 </h4>
                                 <div class="input-group input-group-outline">
-                                    <input type="date" name="doc_date" class="form-control" value="{{$invoice->doc_date}}" >
+                                    <input type="date" name="doc_date" required class="form-control" value="{{$invoice->doc_date}}" >
                                   </div> 
                             </div>
 
                             <div class="col">
+                                @if (isset($config) && $config->due_date_enabled )
                                 <h4 class="order_section_sub_title">
                                     Due Date
                                 </h4>
                                 <div class="input-group input-group-outline">
                                     <input type="date" name="due_date" class="form-control" value="{{$invoice->due_date}}" >
                                   </div> 
+                                  @endif
                             </div>
                         </div>
                         <h4 class="order_section_sub_title">

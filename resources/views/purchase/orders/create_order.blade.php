@@ -241,7 +241,8 @@
                                 Other Charges:
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" onkeypress="validationForSubmit()"  value="{{$order->other_charges  ?? 0}}">
+                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" value="{{isset($order) ? $order->shipping_cost : 0}}"
+                                onkeypress="validationForSubmit()"  value="{{$order->other_charges  ?? 0}}">
                             </div>
 
                             <hr>
