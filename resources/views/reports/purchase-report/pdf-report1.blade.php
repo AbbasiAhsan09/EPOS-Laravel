@@ -16,7 +16,7 @@
         <th>Party</th>
         <th>Gross Total</th>
         <th>Net Total</th>
-        <th>Recieved</th>
+        <th>Paid</th>
         <th>Balance</th>
         <th>User</th>
         <th>Date</th>
