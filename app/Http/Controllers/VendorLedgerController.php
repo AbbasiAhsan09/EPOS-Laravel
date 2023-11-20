@@ -76,7 +76,7 @@ class VendorLedgerController extends Controller
      */
     public function show( int $id)
     {
-        $vendor = Parties::where('id',$id)->byUser()->get();
+        $vendor = Parties::where('id',$id)->byUser()->first();
         if ($vendor) {
             $items = PurchaseInvoice::where('party_id', $id)
                 ->whereRaw('net_amount - recieved > (0.99)')
