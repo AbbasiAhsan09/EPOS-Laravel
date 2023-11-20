@@ -9,6 +9,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryReportController;
 use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\RegisterStoreController;
 use App\Http\Controllers\SalesController;
@@ -159,7 +160,8 @@ Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });
-
+Route::get("profile", [ProfileController::class, 'index']);
+Route::post("profile/change-password", [ProfileController::class, 'updatePassword'])->name('password.change');
 Route::middleware('manager.role')->resource('fields', FieldsController::class);
 Route::middleware('manager.role')->prefix('system')->group(function () {
     Route::resource('configurations', ConfigurationController::class);

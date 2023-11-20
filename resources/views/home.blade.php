@@ -9,7 +9,7 @@
 @endphp
 <div class="container-fluid">
     <h2 class="pb-4">
-      Hello, {{ Auth::check() ? strtoupper(Auth::user()->name) : "" }} 😊
+      Hello, <a href="{{url("/profile")}}">{{ Auth::check() ? strtoupper(Auth::user()->name) : "" }}</a> 😊
       <p><b>
         Store: {{Auth::check() ? Auth::user()->store->store_name ?? "": ''}}
       </b></p>
