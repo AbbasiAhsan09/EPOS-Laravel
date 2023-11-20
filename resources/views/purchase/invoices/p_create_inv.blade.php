@@ -151,7 +151,7 @@
                         <div class="row">
                             <div class="col">
                                 <h4 class="order_section_sub_title">
-                                    Inv Date
+                                    Inv Date 
                                 </h4>
                                 <div class="input-group input-group-outline">
                                     <input type="date" name="doc_date" class="form-control" value="{{isset($order) ? $order->doc_date : date('Y-m-d',time())}}" >
