@@ -415,6 +415,21 @@ class SalesController extends Controller
         return redirect()->back();
     }
 
+    function printChallan($id) {
+        try {
+            $config = Configuration::filterByStore()->first();
+            $template  = $config->dc_template ?? 'challan1';
+            $order = Sales::where('id', $id)->with('order_details.item_details', 'customer', 'user')->filterByStore()->first();
+            if(!$config->enable_dc || !$order){
+                Alert::toast("Invalid Request!",'error');
+                return redirect()->back();
+            }
+            $viewName = 'sales.delivery-challans.'.$template;
+            return view($viewName, compact('order', 'config'));
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 
 
     function cliendCheckStatusView()  {

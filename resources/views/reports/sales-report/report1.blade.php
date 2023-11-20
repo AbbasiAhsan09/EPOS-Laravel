@@ -81,7 +81,7 @@
     <td> {{env('CURRENCY').$item->net_total}}</td>
     <td>{{env('CURRENCY'). $item->recieved}}</td> 
     <td>{{env('CURRENCY'). (round($item->net_total - $item->recieved)) }}</td> 
-        @if (Auth::user()->role_id ==1 )
+        @if (Auth::user()->role_id == 1  || Auth::user()->role_id == 2 )
         <td>
             <div class="s-btn-grp">
               <div class="dropdown">
@@ -92,6 +92,9 @@
                   {{-- <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li> --}}
                   @if ($item->deleted_at === null)
                   <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li>
+                  @if ( Auth::check() && Auth::user()->storeConfig->enable_dc)
+                      <li><a class="dropdown-item popup" href="{{url("/challan/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Delivery Challan</a></li>
+                      @endif
                   <li><a class="dropdown-item" href="{{url('/sales/edit/'.$item->id.'')}}"><i class="fa fa-edit"></i> Edit</a></li>
                   <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transactionHistory{{$item->id}}"><i class="fa fa-dollar"></i> Transaction History</a></li>
                   <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>

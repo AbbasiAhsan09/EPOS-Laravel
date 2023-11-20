@@ -160,6 +160,10 @@ Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });
+Route::prefix('challan')->group(function(){
+    Route::get('/{id}',[SalesController::class, 'printChallan']);
+});
+
 Route::get("profile", [ProfileController::class, 'index']);
 Route::post("profile/change-password", [ProfileController::class, 'updatePassword'])->name('password.change');
 Route::middleware('manager.role')->resource('fields', FieldsController::class);

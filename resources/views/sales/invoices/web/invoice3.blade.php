@@ -174,9 +174,9 @@
 				<thead>
 					<tr>
                         <th>S#</th>
-						<th>Field</th>
-						<th>Category</th>
-						<th>Item</th>
+						{{-- <th>Field</th> --}}
+						{{-- <th>Category</th> --}}
+						<th>Description</th>
 						<th>Rate</th>
 						<th>Tax</th>
 						<th>Disc.</th>
@@ -188,9 +188,9 @@
 					@foreach ($order->order_details as $key => $item)
                 <tr class="items-table" >
                     <td>{{$key+1}}</td>
-                    <td>{{$item->item_details->categories->field->name ?? ''}}</td>
-                    <td>{{$item->item_details->categories->category ?? ''}}</td>
-                    <td>{{$item->item_details->name ?? ''}}</td>
+                    {{-- <td>{{$item->item_details->categories->field->name ?? ''}}</td> --}}
+                    {{-- <td>{{$item->item_details->categories->category ?? ''}}</td> --}}
+                    <td>{{$item->item_details->fullProductName ?? ''}}</td>
                     <td>{{$item->rate}}</td>
                     <td>{{$item->tax}}</td>
                     <td>{{$item->disc}}</td>
@@ -201,27 +201,27 @@
 				
                   <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
-                    <th colspan="7">Gross Total</th>
-                    <th colspan="2">{{env('CURRENCY').round($order->gross_total)}}</th>
+                    <th colspan="6">Gross Total</th>
+                    <th colspan="1">{{env('CURRENCY').round($order->gross_total)}}</th>
                   </tr>
                   @if ($order->discount > 0)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
-                    <th colspan="7">Discount</th>
-                    <th colspan="2">{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : env('CURRENCY').Round($order->discount)}}</th>
+                    <th colspan="6">Discount</th>
+                    <th colspan="1">{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : env('CURRENCY').Round($order->discount)}}</th>
                   </tr>
 				  @endif
                   @if ( $order->other_charges > 0)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
-                    <th colspan="7">Other Charges</th>
-                    <th colspan="2">{{env('CURRENCY').round($order->other_charges)}}</th>
+                    <th colspan="6">Other Charges</th>
+                    <th colspan="1">{{env('CURRENCY').round($order->other_charges)}}</th>
                   </tr>
 				  @endif
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
-                    <th colspan="7">Net Total</th>
-                    <th colspan="2">{{env('CURRENCY').round($order->net_total)}}</th>
+                    <th colspan="6">Net Total</th>
+                    <th colspan="1">{{env('CURRENCY').round($order->net_total)}}</th>
                   </tr>
 
                 </tbody>
@@ -231,7 +231,7 @@
                
                     <p class="sign-line">Receiver's Signature</p>
 					<p style="font-size: 12px">
-						<b>This Software is Developed By TradeWisePOS  {{isset($config)  ? $config->dev_contact : ''}}</b>
+						<b>This Software is Developed By TradeWisePOS  | +92 320 0681969</b>
 					</p>
 
             </div>
