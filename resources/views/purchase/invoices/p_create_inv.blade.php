@@ -154,7 +154,7 @@
                                     Inv Date
                                 </h4>
                                 <div class="input-group input-group-outline">
-                                    <input type="date" name="doc_date" class="form-control" value="{{isset($order) ? $order->doc_dat : date('Y-m-d',time())}}" >
+                                    <input type="date" name="doc_date" class="form-control" value="{{isset($order) ? $order->doc_date : date('Y-m-d',time())}}" >
                                   </div> 
                             </div>
 
@@ -163,7 +163,7 @@
                                     Due Date
                                 </h4>
                                 <div class="input-group input-group-outline">
-                                    <input type="date" name="due_date" class="form-control" value="{{isset($order) ? $order->doc_dat : date('Y-m-d',strtotime(\Carbon\Carbon::now()->addDays(10)))}}" >
+                                    <input type="date" name="due_date" class="form-control" value="{{isset($order) ? $order->due_date : date('Y-m-d',strtotime(\Carbon\Carbon::now()->addDays(10)))}}" >
                                   </div> 
                             </div>
                         </div>
