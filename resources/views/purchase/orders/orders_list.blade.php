@@ -12,13 +12,13 @@
          
             <div class="row .row-customized">
                 <div class="col-lg-8">
-                    <div class="input-group input-group-outline">
+                    {{-- <div class="input-group input-group-outline">
                         
                         <select name="" id="" class="form-control">
                             <option value="">--Select Status--</option>
                             <option value="1">Approved</option>
                         </select>
-                      </div>
+                      </div> --}}
                   
                 </div>
                 <div class="col-lg-4">
@@ -70,7 +70,7 @@
                                 @if (count($item->invoices))
                                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#newStoreModal{{$item->id}}"><i class="fa fa-file-invoice" ></i> Invoices</a></li>
                                 @endif
-                                <li><a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a></li>
+                                {{-- <li><a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete</a></li> --}}
                             </ul>
                             </div>
                          
