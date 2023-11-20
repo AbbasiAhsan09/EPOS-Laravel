@@ -47,6 +47,7 @@ class PurchaseReportController extends Controller
                             $query->where('party_id', $request->vendor);
                         }
                     )
+                    ->byUser()
                     ->get();
                 $data = [
                     'records' => $records,
@@ -78,6 +79,7 @@ class PurchaseReportController extends Controller
                             $query->where('party_id', $request->vendor);
                         }
                     )
+                    ->byUser()
                     ->paginate(20)->withQueryString();
                 $group = PartyGroups::where('group_name', 'LIKE',  'vendor%')->first();
                 $vendors = Parties::where('group_id', $group->id)->byUser()->get();
