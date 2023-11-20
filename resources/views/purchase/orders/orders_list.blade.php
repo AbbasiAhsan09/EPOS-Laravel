@@ -92,7 +92,7 @@
                         <ul>
                             @foreach ($item->invoices as $invoice)
                             <li>
-                                <a href="{{route('invoice.show',$invoice->id)}}">{{'Inv # '.$invoice->doc_num .' | Date: '.date('d.m.y' , strtotime($invoice->created_at))}}</a>
+                                <a href="{{route('invoice.edit',$invoice->id)}}">{{'Inv # '.$invoice->doc_num .' | Date: '.date('d.m.y' , strtotime($invoice->created_at))}}</a>
                             </li>
                                 
                             @endforeach
