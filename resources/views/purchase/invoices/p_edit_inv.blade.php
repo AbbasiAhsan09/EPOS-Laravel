@@ -254,7 +254,7 @@
                                 </h4>
                                 {{-- @dump($order) --}}
                                 <div class="input-group input-group-outline">
-                                    <input type="number" name="recieved" id="received-amount" class="form-control"  value="{{isset($invoice) ? $invoice->recieved : 0}}" min="1" onkeypress="validationForSubmit()" >
+                                    <input type="number" name="recieved" id="received-amount" class="form-control"  value="{{isset($invoice) ? $invoice->recieved : 0}}" min="0" onkeypress="validationForSubmit()" >
                                 </div> 
                                 <hr>
                                 <div class="row row-customized">
