@@ -258,18 +258,18 @@
         <p class="text-sm d-xl-none d-block mt-2">You can change the sidenav type just on desktop view.</p>
         <!-- Navbar Fixed -->
         <div class="mt-3 d-flex">
-          <h6 class="mb-0">Navbar Fixed</h6>
-          <div class="form-check form-switch ps-0 ms-auto my-auto">
+          <a href="{{url("/profile")}}"><h6 class="mb-0">Change Password</h6></a>
+          {{-- <div class="form-check form-switch ps-0 ms-auto my-auto">
             <input class="form-check-input mt-1 ms-auto" type="checkbox" id="navbarFixed" onclick="navbarFixed(this)">
-          </div>
+          </div> --}}
         </div>
         <hr class="horizontal dark my-3">
-        <div class="mt-2 d-flex">
+        {{-- <div class="mt-2 d-flex">
           <h6 class="mb-0">Light / Dark</h6>
           <div class="form-check form-switch ps-0 ms-auto my-auto">
             <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
           </div>
-        </div>
+        </div> --}}
       </div>
     </div>
   </div>
