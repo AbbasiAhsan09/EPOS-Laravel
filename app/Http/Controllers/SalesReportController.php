@@ -40,8 +40,9 @@ class SalesReportController extends Controller
             ->when($request->has('filter_deleted') && $request->filter_deleted == 'true' , function($query){
                 $query->onlyTrashed();
                 session()->put('sales_filter_deleted', true);
-            });
-
+            })
+            ->filterByStore();
+            
 
         if ($request->type === 'pdf') {
             $records = $records->get();
@@ -75,6 +76,9 @@ class SalesReportController extends Controller
                 session()->put('sales-detail-report-start-date', $request->start_date);
                 session()->put('sales-detail-report-end-date', $request->end_date);
                 $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
+            })
+            ->whereHas('sale', function($query){
+                $query->filterByStore();
             })
             ->when($request->has('field') && $request->field != null,function($query) use($request){
                 $query->whereHas('item_details.categories',  function($q) use($request){

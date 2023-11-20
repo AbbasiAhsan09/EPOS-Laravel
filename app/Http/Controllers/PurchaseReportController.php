@@ -107,6 +107,9 @@ class PurchaseReportController extends Controller
                 session()->put('purchase-detail-report-end-date', $request->end_date);
                 $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
             })
+            ->whereHas('invoice', function($query){
+                $query->filterByStore();
+            })
             ->when($request->has('field') && $request->field != null,function($query) use($request){
                 $query->whereHas('items.categories',  function($q) use($request){
                     $q->where('parent_cat', $request->field);
@@ -129,7 +132,7 @@ class PurchaseReportController extends Controller
 
             if ($request->has('type') && $request->type === 'pdf') {
 
-                $records = $records->filterByStore()->get();
+                $records = $records->get();
                 $data = [
                     'records' => $records,
                     'from' => $from,
@@ -139,7 +142,7 @@ class PurchaseReportController extends Controller
                 return $pdf->stream();
             } else {
 
-                $records = $records->filterByStore()->paginate(10);
+                $records = $records->paginate(10);
                 return view('reports.purchase-report.report2', compact('records', 'from', 'to', 'products'));
             }
         } catch (\Throwable $th) {

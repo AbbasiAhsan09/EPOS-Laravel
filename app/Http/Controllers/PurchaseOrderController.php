@@ -67,6 +67,10 @@ class PurchaseOrderController extends Controller
                 $order->shipping_cost = $request->other_charges;
                 $order->created_by = Auth::user()->id;
                 $order->sub_total = $request->gross_total;
+                if($request->has("order_date") && $request->order_date){
+                    $order->order_date = $request->order_date;
+                    $order->created_at = strtotime($request->order_date);
+                }
                 if($request->has('discount') && (substr($request->discount,0,1) == '%')){
                     $order->discount_type = 'PERCENT';
                     $discount = (($request->gross_total / 100 ) *  ((int)ltrim($request->discount,'%')));
@@ -171,6 +175,10 @@ class PurchaseOrderController extends Controller
                 $order->shipping_cost = $request->other_charges;
                 $order->created_by = Auth::user()->id;
                 $order->sub_total = $request->gross_total;
+                if($request->has("order_date") && $request->order_date){
+                    $order->order_date = $request->order_date;
+                    $order->created_at = strtotime($request->order_date);
+                }
                 if($request->has('discount') && (substr($request->discount,0,1) == '%')){
                     $order->discount_type = 'PERCENT';
                     $discount = (($request->gross_total / 100 ) *  ((int)ltrim($request->discount,'%')));

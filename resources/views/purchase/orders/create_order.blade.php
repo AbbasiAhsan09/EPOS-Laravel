@@ -106,6 +106,20 @@
                     <div class="order_create_details_wrapper">
                         <div class="order_create_details">
                             <div class="order_type_wrapper">
+
+                                @if (Auth::check() && (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin'))
+                                <div class="order_Date">
+                                    <h3 class="order_section_sub_title">
+                                        Order Date
+                                    </h3>
+                                    <div class="input-group input-group-outline">
+                                        <input type="date" name="order_date" class="form-control"  value="{{isset($order) ? $order->order_date : date("Y-m-d",time())}}">
+                                    </div>
+                                    <hr>
+                                </div>
+                                @endif
+
+
                                 <div class="order_type">
                                     <h3 class="order_section_sub_title">
                                         Order Type

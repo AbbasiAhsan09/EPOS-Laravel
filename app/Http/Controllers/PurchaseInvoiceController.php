@@ -107,6 +107,9 @@ class PurchaseInvoiceController extends Controller
             $invoice->created_by = Auth::user()->id;
             $invoice->remarks = $request->remarks;
             $invoice->doc_date = $request->doc_date;
+            if( $request->doc_date && Auth::check() && (Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')){
+              $invoice->created_at =  strtotime($request->doc_date);
+            }
             $invoice->recieved = $request->recieved;
             $invoice->due_date = $request->due_date;
             $invoice->save();
