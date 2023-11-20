@@ -46,7 +46,11 @@
                 <tr >
                     <td>{{$key+1}}</td>
                     <td>{{$item->doc_num}}</td>
-                    <td><a href="{{url("/purchase/order/".$item->order->id."/edit")}}" style="font-style: italic">{{$item->order->doc_num ?? '(Null)'}}</a></td>
+                    <td>
+                      @if (isset($item->order->id))
+                      <a href="{{url("/purchase/order/".$item->order->id."/edit")}}" style="font-style: italic">{{$item->order->doc_num ?? '(Null)'}}</a>                          
+                      @endif
+                    </td>
                     
                     <td>{{$item->party->party_name}}</td>
                     <td>{{env('CURRENCY').' '.$item->total}}</td>

@@ -121,11 +121,11 @@
                     @csrf
                     @method('delete')
                    <label class="form-label">Are you sure you want to delete {{$item->doc_num}}</label>
-                   <label for="form-label text-danger"><p class="text-danger " style="color: red; font-weight: 600">{{$item->invoices  ? "There are purchase invoices created for this order!" : ""}}</p></label>
+                   <label for="form-label text-danger"><p class="text-danger " style="color: red; font-weight: 600">{{count($item->invoices)  ? "There are purchase invoices created for this order!" : ""}}</p></label>
             </div>
             <div class="modal-footer">
               {{-- <button type="button" class="btn btn-outline-primary">No</button> --}}
-              <button type="submit" class="btn btn-primary" {{$item->invoices  ? "disabled" : ""}}>Yes</button>
+              <button type="submit" class="btn btn-primary" {{count($item->invoices)  ? "disabled" : ""}}>Yes</button>
             </div>
         </form>
           </div>
