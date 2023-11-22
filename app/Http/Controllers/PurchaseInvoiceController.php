@@ -83,9 +83,8 @@ class PurchaseInvoiceController extends Controller
             ]);
 
             if($validate){
-                // dd(!empty($request->doc_date));
             $invoice = new PurchaseInvoice();
-            $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. (PurchaseInvoice::latest()->first()->id ?? 0) + 1;
+            $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. (PurchaseInvoice::max("id") ?? 0) + 1;
             $invoice->party_id = $request->party_id;
             $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id;
             $invoice->total = $request->gross_total;

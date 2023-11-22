@@ -106,7 +106,7 @@ class SalesController extends Controller
                 $config = Configuration::filterByStore()->first();
                 $store_prefix = 'SA';
                 $order  = new Sales();
-                $order->tran_no = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(Sales::latest()->first()->id) ? (Sales::latest()->first()->id + 1) : 1);
+                $order->tran_no = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(Sales::latest()->first()->id) ? (Sales::max("id") + 1) : 1);
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
                 $order->other_charges = $request->other_charges;

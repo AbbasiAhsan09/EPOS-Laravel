@@ -60,7 +60,7 @@ class PurchaseOrderController extends Controller
             if($validate){
                 // dd($request->all());
                 $order = new PurchaseOrder();
-                $order->doc_num = date('d',time())."/PO"."/".date('m/y',time()).'/'.(PurchaseOrder::latest()->first()->id ?? 0)+ 1;
+                $order->doc_num = date('d',time())."/PO"."/".date('m/y',time()).'/'.(PurchaseOrder::max("id") ?? 0)+ 1;
                 $order->quotation_num = $request->q_num;
                 $order->party_id = $request->party_id;
                 $order->remarks = $request->remarks;
