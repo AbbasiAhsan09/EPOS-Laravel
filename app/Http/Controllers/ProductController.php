@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Imports\ProductImport;
+use App\Models\AppFormFields;
+use App\Models\AppFormFieldsData;
+use App\Models\AppForms;
 use App\Models\Inventory;
 use App\Models\MOU;
 use App\Models\ProductArrtributes;
@@ -31,11 +34,17 @@ class ProductController extends Controller
         // dd($items);
         // dd($items);
         $arrt = ProductArrtributes::all();
-        return view('items.index',compact('items','uom','categories','arrt'));
+        $dynamicFields = AppForms::where("name",'product')
+        ->with("fields")->whereHas("fields", function($query){
+            $query->filterByStore();
+        })->first();
+        // dd($dynamicFields);
+        return view('items.index',compact('items','dynamicFields','uom','categories','arrt'));
     }
 
     public function store(Request $request)
     {
+        
         try {
             $validate = $request->validate([
                 'code' => 'required|unique:products,barcode,id,store_id',
@@ -57,6 +66,25 @@ class ProductController extends Controller
                 $product->description = $request->description;
                 $product->opening_stock = $request->opening_stock;
                 $product->save();
+
+                 // 
+                if(isset($request->dynamicFields) && count($request->dynamicFields)){
+                    foreach ($request->dynamicFields as $key => $value) {
+                        if(!empty($value)){
+                        $form = AppForms::where("name",'product')->first();
+                        foreach ($value as $key => $field_value) {
+                        $form_field = AppFormFields::where('form_id',$form->id)->where('name',$key)->filterByStore()->first();
+                            if($form_field){
+                                AppFormFieldsData::create(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                'value' => $field_value, 'related_to' => $product->id,
+                                'store_id' => Auth::user()->store_id ?? null]);
+                            }
+                        }
+                        }
+                    }
+                }
+             //
+
     
                 if($product){
                     $uom = MOU::find($request->uom);

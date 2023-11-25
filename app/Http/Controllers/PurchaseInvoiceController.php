@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Trait\InventoryTrait;
 use App\Http\Trait\TransactionsTrait;
+use App\Models\AppFormFields;
+use App\Models\AppFormFieldsData;
+use App\Models\AppForms;
 use App\Models\Configuration;
 use App\Models\Inventory;
 use App\Models\Parties;
@@ -25,8 +28,12 @@ class PurchaseInvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = PurchaseInvoice::with('created_by_user','party','order')->byUser()->paginate(15);
-        return view('purchase.invoices.p_inv',compact('invoices'));
+        $invoices = PurchaseInvoice::with('created_by_user','party','order','dynamicFeildsData')->byUser()->paginate(15);
+        $dynamicFields = AppForms::where("name",'purchase_invoice')
+        ->with("fields")->whereHas("fields", function($query){
+            return $query->where('show_in_table', 1)->filterByStore();
+        })->first();
+        return view('purchase.invoices.p_inv',compact('invoices','dynamicFields'));
     }
 
     public function create_inv(int $id)
@@ -46,7 +53,11 @@ class PurchaseInvoiceController extends Controller
 
         $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
         $vendors = Parties::where('group_id' , 2)->byUser()->get();
-        return view('purchase.invoices.p_create_inv',compact('order','vendors','config'));
+        $dynamicFields = AppForms::where("name",'purchase_invoice')
+        ->with("fields")->whereHas("fields", function($query){
+            return $query->where('show_in_table', 1)->filterByStore();
+        })->first();
+        return view('purchase.invoices.p_create_inv',compact('order','vendors','config','dynamicFields'));
         } catch (\Throwable $th) {
             //throw $th;
         }
@@ -117,6 +128,24 @@ class PurchaseInvoiceController extends Controller
                 $invoice->due_date = $request->due_date;
               }
             $invoice->save();
+
+            // Dynamic Fields Storing
+            if(isset($request->dynamicFields) && count($request->dynamicFields)){
+                foreach ($request->dynamicFields as $key => $value) {
+                    if(!empty($value)){
+                    $form = AppForms::where("name",'purchase_invoice')->first();
+                    foreach ($value as $key => $field_value) {
+                    $form_field = AppFormFields::where('form_id',$form->id)->where('name',$key)->filterByStore()->first();
+                        if($form_field){
+                            AppFormFieldsData::create(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                            'value' => $field_value, 'related_to' => $invoice->id,
+                            'store_id' => Auth::user()->store_id ?? null]);
+                        }
+                    }
+                    }
+                }
+            }
+         //Dynamic Fields Storing
 
             $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,($invoice->recieved ?? 0),date('Y-m-d'),'paid');
 
@@ -198,12 +227,17 @@ class PurchaseInvoiceController extends Controller
     public function edit($id)
     {
         try {
-        $invoice = PurchaseInvoice::where('id',$id)->filterByStore()->first();
+        $invoice = PurchaseInvoice::where('id',$id)->with('dynamicFeildsData')->filterByStore()->first();
             if($invoice){
                 $vendors = Parties::where('group_id' , 2)->filterByStore()->get();
                 $config = Configuration::filterByStore()->first();
                     
-                    return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config'));
+                $dynamicFields = AppForms::where("name",'purchase_invoice')
+                ->with("fields")->whereHas("fields", function($query){
+                    return $query->where('show_in_table', 1)->filterByStore();
+                })->first();
+
+                    return view('purchase.invoices.p_edit_inv',compact('invoice','vendors','config','dynamicFields'));
             }
             Alert::toast('Invalid Request','error');
             return redirect()->back();
@@ -271,6 +305,31 @@ class PurchaseInvoiceController extends Controller
                     $invoice->due_date = $request->due_date;
                   }
                 $invoice->save();
+
+                   // Dynamic Fields Storing
+                   if(isset($request->dynamicFields) && count($request->dynamicFields)){
+                    foreach ($request->dynamicFields as $key => $value) {
+                        if(!empty($value)){
+                        $form = AppForms::where("name",'purchase_invoice')->first();
+                        foreach ($value as $key => $field_value) {
+                        $form_field = AppFormFields::where('form_id',$form->id)->where('name',$key)->filterByStore()->first();
+                            if($form_field){
+                               $appFormFieldData = AppFormFieldsData::where(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                'related_to' => $invoice->id,
+                                'store_id' => Auth::user()->store_id])->first();
+                                if($appFormFieldData){
+                                    $appFormFieldData->update(['value' => $field_value]);
+                                }else{
+                                    AppFormFieldsData::create(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                    'related_to' => $invoice->id,
+                                    'store_id' => Auth::user()->store_id,'value' => $field_value]);
+                                }
+                            }
+                        }
+                        }
+                    }
+                }
+             //Dynamic Fields Storing
     
                 if($invoice && count($request->item_id)){
                         $deleteItems = PurchaseInvoiceDetails::where('inv_id' , $invoice->id)->whereNotIn('item_id' , $request->item_id);

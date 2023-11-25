@@ -57,4 +57,10 @@ class PurchaseInvoice extends Model
     {
         return $this->hasMany(PurchaseTransactions::class, 'p_inv_id', 'id');
     }
+
+
+    public function dynamicFeildsData(): HasMany
+    {
+        return $this->hasMany(AppFormFieldsData::class, 'related_to', 'id')->where('form_id', 4);
+    }
 }

@@ -327,6 +327,20 @@
                           </div>
                       
                     </div>
+                    @if (isset($dynamicFields) && count($dynamicFields->fields) )
+                    @foreach ($dynamicFields->fields as $dynamicField)
+                    <div class="col-lg-6">
+                        <label class="form-label">{{$dynamicField->label}} </label>
+                        <div class="input-group input-group-outline">
+                            {{-- <textarea name="description" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" rows="3">{{old('description')}}</textarea> --}}
+                             <input type="{{$dynamicField->type === 'input' && $dynamicField->datatype === 'string' ? 'text' : 'number'}}" class="form-control" name="dynamicFields[][{{$dynamicField->name}}]" {{$dynamicField->required ? 'required' : ''}} value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                            
+                          </div>
+                    </div>
+                    
+                
+                    @endforeach
+            @endif
                     <div class="col-lg-12">
                         <label class="form-label">Description </label>
                         <div class="input-group input-group-outline">
@@ -334,6 +348,7 @@
                             
                           </div>
                     </div>
+                   
                 </div>
         </div>
         <div class="modal-footer">

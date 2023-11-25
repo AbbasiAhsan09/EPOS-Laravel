@@ -47,4 +47,14 @@ public function created_by_user(): BelongsTo
     {
         return $this->hasMany(PurchaseInvoice::class, 'po_id' , 'id');
     }
+
+    /**
+     * Get all of the dynamicFeildsData for the PurchaseOrder
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dynamicFeildsData(): HasMany
+    {
+        return $this->hasMany(AppFormFieldsData::class, 'related_to', 'id')->where('form_id', 3);
+    }
 }

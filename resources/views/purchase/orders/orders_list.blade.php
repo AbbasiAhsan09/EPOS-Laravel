@@ -40,7 +40,13 @@
             <th>Net. Total</th>
             <th>Created By</th>
             <th>Created At</th>
-
+            @if (isset($dynamicFields) && count($dynamicFields->fields) )
+                    @foreach ($dynamicFields->fields as $dynamicField)
+                    @if ($dynamicField->show_in_table)
+                    <th>{{$dynamicField->label ?? ""}}</th>
+                    @endif
+                    @endforeach
+            @endif
             <th>Actions</th>
         </thead>
         <tbody>
@@ -57,6 +63,31 @@
                     </td>
                     <td>{{$item->created_by_user->name}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
+               
+               
+                {{-- Dynamic Fields --}}
+                     
+                @if (isset($dynamicFields) && count($dynamicFields->fields) )
+                @foreach ($dynamicFields->fields as $dynamicField)
+                        @if ($dynamicField->show_in_table)
+                        <td>
+                                @if (count($item->dynamicFeildsData))
+                                    @foreach ($item->dynamicFeildsData as $dynamicFieldData)
+                                        @if ($dynamicFieldData && $dynamicFieldData->field_id === $dynamicField->id)
+                                        {{$dynamicFieldData->value}}
+                                       
+                                        @endif
+                                    @endforeach
+                                
+                                @endif
+                            </td>        
+                            
+                @endif
+                @endforeach
+                @endif
+                
+                {{-- Dynamic Feild End --}}
+               
                     <td>
                         <div class="s-btn-grp">
                             <div class="dropdown">
