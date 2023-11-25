@@ -17,7 +17,7 @@ class AppForms extends Seeder
     {
         $forms = ['product','sales','purchase_order','purchase_invoice','category','field','parties'];
         $check = ModelsAppForms::all();
-        if(!$check){
+        if(!count($check)){
             foreach ($forms as $key => $value) {
                 ModelsAppForms::create(['name' => $value]);
             }
