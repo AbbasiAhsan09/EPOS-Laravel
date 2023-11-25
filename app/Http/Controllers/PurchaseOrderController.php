@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AppFormFields;
+use App\Models\AppFormFieldsData;
+use App\Models\AppForms;
 use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class PurchaseOrderController extends Controller
@@ -19,9 +23,15 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-            $orders = PurchaseOrder::with('invoices')->byUser()->paginate(10);
-        // dd($orders);
-        return view('purchase.orders.orders_list',compact('orders'));
+          
+            $orders = PurchaseOrder::with('invoices','dynamicFeildsData')->byUser()->paginate(10);
+            // dd($orders);
+            $dynamicFields = AppForms::where("name",'purchase_order')
+            ->with("fields")->whereHas("fields", function($query){
+                return $query->where('show_in_table', 1)->filterByStore();
+            })->first();
+
+        return view('purchase.orders.orders_list',compact('orders','dynamicFields'));
     }
 
     /**
@@ -34,8 +44,13 @@ class PurchaseOrderController extends Controller
         // dd('hi');
         $vendors = Parties::where('group_id' , 2)->byUser()->get();
         $config = Configuration::filterByStore()->first();
+        $dynamicFields = AppForms::where("name",'purchase_order')
+        ->with("fields")->whereHas("fields", function($query){
+            $query->filterByStore();
+        })->first();
 
-        return view('purchase.orders.create_order',compact('vendors','config'));
+
+        return view('purchase.orders.create_order',compact('vendors','config','dynamicFields'));
     }
 
     /**
@@ -82,7 +97,25 @@ class PurchaseOrderController extends Controller
                     $discount =  $request->discount;
                 }
                 $order->save();
-    // dd($request->all());
+
+                // Dynamic Fields Storing
+                   if(isset($request->dynamicFields) && count($request->dynamicFields)){
+                    foreach ($request->dynamicFields as $key => $value) {
+                        if(!empty($value)){
+                        $form = AppForms::where("name",'purchase_order')->first();
+                        foreach ($value as $key => $field_value) {
+                        $form_field = AppFormFields::where('form_id',$form->id)->where('name',$key)->filterByStore()->first();
+                            if($form_field){
+                                AppFormFieldsData::create(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                'value' => $field_value, 'related_to' => $order->id,
+                                'store_id' => Auth::user()->store_id ?? null]);
+                            }
+                        }
+                        }
+                    }
+                }
+             //Dynamic Fields Storing
+   
                 if($order){
                     for ($i=0; $i < count($request->item_id) ; $i++) { 
                         $detail = new PurchaseOrderDetails();
@@ -132,13 +165,18 @@ class PurchaseOrderController extends Controller
      */
     public function edit(int $id)
     {
-        $order = PurchaseOrder::where('id',$id)->with('details.items')->filterByStore()->first();
+        $order = PurchaseOrder::where('id',$id)->with('details.items','dynamicFeildsData')->filterByStore()->first();
         if(!$order){
             Alert::toast('Invalid Request','error');
             return redirect()->back();
         }
         $vendors = Parties::where('group_id' , 2)->byUser()->get();
-        return view('purchase.orders.create_order',compact('order','vendors'));
+        $dynamicFields = AppForms::where("name",'purchase_order')
+        ->with("fields")->whereHas("fields", function($query){
+            $query->filterByStore();
+        })->first();
+
+        return view('purchase.orders.create_order',compact('order','vendors','dynamicFields'));
     }
 
     /**
@@ -190,6 +228,32 @@ class PurchaseOrderController extends Controller
                     $discount =  $request->discount;
                 }
                 $order->save();
+
+                  // Dynamic Fields Storing
+                  if(isset($request->dynamicFields) && count($request->dynamicFields)){
+                    foreach ($request->dynamicFields as $key => $value) {
+                        if(!empty($value)){
+                        $form = AppForms::where("name",'purchase_order')->first();
+                        foreach ($value as $key => $field_value) {
+                        $form_field = AppFormFields::where('form_id',$form->id)->where('name',$key)->filterByStore()->first();
+                            if($form_field){
+                               $appFormFieldData = AppFormFieldsData::where(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                'related_to' => $order->id,
+                                'store_id' => Auth::user()->store_id])->first();
+                                if($appFormFieldData){
+                                    $appFormFieldData->update(['value' => $field_value]);
+                                }else{
+                                    AppFormFieldsData::create(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                    'related_to' => $order->id,
+                                    'store_id' => Auth::user()->store_id,'value' => $field_value]);
+                                }
+                            }
+                        }
+                        }
+                    }
+                }
+             //Dynamic Fields Storing
+
     // dd($request->all());
                 if($order){
                     $deleteItems = PurchaseOrderDetails::where('po_id' , $order->id)->whereNotIn('item_id' , $request->item_id);
