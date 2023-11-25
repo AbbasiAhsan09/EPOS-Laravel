@@ -24,7 +24,7 @@ class PurchaseOrderController extends Controller
     public function index()
     {
           
-            $orders = PurchaseOrder::with('invoices','dynamicFeildsData')->byUser()->paginate(10);
+            $orders = PurchaseOrder::with('invoices','dynamicFeildsData')->byUser()->orderBy('id','desc')->paginate(10);
             // dd($orders);
             $dynamicFields = AppForms::where("name",'purchase_order')
             ->with("fields")->whereHas("fields", function($query){
