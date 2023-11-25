@@ -95,7 +95,7 @@
 
                     {{-- Other Dynamic Fields --}}
                     @if (isset($dynamicFields) && count($dynamicFields->fields) )
-                    <div class="card" style="z-index: -1">
+                    <div class="card" >
                         
                         <div class="card-body">
                             <h3 class="order_section_sub_title">Custom Fields</h3>
