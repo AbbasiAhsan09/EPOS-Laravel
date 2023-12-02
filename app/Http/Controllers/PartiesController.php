@@ -57,8 +57,9 @@ class PartiesController extends Controller
             $party->email = $request->email;
             $party->phone = $request->phone;
             $party->business_name = $request->business_name;
-            // $party->country = $request->country;
-            // $party->city = $request->city;
+            $party->country = $request->country;
+            $party->city = $request->city;
+            $party->state = $request->state;
             $party->website = $request->website;
             $party->group_id = $request->group_id;
             $party->location = $request->location;
@@ -106,14 +107,15 @@ class PartiesController extends Controller
     public function update(Request $request, int $id)
     {
         try {
-            // dd($request);
+            // dd($request->all());
             $party =  Parties::where('id',$id)->byUser()->first();
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;
             $party->business_name = $request->business_name;
-            // $party->country = $request->country;
-            // $party->city = $request->city;
+            $party->country = $request->country;
+            $party->city = $request->city;
+            $party->state = $request->state;
             $party->website = $request->website;
             $party->group_id = $request->group_id;
             $party->location = $request->location;

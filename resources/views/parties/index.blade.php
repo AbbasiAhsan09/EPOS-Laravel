@@ -137,32 +137,21 @@
                   </div>
                   </div>
 
-                    <div class="col-lg-4">
-                        <label for="">Party  Country *</label>
-                    <div class="input-group input-group-outline">
-                        <select name="country" class="form-control" id="">
-                            <option value="">Select Country</option>
-                        </select>
-                    </div>
-                    </div> 
-                    
-                    <div class="col-lg-4">
-                        <label for="">Party  City *</label>
-                    <div class="input-group input-group-outline">
-                        <select name="country" class="form-control" id="">
-                            <option value="">Select City</option>
-                        </select>
-                    </div>
-                    </div> 
-
-                   
-
-                    <div class="col-lg-4">
+                  
+                    {{-- <div class="col-lg-4">
                         <label for="">Party  Website </label>
                     <div class="input-group input-group-outline">
                       <input type="text" class="form-control" value="{{$item->website}}" name="website"  placeholder="example.com">
                     </div>
-                    </div> 
+                    </div>  --}}
+
+                    
+                    {{-- <livewire:location /> --}}
+                    @livewire('location', [
+                       'initialCountryId' => $item->country,
+                        'initialStateId' => $item->state,
+                        'initialCityId' => $item->city
+                    ])
 
                     <div class="col-lg-12">
                         <label for="">Party  Address </label>
@@ -245,31 +234,22 @@
                   </div>
                   </div>
 
-                    <div class="col-lg-4">
-                        <label for="">Party  Country *</label>
-                    <div class="input-group input-group-outline">
-                        <select name="country" class="form-control" id="">
-                            <option value="">Select Country</option>
-                        </select>
-                    </div>
-                    </div> 
                     
-                    <div class="col-lg-4">
-                        <label for="">Party  City *</label>
-                    <div class="input-group input-group-outline">
-                        <select name="country" class="form-control" id="">
-                            <option value="">Select City</option>
-                        </select>
-                    </div>
-                    </div> 
-
+                    
+                   
+{{-- 
                     <div class="col-lg-4">
                         <label for="">Party  Website </label>
                     <div class="input-group input-group-outline">
                       <input type="text" class="form-control" name="website"  placeholder="example.com">
                     </div>
-                    </div>
+                    </div> --}}
                     
+                    @livewire('location', [
+                      'initialCountryId' => $item->country,
+                       'initialStateId' => $item->state,
+                       'initialCityId' => $item->city
+                   ])
                     
 
                     <div class="col-lg-12">
