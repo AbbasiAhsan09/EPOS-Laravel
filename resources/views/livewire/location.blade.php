@@ -16,7 +16,7 @@
             <div class="input-group input-group-outline">
             <select wire:model="selectedState" class="form-control" name="state">
                 <option value="">Select State</option>
-                @if(!is_null($selectedCountry))
+                @if(!is_null($selectedCountry) && $states && count($states))
 
                 @foreach($states as $state)
                     <option value="{{ $state->id }}">{{ $state->name }}</option>
@@ -32,7 +32,7 @@
             <div class="input-group input-group-outline">
             <select wire:model="selectedCity" class="form-control" name="city">
                 <option value="">Select City</option>
-                @if(!is_null($selectedState))
+                @if(!is_null($selectedState) && $cities && count($cities))
                 @foreach($cities as $city)
                     <option value="{{ $city->id }}">{{ $city->name }}</option>
                 @endforeach
