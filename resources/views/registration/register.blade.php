@@ -60,7 +60,7 @@
                              <select name="plan" id="" class="form-control" value="{{old('plan')}}" required>
                                 <option value="">Select</option>
                                 <option value="trial">14-Days Trial</option>
-                               <option value="year">Rs.5000/Year</option>
+                               <option value="year">Rs.50000/Year</option>
                              </select>
                               <label class="form-label" for="form3Example1c">Choose Plan</label>
                               @error('plan')
