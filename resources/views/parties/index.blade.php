@@ -148,9 +148,9 @@
                     
                     {{-- <livewire:location /> --}}
                     @livewire('location', [
-                       'initialCountryId' => $item->country,
-                        'initialStateId' => $item->state,
-                        'initialCityId' => $item->city
+                       'initialCountryId' => isset($item->country) && $item->country ? $item->country : '' ,
+                        'initialStateId' => isset($item->state) && $item->state ? $item->state : "" ,
+                        'initialCityId' => isset($item->city) && $item->city ?$item->city  : ""
                     ])
 
                     <div class="col-lg-12">
@@ -245,11 +245,7 @@
                     </div>
                     </div> --}}
                     
-                    @livewire('location', [
-                      'initialCountryId' => $item->country,
-                       'initialStateId' => $item->state,
-                       'initialCityId' => $item->city
-                   ])
+                    @livewire('location')
                     
 
                     <div class="col-lg-12">
