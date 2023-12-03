@@ -22,7 +22,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         session()->forget('filter');
-        $uom = MOU::all();
+        $uom = MOU::filterByStore()->get();
         $categories = ProductCategory::all();
         $items = Products::with('categories','uoms')
         ->when($request->has('filter') && $request->filter != null ,  function($query) use ($request){

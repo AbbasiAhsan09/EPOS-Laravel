@@ -69,6 +69,11 @@ class ConfigurationController extends Controller
                 $config->invoice_type = $request->invoice_type;
                 $config->invoice_template = $request->invoice_template;
                 $config->search_filter = $request->search_filter;
+                $config->enable_dc = ($request->has('enable_dc') ? $request->enable_dc : false);
+                $config->due_date_enabled = ($request->has('due_date_enabled') ? $request->due_date_enabled : false);
+                $config->bill_date_changeable = ($request->has('bill_date_changeable') ? $request->bill_date_changeable : false); //admin can change date for bills
+                
+                $config->show_tp_in_order_form = ($request->has('show_tp_in_order_form') ? $request->show_tp_in_order_form : false);
                 $config->show_ntn = ($request->has('show_ntn') ? $request->show_ntn : false);
                 $config->show_ptn = ($request->has('show_ptn') ? $request->show_ptn : false);
                 $config->mutltiple_sales_order = ($request->has('is_multi_order') ? $request->is_multi_order : false);

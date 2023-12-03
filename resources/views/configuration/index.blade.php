@@ -99,7 +99,42 @@
                     
                     
 
+                    
+
                     <div class="col-lg-3">
+
+                <div class="mt-3 d-flex">
+                   <label for="" class="mb-0">Show TP in Order Form: </label>
+                   <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                       <input type="checkbox" class="form-check-input" id="" name="show_tp_in_order_form" 
+                       value="1" {{isset($currenConfig) ? ($currenConfig->show_tp_in_order_form ? 'checked' : '') : '' }}> 
+                   </div>
+               </div>
+
+               <div class="mt-3 d-flex">
+                <label for="" class="mb-0">Deliver Challan Generation: </label>
+                <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                    <input type="checkbox" class="form-check-input" id="" name="enable_dc" 
+                    value="1" {{isset($currenConfig) ? ($currenConfig->enable_dc ? 'checked' : '') : '' }}> 
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex">
+              <label for="" class="mb-0">Due Date For Purchase Invoices: </label>
+              <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                  <input type="checkbox" class="form-check-input" id="" name="due_date_enabled" 
+                  value="1" {{isset($currenConfig) ? ($currenConfig->due_date_enabled ? 'checked' : '') : '' }}> 
+              </div>
+          </div>
+
+          <div class="mt-3 d-flex">
+            <label for="" class="mb-0">Changeable Order Date (Admin): </label>
+            <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                <input type="checkbox" class="form-check-input" id="" name="bill_date_changeable" 
+                value="1" {{isset($currenConfig) ? ($currenConfig->bill_date_changeable ? 'checked' : '') : '' }}> 
+            </div>
+        </div>
+
                          <div class="mt-3 d-flex">
                     <label for="" class="mb-0">Show NTN: </label>
                     <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
@@ -130,6 +165,7 @@
                         <input type="checkbox" class="form-check-input" id="" name="track_inventory" value="1" {{isset($currenConfig) ? ($currenConfig->inventory_tracking ? 'checked' : '') : '' }}> 
                     </div>
                 </div>
+                
 
 
                     </div>

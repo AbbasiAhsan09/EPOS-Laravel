@@ -50,10 +50,15 @@
                             @csrf
                             @method('post')
                         @endif
+                        <input type="hidden" value="{{$config->show_tp_in_order_form}}" id="show_tp_in_order_form">
                               <table class="table table-sm table-responsive-sm table-striped table-bordered ">
                                 <thead>
                                     <th>Description</th>
                                     <th>UOM</th>
+                                    @if ($config->show_tp_in_order_form)
+                                    <th>TP
+                                    </th>
+                                    @endif
                                     <th>Rate</th>
                                     <th>Qty</th>
                                     <th>Tax</th>
@@ -78,6 +83,10 @@
                                          </select>
                                          @endif
                                          </td>
+                                         @if ($config->show_tp_in_order_form)
+                                         <td><input name="tp[]" readonly disabled type="number" step="0.01" placeholder="TP"
+                                            min="1" class="form-control" value="{{$item->item_details->tp}}"></td>
+                                         @endif
                                         <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                 min="1" class="form-control rate" value="{{$item->rate}}"></td>
                                         <td><input name="qty[]" type="number" step="0.01" data-item-id="{{$item->item_details->id}}" placeholder="Qty"

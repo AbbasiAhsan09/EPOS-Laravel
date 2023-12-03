@@ -19,7 +19,7 @@
                         <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
                       </div> --}}
                       <div class="input-group input-group-outline">
-                      <select  id="filter-party" class="form-control">
+                      <select  id="filter-party" class="form-control" readonly disabled>
                         <option value="">All Parties</option>
                         
                         @foreach ($party_groups as $party_group)
@@ -281,7 +281,8 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
        <div class="modal-body">
-            <form action="{{route('add.partyGroup')}}" method="POST">
+        
+            <form action="{{route('parties.index')}}" method="GET">
                 @csrf
                 <div class="row">
                     <div class="col-lg-6">
@@ -290,7 +291,7 @@
                         <select name="party_group" class="form-control" id="" required>
                             <option value="">Select Party Group *</option>
                             @foreach ($party_groups as $group)
-                                <option value="{{$group->id}}">{{$group->group_name}}</option>
+                                <option value="{{$group->id}}" {{isset(request()->party_group) && request()->party_group == $group->id ? 'selected' : ''}}>{{$group->group_name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -300,7 +301,7 @@
                     <div class="col-lg-6">
                     <label for="">Party Name or ID</label>
                     <div class="input-group input-group-outline">
-                        <input type="text" name="party_name" class="form-control" >
+                        <input type="text" name="party_name" value="{{request()->party_name && request()->party_name ? request()->party_name : ''}}" class="form-control" >
                     </div>
 
                     </div> 
@@ -308,7 +309,9 @@
                     <div class="col-lg-6">
                         <label for="">Party Phone</label>
                         <div class="input-group input-group-outline">
-                            <input type="text" name="party_name" class="form-control" >
+                            <input type="text" name="party_phone"
+                            value="{{request()->party_phone && request()->party_phone ? request()->party_phone : ''}}"
+                             class="form-control" >
                         </div>
     
                         </div> 
@@ -316,15 +319,17 @@
                         <div class="col-lg-6">
                             <label for="">Party Email</label>
                             <div class="input-group input-group-outline">
-                                <input type="text" name="party_name" class="form-control">
+                                <input type="text" name="party_email"
+                                value="{{request()->party_email && request()->party_email ? request()->party_email : ''}}"
+                                 class="form-control">
                             </div>
         
                         </div> 
 
-                        <div class="col-lg-6">
+                        {{-- <div class="col-lg-6">
                             <label for="">From</label>
                             <div class="input-group input-group-outline">
-                                <input type="date" name="party_name" class="form-control">
+                                <input type="date" name="from" class="form-control">
                             </div>
         
                         </div> 
@@ -332,16 +337,17 @@
                         <div class="col-lg-6">
                             <label for="">To</label>
                             <div class="input-group input-group-outline">
-                                <input type="date" name="party_name" class="form-control">
+                                <input type="date" name="to" class="form-control">
                             </div>
         
-                        </div> 
+                        </div>  --}}
                 </div>
            
         </div> 
         <div class="modal-footer">
+          <a href="{{url("parties")}}" class="btn btn-secondary">Reset</a>
           
-          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="submit" class="btn btn-primary">Filter</button>
         </div>
     </form>
       </div>
