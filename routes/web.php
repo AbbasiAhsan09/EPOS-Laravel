@@ -114,7 +114,7 @@ Route::middleware('manager.role')->prefix('party-groups')->group(function(){
 });
 
 Route::middleware('manager.role')->prefix('parties')->group(function () {
-    Route::get('/{group?}','App\Http\Controllers\PartiesController@index');
+    Route::get('/{group?}','App\Http\Controllers\PartiesController@index')->name("parties.index");
     Route::post('/add','App\Http\Controllers\PartiesController@store')->name('add.party');
     Route::put('/edit/{id}','App\Http\Controllers\PartiesController@update')->name('edit.party');
     Route::middleware('admin.role')->delete('/delete/{id}','App\Http\Controllers\PartiesController@destroy')->name('delete.party');

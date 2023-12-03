@@ -66,7 +66,7 @@
         <th>Net Amount</th>
         <th>Recieved</th>
         <th>Balance</th>
-        @if (Auth::user()->role_id == 1)
+        @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
         <th>Actions</th>
         @endif
     </thead>

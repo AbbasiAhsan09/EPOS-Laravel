@@ -13,22 +13,44 @@ class PartiesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($group_id = null)
+    public function index(Request $request)
     {
         try {
-        if(!$group_id){
-            $party_groups = PartyGroups::all();
-            $parties = Parties::orderby('group_id','DESC')->byUser()->paginate(20);
-            
-            return view('parties.index',compact('party_groups','parties','group_id'));
-        }
 
         $party_groups = PartyGroups::all();
-        $parties = Parties::orderby('group_id','DESC')->byUser()->where('group_id',$group_id)->paginate(20);
+        $parties = Parties::with("groups")
+        ->when($request->has('party_group'), function($q) use ($request) {
+            $q->where("group_id", $request->party_group);
+        })
+        ->when(
+            function ($query) use ($request) {
+                return $request->filled('party_name') || $request->filled('party_phone') || $request->filled('party_email');
+            },
+            function ($q) use ($request) {
+                $q->where(function ($query) use ($request) {
+                    if ($request->filled('party_name')) {
+                        $query->where("party_name", 'like', '%' . $request->party_name . '%');
+                    }
+                    if ($request->filled('party_phone')) {
+                        $query->orWhere("phone", 'like', '%' . $request->party_phone . '%');
+                    }
+                    if ($request->filled('party_email')) {
+                        $query->orWhere("email", 'like', '%' . $request->party_email . '%');
+                    }
+                });
+            }
+        )
+        ->orderBy('group_id', 'DESC')
+        ->byUser()
+        ->paginate(20)
+        ->withQueryString();
+    
+        $group_id = $request->has('party_group') ? $request->party_group : false;
+        
         return view('parties.index',compact('party_groups','parties','group_id'));
         
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
