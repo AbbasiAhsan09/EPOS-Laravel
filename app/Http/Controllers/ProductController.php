@@ -14,6 +14,7 @@ use App\Models\Products;
 use Illuminate\Http\Request;
 use Excel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -65,6 +66,18 @@ class ProductController extends Controller
                 $product->brand = $request->brand;
                 $product->description = $request->description;
                 $product->opening_stock = $request->opening_stock;
+                // Product IMage Logic
+                if ($request->hasFile('image')) {
+                    $image = $request->file('image');
+                
+                    // Generating a unique name for the file
+                    $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    // dd($fileName);
+                    $public_path = "images/" . Auth::user()->store_id . "/products";
+                    $image->move(public_path($public_path),$fileName);
+                    $product->img = $fileName; // Assign the file name to the product image attribute
+                }
+
                 $product->save();
 
                  // 
@@ -113,6 +126,7 @@ class ProductController extends Controller
     public function update(int $id, Request $request)
     {
         try {
+            // dd($request->all());
             $product =  Products::find($id);
             $oldQty = $product->opening_stock;
             $product->name = $request->product;
@@ -125,7 +139,18 @@ class ProductController extends Controller
             $product->tp = $request->tp;
             $product->taxes = $request->tax;
             // $product->store_id = 1;
-            $product->img = $request->img;
+            // Product IMage Logic
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+            
+                // Generating a unique name for the file
+                $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                // dd($fileName);
+                $public_path = "images/" . Auth::user()->store_id . "/products";
+                $image->move(public_path($public_path),$fileName);
+                $product->img = $fileName; // Assign the file name to the product image attribute
+            }
+           
             $product->brand = $request->brand;
             $product->description = $request->description;
             $product->save();
