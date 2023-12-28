@@ -107,7 +107,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <form action="{{route('update.product',$item->id)}}" method="POST">
+            <form action="{{route('update.product',$item->id)}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('put')
                 <div class="row">
@@ -131,20 +131,24 @@
                     <div class="col-lg-6">
                         @livewire('field-category', ['selectedCategory' => $item->category])
                     </div>
-                    <div class="col-lg-3">
+                    
+               <div class="col-lg-6">
+                   <div class="row">
+                      {{--  --}}
+                      <div class="col-lg-6">
                         <label for="">Code *</label>
                         <div class="input-group input-group-outline">
                             <input type="text" class="form-control" name="code" required value="{{$item->barcode}}">
                         </div>
                     </div>
-                    
-                    <div class="col-lg-3">
+
+                      <div class="col-lg-6">
                         <label for="">Brand *</label>
                         <div class="input-group input-group-outline">
                             <input type="text" class="form-control" name="brand" required value="{{$item->brand}}">
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                         <label for="">Arrtribute *</label>
                         <div class="input-group input-group-outline">
 
@@ -156,7 +160,7 @@
                         </select>
                     </div>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-6">
                         <label for="">UOM *</label>
                         <div class="input-group input-group-outline">
                             
@@ -169,38 +173,57 @@
                         </select>
                         </div>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <label for="">TAX % *</label>
                         <div class="input-group input-group-outline">
                             <input type="number" step="0.01" class="form-control" name="tax" required value="{{$item->taxes}}" min="0">
                         </div>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <label for="">MRP *</label>
                         <div class="input-group input-group-outline">
                             <input type="number" step="0.01" class="form-control" name="mrp" value="{{$item->mrp}}" required  min="0">
                         </div>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <label for="">Trade Price *</label>
                         <div class="input-group input-group-outline">
                             <input type="number" step="0.01" class="form-control" name="tp" value="{{$item->tp}}" required  min="0">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <label class="form-label">Low Stock Alert </label>
                         <div class="input-group input-group-outline">
                         <input type="number" class="form-control" name="low_stock" required value="{{$item->low_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <label class="form-label">Opening Inventory </label>
                         <div class="input-group input-group-outline">
                         <input type="number" class="form-control" name="opening_stock" required value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>
+                    {{--  --}}
+                   </div>
+               </div>
+               <div class="col-lg-6">
+                <div class="container">
+                           
+                    <div class="avatar-upload">
+                        <div class="avatar-edit">
+                            <input type='file' id="imageUpload-{{$item->id}}" class="imageUpload" name="image" accept=".png, .jpg, .jpeg" />
+                            <label for="imageUpload-{{$item->id}}"></label>
+                        </div>
+                        <div class="avatar-preview">
+                           
+                            <div  class="imagePreview" style="background-image: url({{ $item->img ? asset("/images/".Auth::user()->store_id."/products/".$item->img) : "https://www.trianglelearningcenter.org/wp-content/uploads/2020/08/placeholder.png"}});">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               </div>
                     <div class="col-lg-12">
                         <label class="form-label">Description </label>
                         <div class="input-group input-group-outline">
@@ -235,7 +258,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <form action="{{route('add.product')}}" method="POST">
+            <form action="{{route('add.product')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-lg-6">
@@ -258,75 +281,105 @@
                     <div class="col-lg-6">
                         @livewire('field-category')
                     </div>
-                    <div class="col-lg-3">
-                        <label for="">Code *</label>
-                        <div class="input-group input-group-outline">
-                            <input type="text" class="form-control" name="code" value="{{old('code')}}" required>
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="">Code *</label>
+                                <div class="input-group input-group-outline">
+                                    <input type="text" class="form-control" name="code" value="{{old('code')}}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <label for="">Brand *</label>
+                                <div class="input-group input-group-outline">
+                                    <input type="text" class="form-control" name="brand" value="{{old('brand')}}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label for="">Arrtribute *</label>
+                                <div class="input-group input-group-outline">
+        
+                                <select name="arrt" id="" class="form-control" disabled>
+                                    <option value="">None</option>
+                                    @foreach ($arrt as $arrt)
+                                        <option value="{{$arrt->id}}">{{$arrt->arrtribute}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="">UOM *</label>
+                                <div class="input-group input-group-outline">
+        
+                                <select name="uom" id="" class="form-control" >
+                                    <option value="0">Default</option>
+                                    @foreach ($uom as $uom)
+                                        <option value="{{$uom->id}}" {{old('uom') == $uom->id ? 'selected' : ""}}>{{$uom->uom}}</option>
+                                    @endforeach
+                                </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <label for="">TAX % *</label>
+                                <div class="input-group input-group-outline">
+                                    <input type="number" step="0.01" class="form-control" name="tax"  required value="{{old('tax') ? old('tax'): 17 }}" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="">MRP *</label>
+                                <div class="input-group input-group-outline">
+                                    <input type="number" step="0.01" class="form-control" name="mrp" value="{{old('mrp') ? old('mrp') : 0}}" required  min="0">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <label for="">Trade Price *</label>
+                                <div class="input-group input-group-outline">
+                                    <input type="number" step="0.01" class="form-control" name="tp" value="{{old('tp') ? old('tp') : 0}}" required  min="0">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="form-label">Low Stock Alert </label>
+                                <div class="input-group input-group-outline">
+                                <input type="number" class="form-control" name="low_stock" required value="{{old('low_stock') ? old('low_stock') : 20}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                  </div>
+                              
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label">Opening Inventory </label>
+                                <div class="input-group input-group-outline">
+                                <input type="number" class="form-control" name="opening_stock" required value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                  </div>
+                              
+                            </div>
+
+
                         </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="container">
+                           
+                            <div class="avatar-upload">
+                                <div class="avatar-edit">
+                                    <input type='file' id="imageUpload" name="image" class="imageUpload" accept=".png, .jpg, .jpeg" />
+                                    <label for="imageUpload"></label>
+                                </div>
+                                <div class="avatar-preview">
+                                    <div  class="imagePreview" style="background-image: url(https://www.trianglelearningcenter.org/wp-content/uploads/2020/08/placeholder.png);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
                     
-                    <div class="col-lg-3">
-                        <label for="">Brand *</label>
-                        <div class="input-group input-group-outline">
-                            <input type="text" class="form-control" name="brand" value="{{old('brand')}}" required>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <label for="">Arrtribute *</label>
-                        <div class="input-group input-group-outline">
-
-                        <select name="arrt" id="" class="form-control" disabled>
-                            <option value="">None</option>
-                            @foreach ($arrt as $arrt)
-                                <option value="{{$arrt->id}}">{{$arrt->arrtribute}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <label for="">UOM *</label>
-                        <div class="input-group input-group-outline">
-
-                        <select name="uom" id="" class="form-control" >
-                            <option value="0">Default</option>
-                            @foreach ($uom as $uom)
-                                <option value="{{$uom->id}}" {{old('uom') == $uom->id ? 'selected' : ""}}>{{$uom->uom}}</option>
-                            @endforeach
-                        </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <label for="">TAX % *</label>
-                        <div class="input-group input-group-outline">
-                            <input type="number" step="0.01" class="form-control" name="tax"  required value="{{old('tax') ? old('tax'): 17 }}" min="0">
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <label for="">MRP *</label>
-                        <div class="input-group input-group-outline">
-                            <input type="number" step="0.01" class="form-control" name="mrp" value="{{old('mrp') ? old('mrp') : 0}}" required  min="0">
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <label for="">Trade Price *</label>
-                        <div class="input-group input-group-outline">
-                            <input type="number" step="0.01" class="form-control" name="tp" value="{{old('tp') ? old('tp') : 0}}" required  min="0">
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <label class="form-label">Low Stock Alert </label>
-                        <div class="input-group input-group-outline">
-                        <input type="number" class="form-control" name="low_stock" required value="{{old('low_stock') ? old('low_stock') : 20}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
-                          </div>
-                      
-                    </div>
-                    <div class="col-lg-3">
-                        <label class="form-label">Opening Inventory </label>
-                        <div class="input-group input-group-outline">
-                        <input type="number" class="form-control" name="opening_stock" required value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
-                          </div>
-                      
-                    </div>
+                  
+                    
+                    
                     @if (isset($dynamicFields) && count($dynamicFields->fields) )
                     @foreach ($dynamicFields->fields as $dynamicField)
                     <div class="col-lg-6">
@@ -396,5 +449,34 @@
         </div>
       </div>
       {{-- Csv Modal --}}
+
+      <script>
+        function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $(input).css('background-image', 'url('+e.target.result +')');
+            $(input).hide();
+            $(input).fadeIn(650);
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+$(".imageUpload").change(function() {
+    var $avatarPreview = $(this).closest('.avatar-upload').find('.avatar-preview');
+    var $imagePreview = $avatarPreview.find('.imagePreview'); // Cache the reference
+    console.log({$imagePreview});
+    if (this.files && this.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $imagePreview.css('background-image', 'url(' + e.target.result + ')');
+            $imagePreview.hide().fadeIn(650);
+        };
+        reader.readAsDataURL(this.files[0]);
+    }
+});
+
+
+      </script>
 
 @endsection
