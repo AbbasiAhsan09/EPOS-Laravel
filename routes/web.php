@@ -172,12 +172,15 @@ Route::middleware('manager.role')->prefix('system')->group(function () {
     
 });
 
-
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
  
 Route::resources([
     'customer-ledger' => CustomerLedgerController::class,
     'vendor-ledger'  => VendorLedgerController::class,
 ]);
+
 Route::get('db-backup', [DBBackupController::class, 'DbBackup']);
 
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
