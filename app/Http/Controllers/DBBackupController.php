@@ -40,10 +40,10 @@ class DBBackupController extends Controller
     
     $command = sprintf(
         '"C:\\laragon\\bin\\mysql\\mysql-5.7.33-winx64\\bin\\mysqldump" --user=%s --password=%s --host=%s %s',
-        escapeshellarg(config("database.connections.{$database}.username")),
-        escapeshellarg(config("database.connections.{$database}.password")),
-        escapeshellarg(config("database.connections.{$database}.host")),
-        escapeshellarg(config("database.connections.{$database}.database"))
+        $this->customEscapeShellArg(config("database.connections.{$database}.username")),
+        $this->customEscapeShellArg(config("database.connections.{$database}.password")),
+        $this->customEscapeShellArg(config("database.connections.{$database}.host")),
+        $this->customEscapeShellArg(config("database.connections.{$database}.database"))
     );
 
     $process = proc_open($command, $descriptorSpec, $pipes, $backupPath);
@@ -200,6 +200,9 @@ public function getToken($key, $secret, $refreshToken)
     }
 
 
+}
+function customEscapeShellArg($arg) {
+    return "'" . str_replace("'", "'\\''", $arg) . "'";
 }
 
 }
