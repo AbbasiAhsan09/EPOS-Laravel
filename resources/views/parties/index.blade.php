@@ -13,7 +13,7 @@
         <div class="btn-grp">
          
             <div class="row .row-customized">
-                <div class="col-lg-8">
+                <div class="col-lg-6">
                     {{-- <div class="input-group input-group-outline">
                         <label class="form-label">Search</label>
                         <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
@@ -28,9 +28,10 @@
                       </select>
                       </div>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-6">
+                  <button class="btn btn-outline-primary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#newStoreModal">New Party</button>
+                  <button class="btn btn-outline-secondary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
                     <button class="btn btn-outline-secondary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#filterModal">Filter</button>
-                    <button class="btn btn-outline-primary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#newStoreModal">New Party</button>
 
                 </div>
             </div>
@@ -175,7 +176,7 @@
        @endforeach
     </tbody>
 </table>
-
+{{$parties->links('pagination::bootstrap-4')}}
 </div>
 </div>
 
@@ -344,6 +345,42 @@
           <a href="{{url("parties")}}" class="btn btn-secondary">Reset</a>
           
           <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+
+
+
+   <!-- Filter Modal -->
+   <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content ">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newStoreModalLabel">Import CSV</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+       <div class="modal-body">
+        <form action="{{route("parties.importCSV")}}" method="POST"  enctype="multipart/form-data">
+          @csrf
+          <div class="row">
+                      
+            <div class="col-lg-12">
+                <label for="">Upload File </label>
+          <div class="input-group input-group-outline">
+            <input type="file" class="form-control" name="file" required>
+          </div>
+            </div>
+            
+           
+            
+        </div>
+       </div> 
+        <div class="modal-footer">
+          <a href="{{url("parties")}}" class="btn btn-secondary">Reset</a>
+          
+          <button type="submit" class="btn btn-primary">Import</button>
         </div>
     </form>
       </div>

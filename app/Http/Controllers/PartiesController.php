@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\PartiesImporter;
 use App\Models\Parties;
 use App\Models\PartyGroups;
 use Illuminate\Http\Request;
+use Excel;
 
 class PartiesController extends Controller
 {
@@ -162,5 +164,16 @@ class PartiesController extends Controller
     public function destroy(Parties $parties)
     {
         //
+    }
+
+    function importCSV(Request $request)  {
+        try {
+            // dd($request);
+             Excel::import(new PartiesImporter, $request->file("file"));
+            return redirect()->back();
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

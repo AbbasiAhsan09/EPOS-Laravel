@@ -228,7 +228,7 @@ class ProductController extends Controller
     public function importCsv(Request $request)
     {
         try {
-            // dd($request);
+            // dd($request->file('file'));
             Excel::import(new ProductImport, $request->file('file'));
 
             return redirect()->back();
