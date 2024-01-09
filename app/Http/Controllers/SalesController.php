@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Trait\InventoryTrait;
 use App\Http\Trait\TransactionsTrait;
+use App\Models\AppFormFields;
+use App\Models\AppFormFieldsData;
+use App\Models\AppForms;
 use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PartyGroups;
@@ -139,6 +142,25 @@ class SalesController extends Controller
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
                 $order->save();
 
+                // Dynamic Fields Storing
+                if(isset($request->dynamicFields) && count($request->dynamicFields)){
+                    foreach ($request->dynamicFields as $key => $value) {
+                        if(!empty($value)){
+                        $form = AppForms::where("name",'sales')->first();
+                        foreach ($value as $key => $field_value) {
+                        $form_field = AppFormFields::where('form_id',$form->id)->where('name',$key)->filterByStore()->first();
+                            if($form_field){
+                                AppFormFieldsData::create(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                'value' => $field_value, 'related_to' => $order->id,
+                                'store_id' => Auth::user()->store_id ?? null]);
+                            }
+                        }
+                        }
+                    }
+                }
+             //Dynamic Fields Storing
+             
+
                 $this->createOrderTransactionHistory($order->id,$order->customer_id,$order->recieved,date('Y-m-d'),'recieved');
 
                 if ($order && count($request->item_id)) {
@@ -205,22 +227,28 @@ class SalesController extends Controller
     public function edit(int $id, Sales $sales)
     {
         try {
+
             DB::enableQueryLog();
-
-
             $config = Configuration::filterByStore()->first();
-            $order = Sales::where('id', $id)->with('order_details.item_details')->filterByStore()->first();
+            $order = Sales::where('id', $id)->with('order_details.item_details','dynamicFeildsData')->filterByStore()->first();
             // dump($order);
             // dd(DB::getQueryLog());
             if ($order) {
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
+                
                 if ($group) {
                     $customers = Parties::where('group_id', $group->id)->byUser()->get();
                 } else {
                     $customers = [];
                 }
 
-                return view('sales.sale_orders.new_order', compact('order', 'customers','config'));
+                $dynamicFields = AppForms::where("name",'sales')
+                ->with("fields")->whereHas("fields", function($query){
+                    $query->filterByStore();
+                })->first();
+
+
+                return view('sales.sale_orders.new_order', compact('order', 'customers','config','dynamicFields'));
             }
             Alert::toast('invalid_request','error');
             return redirect()->back()->withErrors('invalid_request', 'Ooops! Your Request is Invalid!');
@@ -289,6 +317,34 @@ class SalesController extends Controller
                 $order->user_id = Auth::user()->id;
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
                 $order->save();
+
+                   // Dynamic Fields Storing
+                   if(isset($request->dynamicFields) && count($request->dynamicFields)){
+                    foreach ($request->dynamicFields as $key => $value) {
+                        if(!empty($value)){
+                        $form = AppForms::where("name",'sales')->first();
+                        foreach ($value as $key => $field_value) {
+                        
+                        $form_field = AppFormFields::where('form_id',$form->id)->where('name',$key)->filterByStore()->first();
+                        // dd($form_field);
+                            if($form_field){
+                               $appFormFieldData = AppFormFieldsData::where(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                'related_to' => $order->id,
+                                'store_id' => Auth::user()->store_id])->first();
+                                if($appFormFieldData){
+                                  
+                                    $appFormFieldData->update(['value' => $field_value]);
+                                }else{
+                                    AppFormFieldsData::create(['form_id' => $form->id, 'field_id' => $form_field->id, 
+                                    'related_to' => $order->id,
+                                    'store_id' => Auth::user()->store_id,'value' => $field_value]);
+                                }
+                            }
+                        }
+                        }
+                    }
+                }
+             //Dynamic Fields Storing
                 
 
                 if ($order && count($request->item_id)) {
@@ -384,7 +440,13 @@ class SalesController extends Controller
             } else {
                 $customers = [];
             }
-            return view('sales.sale_orders.new_order', compact('customers','config','orderid'));
+
+            $dynamicFields = AppForms::where("name",'sales')
+            ->with("fields")->whereHas("fields", function($query){
+                $query->filterByStore();
+            })->first();
+
+            return view('sales.sale_orders.new_order', compact('customers','config','orderid','dynamicFields'));
         } catch (\Throwable $th) {
             throw $th;
         }

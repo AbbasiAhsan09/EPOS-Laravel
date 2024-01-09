@@ -64,4 +64,15 @@ class Sales extends Model
     {
         return $this->belongsTo(Stores::class, 'store_id', 'id');
     }
+
+
+    /**
+     * Get all of the dynamicFeildsData for the PurchaseOrder
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dynamicFeildsData(): HasMany
+    {
+        return $this->hasMany(AppFormFieldsData::class, 'related_to', 'id')->where('form_id', 2);
+    }
 }
