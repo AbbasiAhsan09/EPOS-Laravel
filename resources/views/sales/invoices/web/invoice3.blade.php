@@ -156,7 +156,8 @@
 							<tr>
 								<td>
 									<b>Buyer's Details</b><br />
-									{{isset($order->customer ) ? $order->customer->name : 'Cash' }}<br />
+									{{isset($order->customer ) ? $order->customer->party_name : 'Cash' }}<br />
+									{{-- {{isset($order->customer ) ? $order->customer->business_name : '' }}<br /> --}}
 									{{isset($order->customer ) ? $order->customer->phone : '' }} <br>
                                     {{isset($order->customer ) ? $order->customer->email : '' }}
 									
