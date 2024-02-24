@@ -381,13 +381,8 @@
 
 						<div class="print" style="font-size: 14px">
 							<td>
-                                <b>Track Your Order</b><br />
-                                Goto : https://moon-fabrics.com/<br />
-                                Inv No : {{$order->tran_no}} <br>
-                                Password : {{$order->password ?? ""}}
-                                
-                              
-                            </td>
+                  <p style="text-align: center"> {{$config->invoice_message ?? ""}} </p>                  
+              </td>
 						</div>
                         <div class="footer">
                             The Software is Developed by TradeWisePOS | +92 320 0681969
