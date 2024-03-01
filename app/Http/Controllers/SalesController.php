@@ -181,13 +181,13 @@ class SalesController extends Controller
                         $details->save();
 
                         if ($config->inventory_tracking) {
-                            // dd('hi');
+                           
                             if ($this->allowLowInventory) {
-                                // dd($this->checkAvaialableInventory($details->item_id, $details->is_base_unit));
+                                
                                 $this->subtractInventoryWithOrder($details->item_id, $details->qty, $details->is_base_unit);
                             } else {
                                 if ($this->checkAvaialableInventory($details->item_id, $details->is_base_unit) && $this->checkAvaialableInventory($details->item_id, $details->is_base_unit) >= $details->qty) {
-                                    // dd($this->checkAvaialableInventory($details->item_id, $details->is_base_unit));                                    
+                                                                       
                                     $this->subtractInventoryWithOrder($details->item_id, $details->qty, $details->is_base_unit);
                                 } else {
                                     $details->delete();

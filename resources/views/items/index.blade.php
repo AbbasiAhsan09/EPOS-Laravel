@@ -231,6 +231,17 @@
                             
                           </div>
                     </div>
+                    <div class="col-lg-3">
+                        <div class="mt-3 d-flex">
+                        
+                            <label for="checkInventroyAdd" class="mb-0">Check Inventory </label>
+                            <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                                <input type="checkbox" id="checkInventroyAdd" class="form-check-input" {{$item->check_inv ? 'checked' : ''}}
+                                 name="check_inv" 
+                                value="1" > 
+                            </div>
+                        </div>
+                    </div>
                 </div>
         </div>
         <div class="modal-footer">
@@ -357,6 +368,9 @@
                               
                             </div>
 
+                           
+                            
+
 
                         </div>
                     </div>
@@ -376,6 +390,8 @@
                         </div>
                         
                     </div>
+
+                    
                     
                   
                     
@@ -400,6 +416,16 @@
                             <textarea name="description" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)" rows="3">{{old('description')}}</textarea>
                             
                           </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mt-3 d-flex">
+                        
+                            <label for="checkInventroyAdd" class="mb-0">Check Inventory </label>
+                            <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                                <input type="checkbox" id="checkInventroyAdd" class="form-check-input"  name="check_inv" 
+                                value="1" > 
+                            </div>
+                        </div>
                     </div>
                    
                 </div>

@@ -23,7 +23,11 @@ trait InventoryTrait
         //Check Inventory Available 
         public function checkAvaialableInventory($item, $is_base_unit = 0)
         {
-            
+            $findProduct = Products::find($item);
+            if($findProduct->check_inv){
+                return true;
+            }
+
             $product = Inventory::where('item_id', $item)->where( 'is_opnening_stock', 0)->first();
             if($product){
                 if(!$is_base_unit){
@@ -42,7 +46,7 @@ trait InventoryTrait
         // Manage Inventory on Order Reflection
         public function subtractInventoryWithOrder($item, $qty, $is_base_unit)
         {
-            // dd(12);
+           
           $inventory = Inventory::where('item_id' , $item )
           ->where('is_opnening_stock' , 0)->first();
             if($inventory){
@@ -71,6 +75,7 @@ trait InventoryTrait
                 if($inventory->save()){
                     return true;
                 }
+
             return false;
 
         }
