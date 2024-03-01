@@ -35,7 +35,11 @@ class HomeController extends Controller
         $sales = Sales::whereMonth('created_at', $currentMonth)->byUser()->whereYear('created_at', $currentYear)
             ->orderBy('id', 'DESC')->get();
         $purchases = PurchaseInvoice::whereMonth('created_at', $currentMonth)->byUser()->whereYear('created_at', $currentYear)->get();
-        return view('home', compact('sales', 'purchases','saleBalance', 'purchaseBalance','saleBalanceParties'));
+
+        $totalSales = Sales::byUser()->sum("net_total");
+        $totalPurchase = PurchaseInvoice::byUser()->sum("net_amount");
+        
+        return view('home', compact('sales', 'purchases','saleBalance', 'purchaseBalance','saleBalanceParties', 'totalPurchase', 'totalSales'));
     }
 
     public function reports()
