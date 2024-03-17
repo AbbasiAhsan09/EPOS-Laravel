@@ -344,14 +344,32 @@
             
                             </tbody>
                         </table>
+                        @php
+                            $formatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+                            $amount_in_words = $formatter->format($order->net_total);
+                        @endphp
+                        
 						{{--Table --}}
 						<div class="total text-right">
-							@if (isset($order->note)  && $order->note)
-                            <p class="extra-notes">
+              
+              <p class="extra-notes">
+                <strong>Amount in words :</strong>
+                 {{ucfirst($amount_in_words)}}  only.
+                 @if (isset($order->note)  && $order->note)
+                 <br>
+                 <br>
+                 <strong>Extra Notes</strong>
+								{{$order->note ?? ''}}
+                @endif
+              </p>
+
+							{{-- @if (isset($order->note)  && $order->note)
+                <p class="extra-notes">
 								<strong>Extra Notes</strong>
 								{{$order->note ?? ''}}
 							</p>
-                            @endif
+                @endif
+                 --}}
 							<div class="field">
 								Subtotal <span>{{env('CURRENCY').round($order->gross_total)}}</span>
 							</div>
