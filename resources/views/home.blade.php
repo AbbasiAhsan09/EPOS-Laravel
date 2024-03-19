@@ -2,7 +2,6 @@
 
 @section('content')
 @include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/hGkaaHxzxlo'])
-
 @php
     $is_trial = isset(Auth::user()->store->is_trial) ? Auth::user()->store->is_trial:  false;
     $renewalDate = isset(Auth::user()->store->renewal_date) ? Carbon\Carbon::parse(Auth::user()->store->renewal_date) : false;
@@ -56,7 +55,7 @@
             </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">{{date('M')}}  Sales</p>
-              <h4 class="mb-0">{{env('CURRENCY').' '.round($sales->sum('net_total'))}}</h4>
+              <h4 class="mb-0">{{ConfigHelper::getStoreConfig()["symbol"].' '.round($sales->sum('net_total'))}}</h4>
             </div>
           </div>
           <hr class="dark horizontal my-0">
@@ -73,7 +72,7 @@
             </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">{{date('M')}}  Purchases</p>
-              <h4 class="mb-0">{{env('CURRENCY').' '.round($purchases->sum('net_amount'))}}</h4>
+              <h4 class="mb-0">{{ConfigHelper::getStoreConfig()["symbol"].' '.round($purchases->sum('net_amount'))}}</h4>
             </div>
           </div>
           <hr class="dark horizontal my-0">
@@ -199,10 +198,10 @@
                     {{$item->customer->party_name ?? 'Cash'}}
                   </td>
                   <td class="align-middle text-center text-sm">
-                    <span class="text-xs font-weight-bold"> {{env('CURRENCY').' '.$item->gross_total}} </span>
+                    <span class="text-xs font-weight-bold"> {{ConfigHelper::getStoreConfig()["symbol"].' '.$item->gross_total}} </span>
                   </td>
                   <td class="align-middle text-center">
-                    <span class="text-xs font-weight-bold"> {{env('CURRENCY').' '.$item->net_total}} </span>
+                    <span class="text-xs font-weight-bold"> {{ConfigHelper::getStoreConfig()["symbol"].' '.$item->net_total}} </span>
                   </td>
                 </tr>
                  @endforeach
@@ -229,7 +228,7 @@
                   <i class="material-icons text-warning text-gradient">sell</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round($saleBalance->sum('net_total') -  $saleBalance->sum('recieved'))}}</h6>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{ConfigHelper::getStoreConfig()["symbol"]. round($saleBalance->sum('net_total') -  $saleBalance->sum('recieved'))}}</h6>
                   <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Sales Balance (Overall Cash)</p>
                 </div>
               </div>
@@ -238,7 +237,7 @@
                   <i class="material-icons text-success text-gradient">sell</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round($saleBalanceParties->sum('net_total') -  $saleBalanceParties->sum('recieved'))}}</h6>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{ConfigHelper::getStoreConfig()["symbol"]. round($saleBalanceParties->sum('net_total') -  $saleBalanceParties->sum('recieved'))}}</h6>
                   <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Sales Balance (Overall Parties)</p>
                 </div>
               </div>
@@ -247,7 +246,7 @@
                   <i class="material-icons text-danger text-gradient">inventory_2</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round(($purchaseBalance->sum('net_amount') -  $purchaseBalance->sum('recieved')))}}</h6>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{ConfigHelper::getStoreConfig()["symbol"]. round(($purchaseBalance->sum('net_amount') -  $purchaseBalance->sum('recieved')))}}</h6>
                   <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Purchase Balance (Overall)</p>
                 </div>
               </div>
@@ -299,7 +298,7 @@
                   <i class="material-icons text-warning text-gradient">sync_alt</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round($totalSales -  $totalPurchase)}}</h6>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{ConfigHelper::getStoreConfig()["symbol"]. round($totalSales -  $totalPurchase)}}</h6>
                   <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Overall Outstanding Account</p>
                 </div>
               </div>
@@ -308,7 +307,7 @@
                   <i class="material-icons text-success text-gradient">arrow_forward_ios</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round($totalSales)}}</h6>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{ConfigHelper::getStoreConfig()["symbol"]. round($totalSales)}}</h6>
                   <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Overall Sales </p>
                 </div>
               </div>
@@ -317,7 +316,7 @@
                   <i class="material-icons text-danger text-gradient">arrow_back_ios</i>
                 </span>
                 <div class="timeline-content">
-                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{env('CURRENCY'). round($totalPurchase)}}</h6>
+                  <h6 class="text-dark text-sm font-weight-bold mb-0">{{ConfigHelper::getStoreConfig()["symbol"]. round($totalPurchase)}}</h6>
                   <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Overall Purchase</p>
                 </div>
               </div>

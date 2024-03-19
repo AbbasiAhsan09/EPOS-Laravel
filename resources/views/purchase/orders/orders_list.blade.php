@@ -57,9 +57,9 @@
                     <td><a href="" style="font-style: italic">{{$item->quotation_num ?? '(Null)'}}</a></td>
                     <td>{{$item->type ?? "STANDARD"}}</td>
                     <td>{{$item->party->party_name}}</td>
-                    <td>{{env('CURRENCY').' '.$item->sub_total}}</td>
+                    <td>{{ConfigHelper::getStoreConfig()["symbol"].' '.$item->sub_total}}</td>
                     <td class="text-primary">
-                      <b>  {{env('CURRENCY').' '.($item->sub_total - $item->discount) + $item->other_charges }}</b>
+                      <b>  {{ConfigHelper::getStoreConfig()["symbol"].' '.($item->sub_total - $item->discount) + $item->other_charges }}</b>
                     </td>
                     <td>{{$item->created_by_user->name}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>

@@ -38,12 +38,12 @@
                         @php
                 $total += (!empty($item->stock_qty) ? (round($item->stock_qty / (($item->base_unit_value) ?? 1))) : 0) * ($item->tp ?? 0);
             @endphp
-            <td>{{ env('CURRENCY').(!empty($item->stock_qty) ? (round($item->stock_qty / (($item->base_unit_value) ?? 1))) : 0) * ($item->tp ?? 0)}}</td>
+            <td>{{ ConfigHelper::getStoreConfig()["symbol"].(!empty($item->stock_qty) ? (round($item->stock_qty / (($item->base_unit_value) ?? 1))) : 0) * ($item->tp ?? 0)}}</td>
         </tr>
         @endforeach
     </tbody>
 </table>
-<h4>Total Cost : {{env('CURRENCY').$total ?? 0}}</h4>
+<h4>Total Cost : {{ConfigHelper::getStoreConfig()["symbol"].$total ?? 0}}</h4>
 <style>
     table{
         width: 100% ;

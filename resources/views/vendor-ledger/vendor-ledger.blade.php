@@ -59,7 +59,7 @@
            <tr>
             <td>{{ $item->party_name }}</td>
             {{-- <td>{{$item->purchases}}</td> --}}
-            <td>{{ env('CURRENCY').round($item->purchases->sum('net_amount') - $item->purchases->sum('recieved'))  }}</td>
+            <td>{{ ConfigHelper::getStoreConfig()["symbol"].round($item->purchases->sum('net_amount') - $item->purchases->sum('recieved'))  }}</td>
             <td>
                 <div class="s-btn-grp">
                     <div class="dropdown">

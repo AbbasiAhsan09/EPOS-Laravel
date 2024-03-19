@@ -51,9 +51,9 @@
                     <td><a href="" style="font-style: italic">{{$item->req_num ?? '(Null)'}}</a></td>
                     <td>{{$item->type}}</td>
                     <td>{{$item->party->party_name}}</td>
-                    <td>{{env('CURRENCY').' '.$item->gross_total}}</td>
+                    <td>{{ConfigHelper::getStoreConfig()["symbol"].' '.$item->gross_total}}</td>
                     <td class="text-primary">
-                      <b>  {{env('CURRENCY').' '.($item->gross_total - $item->discount) + $item->other_charges }}</b>
+                      <b>  {{ConfigHelper::getStoreConfig()["symbol"].' '.($item->gross_total - $item->discount) + $item->other_charges }}</b>
                     </td>
                     <td>{{$item->created_by_user->name}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>

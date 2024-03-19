@@ -203,26 +203,26 @@
                   <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="6">Gross Total</th>
-                    <th colspan="1">{{env('CURRENCY').round($order->gross_total)}}</th>
+                    <th colspan="1">{{ConfigHelper::getStoreConfig()["symbol"].round($order->gross_total)}}</th>
                   </tr>
                   @if ($order->discount > 0)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="6">Discount</th>
-                    <th colspan="1">{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : env('CURRENCY').Round($order->discount)}}</th>
+                    <th colspan="1">{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : ConfigHelper::getStoreConfig()["symbol"].Round($order->discount)}}</th>
                   </tr>
 				  @endif
                   @if ( $order->other_charges > 0)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="6">Other Charges</th>
-                    <th colspan="1">{{env('CURRENCY').round($order->other_charges)}}</th>
+                    <th colspan="1">{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</th>
                   </tr>
 				  @endif
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="6">Net Total</th>
-                    <th colspan="1">{{env('CURRENCY').round($order->net_total)}}</th>
+                    <th colspan="1">{{ConfigHelper::getStoreConfig()["symbol"].round($order->net_total)}}</th>
                   </tr>
 
                 </tbody>

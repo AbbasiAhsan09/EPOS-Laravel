@@ -79,19 +79,19 @@
                 </tr>
                 <tr>
                     <th>Gross Total</th>
-                    <td>{{env('CURRENCY').' '. round($item->sales->sum('total'))}}</td>
+                    <td>{{ConfigHelper::getStoreConfig()["symbol"].' '. round($item->sales->sum('total'))}}</td>
                 </tr>
                 <tr>
                     <th>Net Total</th>
-                    <td>{{env('CURRENCY').' '. round($item->sales->sum('net_total'))}}</td>
+                    <td>{{ConfigHelper::getStoreConfig()["symbol"].' '. round($item->sales->sum('net_total'))}}</td>
                 </tr>
                 <tr>
                     <th>Paid (Total)</th>
-                    <td>{{env('CURRENCY').' '. round($item->sales->sum('recieved'))}}</td>
+                    <td>{{ConfigHelper::getStoreConfig()["symbol"].' '. round($item->sales->sum('recieved'))}}</td>
                 </tr>
                 <tr>
                     <th>Balance (Total)</th>
-                    <td>{{env('CURRENCY').' '.round($item->sales->sum('net_total'))- round($item->sales->sum('recieved'))}}</td>
+                    <td>{{ConfigHelper::getStoreConfig()["symbol"].' '.round($item->sales->sum('net_total'))- round($item->sales->sum('recieved'))}}</td>
                 </tr>
            
         </tbody>

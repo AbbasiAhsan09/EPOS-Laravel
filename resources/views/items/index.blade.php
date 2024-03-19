@@ -223,6 +223,10 @@
                         </div>
                     </div>
                 </div>
+                <div style="text-align: center">
+                    @include("items.component.barcode",["code" => $item->barcode])
+                </div>
+
                </div>
                     <div class="col-lg-12">
                         <label class="form-label">Description </label>
