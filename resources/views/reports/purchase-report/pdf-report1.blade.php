@@ -39,10 +39,10 @@
             <th colspan="3">
                 Total:
             </th>
-            <th>{{env('CURRENCY') . $records->sum('total')}}</th>
-            <th>{{env('CURRENCY') . $records->sum('net_amount')}}</th>
-            <th>{{env('CURRENCY') . $records->sum('recieved')}}</th>
-            <th>{{env('CURRENCY') . $records->sum('net_amount') - $records->sum('recieved')}}</th>
+            <th>{{ConfigHelper::getStoreConfig()["symbol"] . $records->sum('total')}}</th>
+            <th>{{ConfigHelper::getStoreConfig()["symbol"] . $records->sum('net_amount')}}</th>
+            <th>{{ConfigHelper::getStoreConfig()["symbol"] . $records->sum('recieved')}}</th>
+            <th>{{ConfigHelper::getStoreConfig()["symbol"] . $records->sum('net_amount') - $records->sum('recieved')}}</th>
             <th colspan="2">Count : ({{$records->count()}})</th>
         </tr>
     </tbody>

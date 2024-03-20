@@ -213,13 +213,13 @@
                   <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Gross Total</th>
-                    <th colspan="2">{{env('CURRENCY').round($order->gross_total)}}</th>
+                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->gross_total)}}</th>
                   </tr>
                   @if ($order->discount > 0)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Discount</th>
-                    <th colspan="2">{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : env('CURRENCY').Round($order->discount)}}</th>
+                    <th colspan="2">{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : ConfigHelper::getStoreConfig()["symbol"].Round($order->discount)}}</th>
                   </tr>
 				  @endif
 
@@ -227,25 +227,25 @@
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Other Charges</th>
-                    <th colspan="2">{{env('CURRENCY').round($order->other_charges)}}</th>
+                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</th>
                   </tr>
 				  @endif
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Net Total</th>
-                    <th colspan="2">{{env('CURRENCY').round($order->net_total)}}</th>
+                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->net_total)}}</th>
                   </tr>
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Received</th>
-                    <th colspan="2">{{env('CURRENCY').round($order->recieved ?? 0)}}</th>
+                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->recieved ?? 0)}}</th>
                   </tr>
 
 				  @if ($order->recieved)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Balance</th>
-                    <th colspan="2">{{env('CURRENCY').round((($order->net_total ?? 0) - ($order->recieved ?? 0)) ?? 0)}}</th>
+                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round((($order->net_total ?? 0) - ($order->recieved ?? 0)) ?? 0)}}</th>
                   </tr>
 				  @endif
 

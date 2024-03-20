@@ -74,9 +74,9 @@
                     <td><a href="{{url("/purchase/order/".$item->order->id."/edit")}}" style="font-style: italic">{{$item->order->doc_num ?? '(Null)'}}</a></td>
                     
                     <td>{{$item->party->party_name}}</td>
-                    <td>{{env('CURRENCY').' '.$item->total}}</td>
+                    <td>{{ConfigHelper::getStoreConfig()["symbol"].' '.$item->total}}</td>
                     <td class="text-primary">
-                      <b>  {{env('CURRENCY').' '.($item->total - $item->discount) + $item->other_charges }}</b>
+                      <b>  {{ConfigHelper::getStoreConfig()["symbol"].' '.($item->total - $item->discount) + $item->other_charges }}</b>
                     </td>
                     <td>{{$item->created_by_user->name}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>
@@ -114,7 +114,7 @@
                             @if (isset($item->transactions ) && count($item->transactions ))
                             <ul>
                                 @foreach ($item->transactions as $transaction)
-                                <li>{{$item->doc_num}} | {{date('m-d-y',strtotime($transaction->created_at))}} | {{env('CURRENCY').$transaction->amount}}</li>
+                                <li>{{$item->doc_num}} | {{date('m-d-y',strtotime($transaction->created_at))}} | {{ConfigHelper::getStoreConfig()["symbol"].$transaction->amount}}</li>
                                 @endforeach
                                 </ul>
                             @else

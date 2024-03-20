@@ -10,3 +10,5 @@ class AppFormFieldsData extends Model
     protected $fillable = ['form_id','field_id','value','store_id','related_to'];
     use HasFactory;
 }
+
+

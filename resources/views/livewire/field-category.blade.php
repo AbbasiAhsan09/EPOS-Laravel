@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col">
-        <div class="col-lg-6">
+        <div class="">
             <label for="">Field *</label>
             <div class="input-group input-group-outline">
                 <select name="field" id="" class="form-control" wire:change="changeField()" wire:model="selectedField">
@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="col">
-            <div class="col-lg-6">
+            <div class="">
                 <label for="">Category *</label>
                 <div class="input-group input-group-outline">
                     <select name="category" id="" class="form-control">

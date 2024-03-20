@@ -401,3 +401,9 @@
 				}, 1000);
 			});
 			</script>
+
+<style>
+      @page {
+    size: auto !important;
+}
+</style>

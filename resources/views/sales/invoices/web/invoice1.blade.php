@@ -371,41 +371,36 @@
                 @endif
                  --}}
 							<div class="field">
-								Subtotal <span>{{env('CURRENCY').round($order->gross_total)}}</span>
+								Subtotal <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->gross_total)}}</span>
 							</div>
                             @if ( $order->other_charges > 0)
 							<div class="field">
-								Other Charges <span>{{env('CURRENCY').round($order->other_charges)}}</span>
+								Other Charges <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</span>
 							</div>
                             @endif
                             @if ($order->discount > 0)
 							<div class="field">
-								Discount <span>{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : env('CURRENCY').Round($order->discount)}}</span>
+								Discount <span>{{$order->discount_type == 'PERCENT' ? '%'.Round($order->discount) : ConfigHelper::getStoreConfig()["symbol"].Round($order->discount)}}</span>
 							</div>
                             @endif
 							<div class="field grand-total">
-								Total <span>{{env('CURRENCY').round($order->net_total)}}</span>
+								Total <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->net_total)}}</span>
 							</div>
 
                             <div class="field grand-total">
-								Recieved <span>{{env('CURRENCY').round($order->recieved ?? 0)}}</span>
+								Recieved <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->recieved ?? 0)}}</span>
 							</div>
 
                             <div class="field grand-total">
-								Balance <span>{{env('CURRENCY').round((($order->net_total ?? 0) - ($order->recieved ?? 0)) ?? 0)}}</span>
+								Balance <span>{{ConfigHelper::getStoreConfig()["symbol"].round((($order->net_total ?? 0) - ($order->recieved ?? 0)) ?? 0)}}</span>
 							</div>
 
 						</div>
 
 						<div class="print" style="font-size: 14px">
 							<td>
-                                <b>Track Your Order</b><br />
-                                Goto : https://moon-fabrics.com/<br />
-                                Inv No : {{$order->tran_no}} <br>
-                                Password : {{$order->password ?? ""}}
-                                
-                              
-                            </td>
+                  <p style="text-align: center"> {{$config->invoice_message ?? ""}} </p>                  
+              </td>
 						</div>
                         <div class="footer">
                             The Software is Developed by TradeWisePOS | +92 320 0681969

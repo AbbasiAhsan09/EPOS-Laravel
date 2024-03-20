@@ -92,7 +92,7 @@
               </td>
             @endif
          {{--Status  --}}
-        <td> {{env('CURRENCY').$item->net_total}}</td> 
+        <td> {{ConfigHelper::getStoreConfig()["symbol"].$item->net_total}}</td> 
             @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2 )
             <td>
                 <div class="s-btn-grp">

@@ -140,15 +140,15 @@
 				
                   <tr>
                     <th colspan="6">Gross Total</th>
-                    <th colspan="6">{{env('CURRENCY').round($order->gross_total)}}</th>
+                    <th colspan="6">{{ConfigHelper::getStoreConfig()["symbol"].round($order->gross_total)}}</th>
                   </tr>
                   <tr>
                     <th colspan="6">Discount</th>
-                    <th colspan="6">{{env('CURRENCY').Round($order->discount)}}</th>
+                    <th colspan="6">{{ConfigHelper::getStoreConfig()["symbol"].Round($order->discount)}}</th>
                   </tr>
                   <tr>
                     <th colspan="6">Other Charges</th>
-                    <th colspan="6">{{env('CURRENCY').round($order->other_charges)}}</th>
+                    <th colspan="6">{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</th>
                   </tr>
 
                 </tbody>

@@ -33,6 +33,9 @@ return [
 
     'dropbox' => [
         'token' => env('DROPBOX_TOKEN'),
+        'app_key' => env("DROPBOX_APP_KEY") ?? "wicxc06cn5lzmnd",
+        'secret' => env("DROPBOX_APP_SECRET") ?? "n3ra5eg9cfq6wrb",
+        'refresh_token' => env("DROPBOX_REFRESH_TOKEN")
     ],
     
 ];

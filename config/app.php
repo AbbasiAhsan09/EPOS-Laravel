@@ -82,7 +82,7 @@ return [
     |
     */
 
-    'locale' => 'fr',
+    'locale' => 'en',
 
     /*
     |--------------------------------------------------------------------------
@@ -216,6 +216,7 @@ return [
         'Alert' => RealRashid\SweetAlert\Facades\Alert::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'ConfigHelper' => App\Helpers\ConfigHelper::class,
     ])->toArray(),
 
 ];

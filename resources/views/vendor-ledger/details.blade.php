@@ -63,7 +63,7 @@
               <td><a href="{{url("/purchase/order/".$item->order->id."/edit")}}" style="font-style: italic">{{$item->order->doc_num ?? '(Null)'}}</a></td>
               
               <td>{{$item->party->party_name}}</td>
-              {{-- <td>{{env('CURRENCY').' '.$item->total}}</td> --}}
+              {{-- <td>{{ConfigHelper::getStoreConfig()["symbol"].' '.$item->total}}</td> --}}
               <td class="text-primary">
                 <b>  {{$item->net_amount}}</b>
               </td>

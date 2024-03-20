@@ -66,6 +66,7 @@ class ProductController extends Controller
                 $product->brand = $request->brand;
                 $product->description = $request->description;
                 $product->opening_stock = $request->opening_stock;
+                $product->check_inv = isset($request->check_inv) && $request->check_inv ? true : false;
                 // Product IMage Logic
                 if ($request->hasFile('image')) {
                     $image = $request->file('image');
@@ -138,6 +139,7 @@ class ProductController extends Controller
             $product->opening_stock = $request->opening_stock;
             $product->tp = $request->tp;
             $product->taxes = $request->tax;
+            $product->check_inv = isset($request->check_inv) && $request->check_inv ? true : false;
             // $product->store_id = 1;
             // Product IMage Logic
             if ($request->hasFile('image')) {
@@ -228,7 +230,7 @@ class ProductController extends Controller
     public function importCsv(Request $request)
     {
         try {
-            // dd($request);
+            // dd($request->file('file'));
             Excel::import(new ProductImport, $request->file('file'));
 
             return redirect()->back();

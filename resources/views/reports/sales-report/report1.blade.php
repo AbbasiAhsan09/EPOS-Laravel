@@ -78,9 +78,9 @@
      <td>{{isset($item->customer) ? $item->customer->party_name : 'Cash'}}</td>    
     <td>{{date('d-M-y | h:m' , strtotime($item->created_at))}}</td>
     <td>{{$item->user->name}}</td>   
-    <td> {{env('CURRENCY').$item->net_total}}</td>
-    <td>{{env('CURRENCY'). $item->recieved}}</td> 
-    <td>{{env('CURRENCY'). (round($item->net_total - $item->recieved)) }}</td> 
+    <td> {{ConfigHelper::getStoreConfig()["symbol"].$item->net_total}}</td>
+    <td>{{ConfigHelper::getStoreConfig()["symbol"]. $item->recieved}}</td> 
+    <td>{{ConfigHelper::getStoreConfig()["symbol"]. (round($item->net_total - $item->recieved)) }}</td> 
         @if (Auth::user()->role_id == 1  || Auth::user()->role_id == 2 )
         <td>
             <div class="s-btn-grp">
@@ -149,7 +149,7 @@
           @if (isset($item->transactions ) && count($item->transactions ))
           <ul>
            @foreach ($item->transactions as $transaction)
-           <li>{{$item->tran_no}} | {{date('m-d-y',strtotime($transaction->created_at))}} | {{env('CURRENCY').$transaction->amount}}</li>
+           <li>{{$item->tran_no}} | {{date('m-d-y',strtotime($transaction->created_at))}} | {{ConfigHelper::getStoreConfig()["symbol"].$transaction->amount}}</li>
            @endforeach
            </ul>
        @else

@@ -1,5 +1,6 @@
 @php
     use App\Models\Configuration;
+   
     $currenConfig = Configuration::filterByStore()->first();
 @endphp
 
@@ -13,7 +14,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/apple-icon.png')}}">
   <link rel="icon" type="image/png" href="{{asset('images/icon.png')}}">
   <title>
-    {{env('APP_TITLE')}}
+    {{Auth::check() ? isset(ConfigHelper::getStoreConfig()["app_title"]) ? ConfigHelper::getStoreConfig()["app_title"] : env('APP_TITLE') : env('APP_TITLE')  }}
   </title>
   {{-- Custom CSS --}}
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
@@ -586,5 +587,7 @@
         align-content: center;
         justify-content: center
     }
+
+
 </style>
 

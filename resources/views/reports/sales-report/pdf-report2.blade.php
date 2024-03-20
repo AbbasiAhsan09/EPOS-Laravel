@@ -48,7 +48,7 @@
        <tfoot>
         <tr>
         <th colspan="10">Total</th>
-        <th colspan="2">{{env('CURRENCY').round($records->sum('total'))}}</th>
+        <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($records->sum('total'))}}</th>
         </tr>
     </tfoot>
     </tbody>

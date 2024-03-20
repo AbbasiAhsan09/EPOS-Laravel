@@ -110,12 +110,53 @@
                               </table>
                         </div>
                     </div>
+
+                     {{-- Other Dynamic Fields --}}
+                     @if (isset($dynamicFields) && count($dynamicFields->fields) )
+                     <div class="card" >
+                         
+                         <div class="card-body">
+                             <h3 class="order_section_sub_title">Custom Fields</h3>
+                             <hr>
+                             <div class="row">
+                             @foreach ($dynamicFields->fields as $dynamicField)
+                             <div class="col-lg-6">
+                                 @php
+                                     $old_field_value = '';
+                                 @endphp
+                                 @if (isset(($order->dynamicFeildsData)) && count($order->dynamicFeildsData))
+                                     @foreach ($order->dynamicFeildsData as $dynamicFieldData)
+                                         @if ($dynamicField->id === $dynamicFieldData->field_id)
+                                             @php
+                                                 $old_field_value = $dynamicFieldData->value ?? "";
+                                             @endphp
+                                         @endif
+                                     @endforeach
+                                 @endif
+                                 <h3 class="order_section_sub_title">{{$dynamicField->label}}</h3>
+                                 <div class="input-group input-group-outline">
+                                      <input type="{{$dynamicField->type === 'input' && $dynamicField->datatype === 'string' ? 'text' : 'number'}}" class="form-control" 
+                                      name="dynamicFields[][{{$dynamicField->name}}]" {{$dynamicField->required ? 'required' : ''}} 
+                                      value="{{$old_field_value}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                     
+                                   </div>
+                             </div>
+                             @endforeach
+                             </div>
+                         </div>
+                     </div>
+                     @endif
+ 
+             {{-- Dynamic field end --}}
+             
                 </div>
+
+                
                 <div class="col-lg-4 order_detail_wrapper">
                       {{-- Total  --}}
                       <div class="order_total_wrapper my-3">
                         <div class="order_total">
-                            <h3 class="page-title text-primary">Total: {{env('CURRENCY')}} <span class="g_total ">{{ $isEditMode ? $order->net_total : 0 }}</span></h3>
+                            <h3 class="page-title text-primary">Total: {{ConfigHelper::getStoreConfig()["symbol"]}} <span class="g_total ">{{ $isEditMode ? $order->net_total : 0 }}</span></h3>
                             <input type="hidden" name="gross_total" id="gross_total" >
                         </div>
                     </div>

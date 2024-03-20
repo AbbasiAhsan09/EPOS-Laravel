@@ -131,7 +131,7 @@
                       {{-- Total  --}}
                       <div class="order_total_wrapper my-3">
                         <div class="order_total">
-                            <h3 class="page-title text-primary">Total: {{env('CURRENCY')}} <span class="g_total ">0</span></h3>
+                            <h3 class="page-title text-primary">Total: {{ConfigHelper::getStoreConfig()["symbol"]}} <span class="g_total ">0</span></h3>
                             <input type="hidden" name="gross_total" id="gross_total">
                         </div>
                     </div>
@@ -297,7 +297,7 @@
                             </div>
                             <div class="">
                                 <h4 class="order_section_sub_title" >
-                                    Paid Amount ({{env('CURRENCY')}}):
+                                    Paid Amount ({{ConfigHelper::getStoreConfig()["symbol"]}}):
                                 </h4>
                                 <div class="input-group input-group-outline">
                                    
