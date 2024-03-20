@@ -17,7 +17,8 @@ $(document).ready(function(){
                    
                    $('#item_selection_list').append(
                    '<button class="selection_list_item" data-id="'+element.barcode+'">'+
-                               '<h5>'+element.categories.field.name+' - '+element.categories.category+' - '+element.name+" - " + element.barcode + '</h5>'+
+                                '<h5>'+element.categories.category+' | '+element.name+ '</h5>'+                   
+                               '<p>Field: '+element.categories.field.name+' | Code: '+ element.barcode + '</p>'+
                             //    '<p>Lorem ipsum dolor sit amet.</p>'+
                            '</button>'
                    );
@@ -142,26 +143,40 @@ $(document).ready(function(){
     })
 
     // Caling Ajax Query for getting products
+    var timer; // Declare a variable to hold the timer ID
+    var previousValue = ''; // Variable to store the previous input value
+    
     $('#searchItemValue').keyup(function(e){
-        var value = $('#searchItemValue').val();
-        console.log(value);
-        removeItemsFromList();
-       if(e.which == 40){
-        $.ajax({
-            url : '/api/items/0/'+value+'/'+storeId,
-            type: 'GET',
-            success : function(res){
-                if(res.length < 1){
-                    // console.log('not found');
-                    removeItemsFromList();
-                }else{
-                    addItemInList(res);
-                } 
-            }
-        })
-       }
+        var currentValue = $('#searchItemValue').val();
+        
+        // Check if the input value has changed significantly
+        if (currentValue !== previousValue) {
+            clearTimeout(timer); // Clear the previous timer
+    
+            timer = setTimeout(function(){
+                var value = $('#searchItemValue').val();
+                removeItemsFromList();
+                
+                if(currentValue){
+                    // Perform AJAX request
+                $.ajax({
+                    url : '/api/items/0/'+value+'/'+storeId,
+                    type: 'GET',
+                    success : function(res){
+                        if(res.length < 1){
+                            removeItemsFromList();
+                        }else{
+                            addItemInList(res);
+                        } 
+                    }
+                });
+                }
+                
+                previousValue = currentValue; // Update the previous value
+            }, 500); // Set a delay of 500 milliseconds
+        }
     });
-
+    
     // Calculation New Orders
     function calculateOrders(){
         // Step One

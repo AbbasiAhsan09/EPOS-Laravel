@@ -153,6 +153,7 @@ class PurchaseInvoiceController extends Controller
             if($invoice && count($request->item_id)){
                 
                     for ($i=0; $i < count($request->item_id) ; $i++) { 
+                        
                         $detail = new PurchaseInvoiceDetails();
                         $detail->inv_id = $invoice->id;
                         $detail->item_id = $request->item_id[$i];
@@ -377,11 +378,15 @@ class PurchaseInvoiceController extends Controller
                             $detail->inv_id = $invoice->id;
                             $detail->item_id = $request->item_id[$i];
                             $detail->rate = $request->rate[$i];
+                            $detail->mrp = $request->mrp[$i];
                             $detail->qty = $request->qty[$i];
                             $detail->tax = $request->tax[$i];
                             $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                             $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                             $detail->save();
+
+                            $this->updateProductPrice($detail->item_id, $detail->mrp ,$detail->rate, $detail->is_base_unit);
+
                         }
                 }
 
