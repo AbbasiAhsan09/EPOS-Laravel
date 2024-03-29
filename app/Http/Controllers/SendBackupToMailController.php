@@ -43,10 +43,8 @@ class SendBackupToMailController extends Controller
 
     function DbBackup()
     {
-        File::link(
-            storage_path('app/public'), public_path('storage')
-        );
-        
+       
+
         $this->removeAllBackupExceptRecent(2);
         $filename = $this->getRecentBackupFilename() ?? "";
 
