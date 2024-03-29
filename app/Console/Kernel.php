@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\SendBackupToMailController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -15,9 +16,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->call('App\Http\Controllers\DBBackupController@DbBackup')->hourly();
-        // $schedule->command('backup:email')->daily();
+        $schedule->command('backup:run')->everyFourHours();
+        $schedule->call('App\Http\Controllers\SendBackupToMailController@DbBackup')->everySixHours();
     }
 
     /**

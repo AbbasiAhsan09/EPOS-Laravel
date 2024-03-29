@@ -14,6 +14,7 @@ use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\RegisterStoreController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\SendBackupToMailController;
 use App\Http\Controllers\StoresController;
 use App\Http\Controllers\VendorLedgerController;
 use App\Models\CustomerLedger;
@@ -182,7 +183,7 @@ Route::resources([
     'vendor-ledger'  => VendorLedgerController::class,
 ]);
 
-Route::get('db-backup', [DBBackupController::class, 'DbBackup']);
+Route::get('db-backup', [SendBackupToMailController::class, 'DbBackup']);
 
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
 });
