@@ -43,6 +43,10 @@ class SendBackupToMailController extends Controller
 
     function DbBackup()
     {
+        File::link(
+            storage_path('app/public'), public_path('storage')
+        );
+        
         $this->removeAllBackupExceptRecent(2);
         $filename = $this->getRecentBackupFilename() ?? "";
 
@@ -70,7 +74,7 @@ class SendBackupToMailController extends Controller
         try {
             // Define the directory path
             $directory = storage_path('app/EPOS/');
-
+            
             // Get all files in the directory
             $files = File::files($directory);
             
