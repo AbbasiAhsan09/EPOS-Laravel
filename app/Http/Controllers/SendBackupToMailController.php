@@ -14,7 +14,7 @@ class SendBackupToMailController extends Controller
     {
         try {
             // Get the path to the directory
-            $directory = Storage::path('app/EPOS');
+            $directory = storage_path('app/EPOS');
 
             // Get all files in the directory
             $files = File::files($directory);
@@ -47,7 +47,7 @@ class SendBackupToMailController extends Controller
         $filename = $this->getRecentBackupFilename() ?? "";
 
         if ($filename) {
-            $filePath = Storage::path('app/EPOS/' . $filename);
+            $filePath = storage_path('app/EPOS/' . $filename);
 
             // Check if the file exists
             if (Storage::exists('EPOS/' . $filename)) {
@@ -69,7 +69,7 @@ class SendBackupToMailController extends Controller
     {
         try {
             // Define the directory path
-            $directory = Storage::path('app/EPOS/');
+            $directory = storage_path('app/EPOS/');
 
             // Get all files in the directory
             $files = File::files($directory);
@@ -86,7 +86,7 @@ class SendBackupToMailController extends Controller
                 if (!in_array($file, $keepFiles)) {
                     // dd($file->getPathname());
                     // Delete the file
-                    $path = Storage::path('app/EPOS/'.$file->getFilename());
+                    $path = storage_path('app/EPOS/'.$file->getFilename());
                     unlink($path);
                 }
             }
