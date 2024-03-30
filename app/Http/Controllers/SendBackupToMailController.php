@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\SendBackupMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -43,7 +44,8 @@ class SendBackupToMailController extends Controller
 
     function DbBackup()
     {
-       
+        // Creating new backup
+        Artisan::call("backup:run");
 
         $this->removeAllBackupExceptRecent(2);
         $filename = $this->getRecentBackupFilename() ?? "";
