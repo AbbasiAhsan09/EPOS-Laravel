@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('backup:run')->everyFourHours();
-        $schedule->call('App\Http\Controllers\SendBackupToMailController@DbBackup')->everyFourHours();
+        $schedule->call('App\Http\Controllers\SendBackupToMailController@DbBackup')->everyFiveMinutes();
     }
 
     /**
