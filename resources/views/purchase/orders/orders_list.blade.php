@@ -98,6 +98,7 @@
                                 {{-- <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li> --}}
                                 <li><a class="dropdown-item" href="{{url("/purchase/invoice/$item->id/create")}}"><i class="fa fa-file-invoice"></i> Create Invoice</a></li>
                                 <li><a class="dropdown-item" href="{{url("/purchase/order/$item->id/edit")}}"><i class="fa fa-edit"></i> Edit</a></li>
+                                <li><a class="dropdown-item popup" href="{{url("/purchase/order/print/$item->id/")}}"><i class="fa fa-file-invoice"></i> Print</a></li>
                                 @if (count($item->invoices))
                                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#newStoreModal{{$item->id}}"><i class="fa fa-file-invoice" ></i> Invoices</a></li>
                                 @endif
@@ -175,5 +176,12 @@
     </div>
 </div>
 </div>
+
+<script>
+    $('.popup').click(function(event) {
+        event.preventDefault();
+        window.open($(this).attr("href"), "popupWindow", "width=300,height=600,scrollbars=yes,left="+($(window).width()-400)+",top=50");
+    });
+</script>
 
 @endsection

@@ -297,6 +297,7 @@ class PurchaseOrderController extends Controller
     public function destroy($id)
     {
         try {
+            
             $order = PurchaseOrder::where('id',$id)->filterByStore()->first();
             if($order){
                 $order->delete();
@@ -307,6 +308,22 @@ class PurchaseOrderController extends Controller
             }
 
             return redirect()->back();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    function print_invoice($id)  {
+        try {
+            $config = Configuration::filterByStore()->first();
+            $order = PurchaseOrder::where('id',$id)->filterByStore()->with(["party","details.items"])
+            ->first();
+            // dd($invoice);
+            if(!$order){
+                Alert::toast("Invalid Request",'error');
+                return redirect()->back();
+            }
+            return view('purchase.invoices.print', compact('order', 'config'));
         } catch (\Throwable $th) {
             throw $th;
         }
