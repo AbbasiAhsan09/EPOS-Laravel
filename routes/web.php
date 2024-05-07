@@ -142,6 +142,7 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::resource('/quotation','App\Http\Controllers\PurchaseQuotationController');
         Route::resource('/order','App\Http\Controllers\PurchaseOrderController');
         Route::resource('/invoice','App\Http\Controllers\PurchaseInvoiceController');
+        Route::get("order/print/{id}",'App\Http\Controllers\PurchaseOrderController@print_invoice');
         Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
 });
 
