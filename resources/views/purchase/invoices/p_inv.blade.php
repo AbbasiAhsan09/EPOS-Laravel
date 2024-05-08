@@ -99,7 +99,7 @@
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$item->id}}">
                                 {{-- <li><a class="dropdown-item" href="#{{$item->id}}"><i class="fa fa-eye"></i> View</a></li> --}}
                                 @if ($item->deleted_at === null)
-                                {{-- <li><a class="dropdown-item popup" href="{{url("/invoice/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li> --}}
+                                <li><a class="dropdown-item popup" href="{{url("/purchase/invoice/print/".$item->id."")}}"><i class="fa fa-file-invoice"></i> Print Invoice</a></li>
                                 <li><a class="dropdown-item" href="{{url("/purchase/invoice/$item->id/edit")}}"><i class="fa fa-edit"></i> Edit</a></li>
                                 <li><a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#paymentHistory{{$item->id}}"><i class="fa fa-dollar"></i> Transaction History</a></li>
                                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}"><i class="fa fa-trash"></i> Delete</a></li>
@@ -186,6 +186,13 @@
 </div>
 </div>
 
+
+<script>
+    $('.popup').click(function(event) {
+        event.preventDefault();
+        window.open($(this).attr("href"), "popupWindow", "width=300,height=600,scrollbars=yes,left="+($(window).width()-400)+",top=50");
+    });
+</script>
 
 
 @endsection

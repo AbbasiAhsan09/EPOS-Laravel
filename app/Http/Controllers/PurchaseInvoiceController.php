@@ -426,13 +426,13 @@ class PurchaseInvoiceController extends Controller
 
     function print_invoice($id)  {
         try {
-            $invoice = PurchaseInvoice::where('id',$id)->filterByStore()->first();
+            $order = PurchaseInvoice::where('id',$id)->filterByStore()->first();
             // dd($invoice);
-            if(!$invoice){
+            if(!$order){
                 Alert::toast("Invalid Request",'error');
                 return redirect()->back();
             }
-            return view('purchase.invoices.print', compact('invoice'));
+            return view('purchase.invoices.print-invoice', compact('order'));
         } catch (\Throwable $th) {
             throw $th;
         }
