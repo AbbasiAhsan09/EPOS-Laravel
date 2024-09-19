@@ -195,9 +195,10 @@ class SalesController extends Controller
                             }
                         }
                     }
+
                     toast('Order Created!', 'success');
                     
-                    return redirect()->back()->with('openNewWindow',$order->id);
+                    return redirect()->back()->with('openNewWindow',$request->has('print_invoice')  ? $order->id : false );
                 } else {
                     return 'Un-autorized Action';
                 }
@@ -389,7 +390,7 @@ class SalesController extends Controller
                     }
                    
                     toast('Order Updated!', 'info');
-                    return redirect('/sales');
+                    return redirect()->back()->with('openNewWindow',$request->has('print_invoice')  ? $order->id : false );
                 } else {
                     return 'error';
                 }

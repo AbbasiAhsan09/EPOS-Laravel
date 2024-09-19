@@ -81,9 +81,17 @@ class PartiesController extends Controller
             $party->email = $request->email;
             $party->phone = $request->phone;
             $party->business_name = $request->business_name;
-            $party->country = $request->country;
-            $party->city = $request->city;
-            $party->state = $request->state;
+            if($request->has('country') && $request->country){
+                $party->country = $request->country;
+            }
+            if($request->has('city') && $request->city){
+                $party->city = $request->city;
+            }
+            if($request->has('state') && $request->state){
+                $party->state = $request->state;
+            }
+            // $party->city = $request->city;
+            // $party->state = $request->state;
             $party->website = $request->website;
             $party->group_id = $request->group_id;
             $party->location = $request->location;
@@ -137,9 +145,15 @@ class PartiesController extends Controller
             $party->email = $request->email;
             $party->phone = $request->phone;
             $party->business_name = $request->business_name;
-            $party->country = $request->country;
-            $party->city = $request->city;
-            $party->state = $request->state;
+            if($request->has('country') && $request->country){
+                $party->country = $request->country;
+            }
+            if($request->has('city') && $request->city){
+                $party->city = $request->city;
+            }
+            if($request->has('state') && $request->state){
+                $party->state = $request->state;
+            }
             $party->website = $request->website;
             $party->group_id = $request->group_id;
             $party->location = $request->location;

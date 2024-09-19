@@ -109,7 +109,7 @@
                     <div class="col-lg-6">
                         <label for="">Party  Group *</label>
                     <div class="input-group input-group-outline">
-                        <select name="group_id" class="form-control" id="">
+                        <select name="group_id" class="form-control" id="" required>
                             <option value="">Select Party Group</option>
                             @foreach ($party_groups as $pt_gp)
                                 <option value="{{$pt_gp->id}}" {{$pt_gp->id == $item->group_id ? 'selected' : ''}}>{{$pt_gp->group_name}}</option>
@@ -120,14 +120,14 @@
                     <div class="col-lg-4">
                         <label for="">Party  Email</label>
                     <div class="input-group input-group-outline">
-                      <input type="email" class="form-control" name="email" value="{{$item->email}}" required>
+                      <input type="email" class="form-control" name="email" value="{{$item->email}}" >
                     </div>
                     </div>  
 
                     <div class="col-lg-4">
                         <label for="">Party  Phone *</label>
                     <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" name="phone" value="{{$item->phone}}" required>
+                      <input type="text" class="form-control" name="phone" value="{{$item->phone}}" >
                     </div>
                     </div>  
                     
@@ -205,7 +205,7 @@
                     <div class="col-lg-6">
                         <label for="">Party  Group *</label>
                     <div class="input-group input-group-outline">
-                        <select name="group_id" class="form-control" id="">
+                        <select name="group_id" class="form-control" id="" required>
                             <option value="">Select Party Group</option>
                             @foreach ($party_groups as $pt_grp)
                                 <option value="{{$pt_grp->id}}">{{$pt_grp->group_name}}</option>
@@ -216,14 +216,14 @@
                     <div class="col-lg-4">
                         <label for="">Party  Email</label>
                     <div class="input-group input-group-outline">
-                      <input type="email" class="form-control" name="email" required>
+                      <input type="email" class="form-control" name="email" >
                     </div>
                     </div>  
 
                     <div class="col-lg-4">
                         <label for="">Party  Phone *</label>
                     <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" name="phone" required>
+                      <input type="text" class="form-control" name="phone" >
                     </div>
                     </div>  
 

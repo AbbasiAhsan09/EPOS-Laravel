@@ -27692,6 +27692,10 @@ pre[class*="language-"] {
   width: 11px;
 }
 
+.page-title{
+  font-size: 24px;
+}
+
 /* MS supports */
 @supports (-ms-overflow-style: none) {
   .ps {
@@ -27705,5 +27709,17 @@ pre[class*="language-"] {
     overflow: auto !important;
   }
 }
+
+  .focusable {
+            outline: none; /* Optional: Remove default focus outline */
+        }
+        .focusable:focus {
+            outline: 2px solid blue; /* Optional: Custom focus style */
+        }
+
+.mid-section{
+  min-height: 65vh;
+}
+
 
 /*# sourceMappingURL=dashboard-free.css.map */
