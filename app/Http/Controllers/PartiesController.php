@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Imports\PartiesImporter;
+use App\Models\Account;
 use App\Models\Parties;
 use App\Models\PartyGroups;
 use Illuminate\Http\Request;
 use Excel;
+use Illuminate\Support\Facades\Auth;
 
 class PartiesController extends Controller
 {
@@ -98,10 +100,49 @@ class PartiesController extends Controller
             $party->save();
 
             
+            $group_validation = $this->is_customer_group($request->group_id);
+            $is_vendor = $group_validation['is_vendor'];
+            $is_customer = $group_validation['is_customer'];
+            
+            if($is_vendor || $is_customer){
+             // Create new account for income category
+            Account::create([
+                'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : '')  ,
+                'reference_id' => $party->id,'title'=> $party->party_name,'type' => $is_customer ? 'income' : 
+                'liabilities','opening_balance' => 0,
+                'store_id'=> Auth::user()->store_id
+             ]);
+            }
+            
             toast('Party Added!','success');
             return redirect()->back();
 
 
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function is_customer_group(int $group_id) {
+        try {
+            $party_group = PartyGroups::find($group_id);
+
+            $validation = [
+                'is_customer' => false,
+                'is_vendor' => false
+            ];
+
+            if($party_group && ($party_group->group_name === 'Customer' || $party_group->group_name === 'customer' || $party_group->group_name === 'customers')){
+               
+                $validation["is_customer"] = true;
+            } 
+
+            if($party_group && ($party_group->group_name === 'Vendor' || $party_group->group_name === 'vendor' || $party_group->group_name === 'vendors')){
+               
+                $validation["is_vendor"] = true;
+            } 
+
+            return $validation;
         } catch (\Throwable $th) {
             throw $th;
         }

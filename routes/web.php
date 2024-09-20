@@ -1,9 +1,8 @@
 <?php
 
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
-use App\Http\Controllers\DBBackupController;
 use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
@@ -15,9 +14,8 @@ use App\Http\Controllers\RegisterStoreController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SendBackupToMailController;
-use App\Http\Controllers\StoresController;
 use App\Http\Controllers\VendorLedgerController;
-use App\Models\CustomerLedger;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -86,6 +84,12 @@ Route::middleware('manager.role')->prefix('uom')->group(function(){
     Route::post('/add','App\Http\Controllers\MOUController@store')->name('add.uom');
     Route::put('/edit/{id}','App\Http\Controllers\MOUController@update')->name('edit.uom');
     Route::middleware('admin.role')->put('/delete/{id}','App\Http\Controllers\MOUController@destroy')->name('delete.uom');
+});
+
+Route::middleware('manager.role')->prefix("account")->group(function(){
+    Route::get("/",[AccountController::class, 'index']);
+    Route::post('/',[AccountController::class, 'store'])->name('account.add');
+    Route::put('/{id}',[AccountController::class, 'update'])->name('account.update');
 });
 
 
