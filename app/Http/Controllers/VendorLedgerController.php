@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 // use Symfony\Contracts\Translation\TranslatorTrait;
 
-use function PHPUnit\Framework\isNull;
 
 class VendorLedgerController extends Controller
 {
@@ -110,8 +109,61 @@ class VendorLedgerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, int $vendor_id)
+    {      
+     try {
+        // dd($request);
+        $validate = $request->validate([
+            'amount' => 'required | integer | min:1 ',
+            'date' => 'date | required'
+        ]);
+
+        dd($request->all());
+
+        if($validate){
+            $amount = $request->amount;
+            $invoices = PurchaseInvoice::where('party_id' , $vendor_id)
+            ->whereRaw('net_amount - recieved > (0.99)')->get();
+
+            if($invoices->count()){
+                foreach ($invoices as $key => $invoice) {
+                    $balance = $invoice->net_amount -  $invoice->recieved;
+                    if($amount >= $balance){
+                        if($invoice->update(['recieved' =>$invoice->recieved + $balance , 'updated_at' => strtotime($request->date)])){
+                            $amount = $amount - $balance;
+                            // $this->create;
+                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$balance,$request->date,'paid');
+                        }
+                    }else{
+                        if($invoice->update(['recieved' =>$invoice->recieved + $amount, 'updated_at' => strtotime($request->date)])){
+                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$amount,$request->date,'paid');
+                            $amount = 0;
+                            break;
+                        } 
+                    }
+                }
+            }
+            Alert::toast('Bulk Payment Updated!','success');
+            return redirect()->back();
+        }
+     } catch (\Throwable $th) {
+        throw $th;
+     }       
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\VendorLedger  $vendorLedger
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(VendorLedger $vendorLedger)
     {
-        
+        //
+    }
+
+    public function update_invoice_bulk_payments(Request $request, int $vendor_id)
+    {      
+     try {
         $validate = $request->validate([
             'amount' => 'required | integer | min:1 ',
             'date' => 'date | required'
@@ -144,18 +196,9 @@ class VendorLedgerController extends Controller
             Alert::toast('Bulk Payment Updated!','success');
             return redirect()->back();
         }
-            
-            
+     } catch (\Throwable $th) {
+        throw $th;
+     }       
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\VendorLedger  $vendorLedger
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(VendorLedger $vendorLedger)
-    {
-        //
-    }
 }

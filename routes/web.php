@@ -90,6 +90,8 @@ Route::middleware('manager.role')->prefix("account")->group(function(){
     Route::get("/",[AccountController::class, 'index']);
     Route::post('/',[AccountController::class, 'store'])->name('account.add');
     Route::put('/{id}',[AccountController::class, 'update'])->name('account.update');
+    Route::get('/journal',[AccountController::class, 'journal'])->name('journal.index');
+    Route::post('/journal',[AccountController::class, 'journal_post'])->name('journal.post');
 });
 
 

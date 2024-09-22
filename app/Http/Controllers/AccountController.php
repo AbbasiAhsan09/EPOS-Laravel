@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Http\Requests\StoreAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
+use App\Models\AccountTransaction;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AccountController extends Controller
@@ -133,5 +135,73 @@ class AccountController extends Controller
     public function destroy(Account $account)
     {
         //
+    }
+
+
+    function journal() {
+
+        $accounts =  Account::orderBy('title', 'ASC')->byUser()->filterByStore()->get();
+
+        return view('accounts.journal',compact('accounts'));
+    }
+
+    public function journal_post(Request $request)  {
+        try {
+            // dd($request);
+            $validate = $request->validate([
+                'account_id' => 'required',
+                'transaction_date' => 'required',
+            ]); 
+
+            if(!$validate){
+                toast('Please fill the appropriate fields','error');
+                return redirect()->back();
+            }
+            // dd($request->all());
+
+            for ($i=0; $i < count($request->account_id); $i++) { 
+                $item = [
+                    'account_id' => $request->account_id[$i],
+                    'transaction_date' => $request->transaction_date[$i],
+                    'note' => $request->note[$i],
+                    'credit' => isset($request->credit[$i]) ? $request->credit[$i] : 0,
+                    'debit' => isset($request->debit[$i]) ? $request->debit[$i] : 0,
+                    'store_id' => Auth::user()->store_id,
+                ];
+                
+                $created = AccountTransaction::create($item);
+                if($created){
+                    
+                    $transaction = AccountTransaction::where("id",$created->id)->with('account')
+                    ->first()->toArray();
+                    
+                    $account = $transaction["account"];
+                    
+                    if($account["reference_type"] === "vendor" && $transaction["debit"] > 0){
+                        
+                        $vendor_req =new Request([
+                            'amount' => $transaction["debit"],
+                            'date' => $transaction["transaction_date"]
+                        ]);
+                        $vendorLedgerController = new VendorLedgerController();
+                        $vendorLedgerController->update($vendor_req, $account["reference_id"]);
+                        dd($vendor_req);
+                        dd($account,$transaction);
+                    }
+                    dump($transaction);
+                    dump($account);
+                    dd();
+
+                }
+
+
+            }
+
+            toast('Transaction added successfully','success');
+            return redirect()->back();
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }
