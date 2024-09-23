@@ -50,7 +50,7 @@
             <td>N/A</td>
             
             <td>
-              @if (!$item->reference_type && !$item->reference_id)
+              @if (!$item->reference_type && !$item->reference_id && $item->title !== 'Cash Sales')
               <div class="s-btn-grp">
                 <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#accountModal{{$item->id}}">
                     <i class="fa fa-edit"></i>
@@ -61,7 +61,12 @@
              
               </div>  
               @else
+              @if ($item->title === 'Cash Sales')
+              System Defined
+              @else
               {{ucfirst($item->reference_type)}}
+                  
+              @endif
               @endif
             </td>
         </tr>
@@ -104,7 +109,7 @@
                     </div>
                     </div>
                     <div class="col-lg-6">
-                        <label for="">Opening Balance</label>
+                        <label for="">Opening Balance <small>(Use "-" if payable)</small></label>
                     <div class="input-group input-group-outline">
                       <input type="number"  step="0.01" class="form-control" value="{{$item->opening_balance}}" name="opening_balance" >
                     </div>
@@ -130,7 +135,7 @@
 
 
     <!-- Delete Modal -->
-    {{-- <div class="modal fade" id="dltModal{{$item->id}}" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+    <div class="modal fade" id="dltModal{{$item->id}}" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -154,7 +159,7 @@
       </form>
         </div>
       </div>
-    </div> --}}
+    </div>
     {{--Delete Modal --}}
            @endforeach
         </tbody>
@@ -200,7 +205,7 @@
                     </div>
                     </div>
                     <div class="col-lg-6">
-                        <label for="">Opening Balance</label>
+                        <label for="">Opening Balance <small>(Use "-" if payable)</small></label>
                     <div class="input-group input-group-outline">
                       <input type="number"  step="0.01" class="form-control" name="opening_balance" >
                     </div>

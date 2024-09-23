@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ConfigHelper;
 use App\Imports\PartiesImporter;
 use App\Models\Account;
+use App\Models\AccountTransaction;
 use App\Models\Parties;
 use App\Models\PartyGroups;
+use App\Models\PurchaseInvoice;
+use App\Models\Sales;
 use Illuminate\Http\Request;
 use Excel;
 use Illuminate\Support\Facades\Auth;
@@ -92,6 +96,13 @@ class PartiesController extends Controller
             if($request->has('state') && $request->state){
                 $party->state = $request->state;
             }
+
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                if($request->has('opening_balance')){
+                    $party->opening_balance = $request->opening_balance ?? 0;
+                }
+            }
+
             // $party->city = $request->city;
             // $party->state = $request->state;
             $party->website = $request->website;
@@ -104,14 +115,28 @@ class PartiesController extends Controller
             $is_vendor = $group_validation['is_vendor'];
             $is_customer = $group_validation['is_customer'];
             
-            if($is_vendor || $is_customer){
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"] && ($is_vendor || $is_customer)){
              // Create new account for income category
-            Account::create([
+           $account =  Account::create([
                 'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : '')  ,
-                'reference_id' => $party->id,'title'=> $party->party_name,'type' => $is_customer ? 'income' : 
-                'liabilities','opening_balance' => 0,
+                'reference_id' => $party->id,'title'=> $party->party_name,'type' => $is_customer ? 'income' : 'expenses',
+                'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
                 'store_id'=> Auth::user()->store_id
              ]);
+            if($account){
+                AccountTransaction::create([
+                    'account_id' => $account->id,
+                    'store_id' => $account->store_id,
+                    'note' => 'Account opening balance',
+                    'debit' => $account->reference_type === 'customer' ? $account->opening_balance : 0,
+                    'credit' =>  $account->reference_type === 'vendor' ? $account->opening_balance : 0,
+                    'date' => date("Y-m-d",time()),
+                    'reference_type' => 'opening_balance_'.$account->reference_type,
+                    'reference_id' => $account->reference_id,
+                    'recorded_by' => Auth::user()->id,
+                    'transaction_date' => date("Y-m-d",time())
+                ]);
+            }
             }
             
             toast('Party Added!','success');
@@ -180,8 +205,35 @@ class PartiesController extends Controller
     public function update(Request $request, int $id)
     {
         try {
-            // dd($request->all());
+
             $party =  Parties::where('id',$id)->byUser()->first();
+
+            // dd($party->toArray(),$request->all());
+            
+            if($party && $request->has('group_id') && ((int)$request->group_id !== (int)$party->group_id)){
+                $group_validation = $this->is_customer_group($party->group_id);
+                $is_customer = $group_validation["is_customer"];
+                $is_vendor = $group_validation["is_vendor"];
+
+                if($is_customer){
+                    $sales = Sales::where("customer_id",$id)->count();
+                    if($sales){
+                        toast('You cannot update this party group because this party has ('.$sales.') active sale orders. Contact support to update this party','error');
+                        return redirect()->back();
+                    }
+                }
+
+                if($is_vendor){
+                    $purchases = PurchaseInvoice::where("party_id",$id)->count();
+                    
+                    if($purchases){
+                        toast('You cannot update this party group because this party has ('.$purchases.') active purchase invoices. Contact support to update this party','error');
+                        return redirect()->back();
+                    }
+                }
+            }
+            
+          
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;
@@ -195,11 +247,88 @@ class PartiesController extends Controller
             if($request->has('state') && $request->state){
                 $party->state = $request->state;
             }
+            
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                if($request->has('opening_balance')){
+                    $party->opening_balance = $request->opening_balance ?? 0;
+                }
+            }
+
             $party->website = $request->website;
             $party->group_id = $request->group_id;
             $party->location = $request->location;
             $party->save();
 
+            $group_validation = $this->is_customer_group($party->group_id);
+            $is_vendor = $group_validation['is_vendor'];
+            $is_customer = $group_validation['is_customer'];
+
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"] && ($is_vendor || $is_customer)){
+
+                $account = Account::where(function ($query) {
+                    $query->where('reference_type', 'customer')
+                          ->orWhere('reference_type', 'vendor');
+                })
+                ->where('reference_id', $party->id)
+                ->where('store_id', Auth::user()->store_id)
+                ->first();
+
+                if($account){
+                    $account->update([
+                    'title' => $party->party_name,
+                    'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0, 
+                    'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
+                    'type' => $is_customer ? 'income' : 'expenses',
+                ]);
+                }else{
+                    // Create new account for income or liabilities category
+                   $account = Account::firstOrCreate(
+                        [
+                            'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
+                            'reference_id' => $party->id,
+                            'store_id' => Auth::user()->store_id
+                        ],
+                        [
+                            'title' => $party->party_name,
+                            'type' => $is_customer ? 'income' : 'expenses',
+                            'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
+                        ]
+                    );
+                }
+
+                $opening_transaction = AccountTransaction::where(function ($query) {
+                    $query->where('reference_type', 'opening_balance_customer')
+                          ->orWhere('reference_type', 'opening_balance_vendor');
+                })
+                ->where("reference_id",$party->id)->where("account_id", $account->id)
+                ->first();
+
+                if($opening_transaction){
+                    
+                    if($is_customer){
+                        $opening_transaction->update(['credit' => 0, 'debit' => $party->opening_balance, 'reference_type' => 'opening_balance_customer']);
+                    }
+
+                    if($is_vendor){
+                        $opening_transaction->update(['credit' => $party->opening_balance, 'debit' => 0, 'reference_type' => 'opening_balance_vendor']);
+                    }
+                    
+                }else{
+                    AccountTransaction::create([
+                        'account_id' => $account->id,
+                        'store_id' => $account->store_id,
+                        'note' => 'Account opening balance',
+                        'debit' => $account->reference_type === 'customer' ? $account->opening_balance : 0,
+                        'credit' =>  $account->reference_type === 'vendor' ? $account->opening_balance : 0,
+                        'date' => date("Y-m-d",time()),
+                        'reference_type' => 'opening_balance_'.$account->reference_type,
+                        'reference_id' => $account->reference_id,
+                        'recorded_by' => Auth::user()->id,
+                        'transaction_date' => date("Y-m-d",time())
+                    ]);
+                }
+
+            }
             
             toast('Party Updated!','info');
             return redirect()->back();

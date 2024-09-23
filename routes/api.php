@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::get('items/{exact}/{param}/{storeId}', 'App\Http\Controllers\ProductController@getProductApi')->middleware("throttle:1000000:1");
+Route::get('account/{accountId}/{storeId}', [AccountController::class , 'account_details'])->middleware("throttle:1000000:1");

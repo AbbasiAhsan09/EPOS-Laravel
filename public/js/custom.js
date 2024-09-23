@@ -217,16 +217,31 @@ $(document).ready(function(){
         orderType();
     });
     function orderType(){
+        $is_accounting_module = $("#is_accounting_module").val();
+        // alert($is_accounting_module);
         if($('#posOrder').is(':checked')){
             $('.select_party_wrapper').css('display' , 'none');
             $('#customer_select').prop('required' , false);
             $('#customer_select').val('');
+             $(".payment_methods_wrapper_container").css("display", 'block');
+            $(".payment_methods input").prop("disabled", false);
             $('.other-methods').css('display' , 'none');
             $('.other-methods input').prop('checked',false);
+            $("#received-amount").prop("disabled",false);
         }else{
             $('.select_party_wrapper').css('display' , 'block');
-            $('.other-methods').css('display' , 'inline-block')
             $('#customer_select').prop('required' , true);
+            if($is_accounting_module){
+                $('.other-methods').css('display' , 'none')
+                $(".payment_methods input").prop("disabled", true);
+                $(".payment_methods_wrapper_container").css("display", 'none');
+                $("#received-amount").prop("disabled",true);
+
+            }else{
+                $(".payment_methods input").prop("disabled", false);
+                $("#received-amount").prop("disabled",false);
+                $('.other-methods').css('display' , 'inline-block')
+            }
         }
         
     }

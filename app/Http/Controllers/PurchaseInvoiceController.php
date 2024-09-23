@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ConfigHelper;
 use App\Http\Trait\InventoryTrait;
 use App\Http\Trait\TransactionsTrait;
+use App\Models\Account;
+use App\Models\AccountTransaction;
 use App\Models\AppFormFields;
 use App\Models\AppFormFieldsData;
 use App\Models\AppForms;
@@ -199,6 +202,65 @@ class PurchaseInvoiceController extends Controller
                 
             }
 
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                    
+                $purchase_account = Account::firstOrCreate(
+                    [
+                        'title' => 'Purchase', // Search by title
+                        'pre_defined' => 1,      // and pre_defined
+                        'store_id' => Auth::user()->store_id, // and store_id
+                    ],
+                    [
+                        'type' => 'expenses',
+                        'description' => 'This account handles the purchases transactions', // Added description key
+                        'opening_balance' => 0,
+                    ]
+                );
+
+                if($invoice->party_id){
+                    $party = Parties::find($invoice->party_id);
+                    if($party){
+                       $party_account = Account::firstOrCreate(
+                            [ 
+                                'store_id' => Auth::user()->store_id, // and store_id,
+                                'reference_type' => 'vendor',
+                                'reference_id' => $party->id,
+                            ],
+                            [
+                                'title' => $party->party_name,
+                                'type' => 'assets',
+                                'description' => 'This account is created by system on creating Purchase Invoice '.$invoice->doc_num, // Added description key
+                                'opening_balance' => 0,
+                            ]
+                        );
+
+                        if($party_account){
+                            $debit = AccountTransaction::create([
+                                'store_id' => Auth::user()->store_id,
+                                'account_id' => $purchase_account->id,
+                                'reference_type' => 'purchase_invoice',
+                                'reference_id' => $invoice->id,
+                                'credit' => 0,
+                                'debit' => $invoice->net_amount,
+                                'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
+                                'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
+                            ]);
+
+                            $credit = AccountTransaction::create([
+                                'store_id' => Auth::user()->store_id,
+                                'account_id' => $party_account->id,
+                                'reference_type' => 'purchase_invoice',
+                                'reference_id' => $invoice->id,
+                                'credit' => $invoice->net_amount,
+                                'debit' => 0,
+                                'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
+                                'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
+                            ]);
+                        }
+                    }
+                }
+            }
+
             Alert::toast('PO Invoice Created!','success');
                 return redirect("/purchase/invoice");
         }
@@ -390,6 +452,101 @@ class PurchaseInvoiceController extends Controller
                         }
                 }
 
+
+                if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+
+                    $reversible_transactions = AccountTransaction::where([
+                        'store_id' => Auth::user()->store_id,
+                        'reference_type' => 'purchase_invoice',
+                        'reference_id' => $invoice->id,
+                    ])->orderBy("id","DESC")->take(2)->get();
+    
+                    if($reversible_transactions && count($reversible_transactions) > 0){
+                        foreach ($reversible_transactions as $key => $reversible_transaction) {
+                            if($reversible_transaction->credit && $reversible_transaction->credit > 0){
+                                AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $reversible_transaction->account_id,
+                                    'reference_type' => 'purchase_invoice',
+                                    'reference_id' => $invoice->id,
+                                    'credit' => 0,
+                                    'debit' => $reversible_transaction->credit,
+                                    'transaction_date' => date('Y-m-d',time()),
+                                    'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
+                                ]);
+                            }else{
+                                AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $reversible_transaction->account_id,
+                                    'reference_type' => 'purchase_invoice',
+                                    'reference_id' => $invoice->id,
+                                    'credit' => $reversible_transaction->debit,
+                                    'debit' => 0,
+                                    'transaction_date' => date('Y-m-d',time()),
+                                    'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.'   because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
+                                ]);
+                            }
+                        }
+                    }
+
+                    
+                    $purchase_account = Account::firstOrCreate(
+                        [
+                            'title' => 'Purchase', // Search by title
+                            'pre_defined' => 1,      // and pre_defined
+                            'store_id' => Auth::user()->store_id, // and store_id
+                        ],
+                        [
+                            'type' => 'expenses',
+                            'description' => 'This account handles the purchases transactions', // Added description key
+                            'opening_balance' => 0,
+                        ]
+                    );
+    
+                    if($invoice->party_id){
+                        $party = Parties::find($invoice->party_id);
+                        if($party){
+                           $party_account = Account::firstOrCreate(
+                                [ 
+                                    'store_id' => Auth::user()->store_id, // and store_id,
+                                    'reference_type' => 'vendor',
+                                    'reference_id' => $party->id,
+                                ],
+                                [
+                                    'title' => $party->party_name,
+                                    'type' => 'assets',
+                                    'description' => 'This account is created by system on creating Purchase Invoice '.$invoice->doc_num, // Added description key
+                                    'opening_balance' => 0,
+                                ]
+                            );
+    
+                            if($party_account){
+                                $debit = AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $purchase_account->id,
+                                    'reference_type' => 'purchase_invoice',
+                                    'reference_id' => $invoice->id,
+                                    'debit' => 0,
+                                    'credit' => $invoice->net_amount,
+                                    'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
+                                ]);
+    
+                                $credit = AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $party_account->id,
+                                    'reference_type' => 'purchase_invoice',
+                                    'reference_id' => $invoice->id,
+                                    'credit' => 0,
+                                    'debit' => $invoice->net_amount,
+                                    'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
+                                ]);
+                            }
+                        }
+                    }
+                }
+
                 Alert::toast('Invoice Updated!','info');
                 return redirect("/purchase/invoice");
             }
@@ -412,6 +569,41 @@ class PurchaseInvoiceController extends Controller
             $details = PurchaseInvoiceDetails::where('inv_id', $invoice->id);
             $this->deleteItemOnPurchaseInvoice($details->get());
             $details->delete();
+
+            $reversible_transactions = AccountTransaction::where([
+                'store_id' => Auth::user()->store_id,
+                'reference_type' => 'purchase_invoice',
+                'reference_id' => $invoice->id,
+            ])->orderBy("id","DESC")->take(2)->get();
+
+            if($reversible_transactions && count($reversible_transactions) > 0){
+                foreach ($reversible_transactions as $key => $reversible_transaction) {
+                    if($reversible_transaction->credit && $reversible_transaction->credit > 0){
+                        AccountTransaction::create([
+                            'store_id' => Auth::user()->store_id,
+                            'account_id' => $reversible_transaction->account_id,
+                            'reference_type' => 'purchase_invoice',
+                            'reference_id' => $invoice->id,
+                            'credit' => 0,
+                            'debit' => $reversible_transaction->credit,
+                            'transaction_date' => date('Y-m-d',time()),
+                            'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
+                        ]);
+                    }else{
+                        AccountTransaction::create([
+                            'store_id' => Auth::user()->store_id,
+                            'account_id' => $reversible_transaction->account_id,
+                            'reference_type' => 'purchase_invoice',
+                            'reference_id' => $invoice->id,
+                            'credit' => $reversible_transaction->debit,
+                            'debit' => 0,
+                            'transaction_date' => date('Y-m-d',time()),
+                            'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.'   because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
+                        ]);
+                    }
+                }
+            }
+
             $invoice->delete();
             Alert::toast('Purchase Invoice Deleted!', 'info');
             return redirect()->back();

@@ -52,6 +52,7 @@
     </thead>
     <tbody>
        @foreach ($parties as $item)
+       {{-- @dd($item) --}}
        <tr>
         <td>{{$item->id}}</td>
         <td>
@@ -92,7 +93,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="newStoreModalLabel">Create New Party</h5>
+          <h5 class="modal-title" id="newStoreModalLabel">Update Party</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
        <div class="modal-body">
@@ -106,7 +107,7 @@
                       <input type="text" class="form-control" name="party_name" value="{{$item->party_name}}" required>
                     </div>
                     </div>  
-                    <div class="col-lg-6">
+                    <div class="col-lg-3">
                         <label for="">Party  Group *</label>
                     <div class="input-group input-group-outline">
                         <select name="group_id" class="form-control" id="" required>
@@ -116,7 +117,16 @@
                             @endforeach
                         </select>
                     </div>
-                    </div> 
+                    </div>
+                    
+                    @if (ConfigHelper::getStoreConfig()["use_accounting_module"])
+                    <div class="col-lg-3">
+                        <label for="">Opening Balance</label>
+                    <div class="input-group input-group-outline">
+                      <input type="number" name="opening_balance" value="{{ $item->opening_balance }}" class="form-control" >
+                    </div>
+                    </div>
+                    @endif  
                     <div class="col-lg-4">
                         <label for="">Party  Email</label>
                     <div class="input-group input-group-outline">
@@ -202,7 +212,7 @@
                       <input type="text" class="form-control" name="party_name" required>
                     </div>
                     </div>  
-                    <div class="col-lg-6">
+                    <div class="col-lg-3">
                         <label for="">Party  Group *</label>
                     <div class="input-group input-group-outline">
                         <select name="group_id" class="form-control" id="" required>
@@ -213,6 +223,14 @@
                         </select>
                     </div>
                     </div> 
+                    @if (ConfigHelper::getStoreConfig()["use_accounting_module"])
+                    <div class="col-lg-3">
+                      <label for="">Opening Balance</label>
+                  <div class="input-group input-group-outline">
+                     <input type="number" name="opening_balance" class="form-control" id="">
+                  </div>
+                  </div> 
+                  @endif
                     <div class="col-lg-4">
                         <label for="">Party  Email</label>
                     <div class="input-group input-group-outline">

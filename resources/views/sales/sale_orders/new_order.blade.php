@@ -46,6 +46,9 @@
                                         </div>
                                      </div>
                                         @endif
+
+                                        <input type="hidden" id="is_accounting_module" 
+                                        value="{{isset(ConfigHelper::getStoreConfig()["use_accounting_module"]) ? ConfigHelper::getStoreConfig()["use_accounting_module"] : false }}">
             
                                         <div class="col-lg-4">
                                             <div class="order_type_wrapper">
@@ -61,7 +64,7 @@
                                                       
                                                                 <label for="normalOrder" class="order-type-item" style="width: 49%">
                                                                 <input type="radio" name="order_tyoe" id="normalOrder" value="normal" class="form-check-input order_type_val" {{ $isEditMode && $order->customer_id ? 'checked'  : '' }}>
-                                                                    NORMAL ORDER
+                                                                    CREDIT ORDER
                                                                 </label>
                                                     </div>
                                                 </div>
@@ -303,7 +306,7 @@
                                 </div>
                             </div>
                           
-                            <div class="col-lg-3">
+                            <div class="col-lg-3 payment_methods_wrapper_container">
                                 {{-- Payment Methods --}}
                        <div class="payment_methods_wrapper my-3">
                            <h4 class="order_section_sub_title">
@@ -337,7 +340,7 @@
                       
                        {{-- Payment Methods --}}
                            </div>
-                           <div class="col-lg-1">
+                           <div class="col-lg">
                             <h4 class="order_section_sub_title">
                                 Print Invoice
                             </h4>
@@ -354,6 +357,28 @@
     
                     </div>
                  </div>
+             </div>
+
+             <div class="short-keys-wrapper">
+                <div class="row align-items-center">
+                    <div class="col-lg-1">
+                        <h5>Short Keys</h5>
+                    </div>
+                    <div class="col-lg-11">
+                        <div class="short-keys">
+                            <div class="short-key-item">
+                                Ctrl + C = Swith Order Type
+                            </div>
+                            <div class="short-key-item">
+                                / = Go to Search Product Input
+                            </div>
+                            <div class="short-key-item">
+                                Alt + A = To Save Order
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
              </div>
              {{-- Refactor Bottom --}}
             </div>

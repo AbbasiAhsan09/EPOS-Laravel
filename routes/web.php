@@ -92,6 +92,9 @@ Route::middleware('manager.role')->prefix("account")->group(function(){
     Route::put('/{id}',[AccountController::class, 'update'])->name('account.update');
     Route::get('/journal',[AccountController::class, 'journal'])->name('journal.index');
     Route::post('/journal',[AccountController::class, 'journal_post'])->name('journal.post');
+    Route::delete('/journal/{id}',[AccountController::class, 'transaction_destroy'])->name('journal.delete');
+    Route::get('/transactions',[AccountController::class, 'journal_entries'])->name('account.transactions');
+    Route::get('general-ledger',[AccountController::class,'generate_sales_ledger_report']);
 });
 
 

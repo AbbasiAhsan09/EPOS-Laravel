@@ -20,7 +20,8 @@ class AccountTransaction extends Model
         'debit',
         'note',
         'transaction_date',
-        'recorded_by'
+        'recorded_by',
+        'source_account'
     ];
 
 

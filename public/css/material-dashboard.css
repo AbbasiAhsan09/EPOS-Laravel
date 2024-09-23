@@ -27721,5 +27721,24 @@ pre[class*="language-"] {
   min-height: 65vh;
 }
 
+.short-keys-wrapper{
+  background-color: white;
+  margin-top: 10px;
+  padding : 10px
+}
 
+.short-keys{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.short-key-item{
+  border : solid 2px var(--bs-primary);
+  padding: 5px 10px;
+  font-weight: bold;
+  margin-left: 5px 
+}
 /*# sourceMappingURL=dashboard-free.css.map */
+
+

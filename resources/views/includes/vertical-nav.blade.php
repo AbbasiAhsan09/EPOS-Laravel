@@ -20,6 +20,17 @@
                 <li class="submenu-item">Full Screen</li>
             </ul>
         </li>
+
+        <li class="menu-item">Accounting
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/account">Accounts</a></li>
+                <li class="submenu-item"><a href="/account/journal">New Transactions</a></li>
+                <li class="submenu-item"><a href="/account/transactions">Transaction</a></li>
+                <li class="submenu-item">Reports</li>
+            </ul>
+        </li>
+
+
         <li class="menu-item">
             <a href="/parties">Parties</a>
         </li>

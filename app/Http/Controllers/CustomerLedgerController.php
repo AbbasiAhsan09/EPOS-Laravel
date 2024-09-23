@@ -142,6 +142,40 @@ class CustomerLedgerController extends Controller
         }
     }
 
+
+
+    public function update_invoice_bulk_payments($params = ["amount" => 0, 'date' => null], int $customer_id)
+    {
+
+
+        if($params && $params["amount"] && $params["date"]){
+            $amount =  $params["amount"];
+            $date =  $params["date"];
+            $orders = Sales::where('customer_id' , $customer_id)
+            ->whereRaw('net_total - recieved > (0.99)')->get();
+
+            if($orders->count()){
+                foreach ($orders as $key => $order) {
+                    $balance = $order->net_total -  $order->recieved;
+                    if($amount >= $balance){
+                        if($order->update(['recieved' =>$order->recieved + $balance , 'updated_at' => strtotime($date)])){
+                            $amount = $amount - $balance;
+                            $this->createOrderTransactionHistory($order->id,$order->customer_id,$balance,$date,'recieved');
+                        }
+                    }else{
+                        if($order->update(['recieved' =>$order->recieved + $amount, 'updated_at' => strtotime($date)])){
+                            $this->createOrderTransactionHistory($order->id,$order->customer_id,$amount,$date,'recieved');
+                            $amount = 0;
+                            break;
+                        } 
+                    }
+                }
+            }
+            
+            return true;
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *

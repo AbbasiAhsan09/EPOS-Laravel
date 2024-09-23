@@ -387,13 +387,15 @@
 								Total <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->net_total)}}</span>
 							</div>
 
-                            <div class="field grand-total">
+              @if (!ConfigHelper::getStoreConfig()["use_accounting_module"])
+              <div class="field grand-total">
 								Recieved <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->recieved ?? 0)}}</span>
 							</div>
 
-                            <div class="field grand-total">
+              <div class="field grand-total">
 								Balance <span>{{ConfigHelper::getStoreConfig()["symbol"].round((($order->net_total ?? 0) - ($order->recieved ?? 0)) ?? 0)}}</span>
 							</div>
+              @endif
 
 						</div>
 

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('store_id');
             $table->integer('account_id');
-            $table->integer('reference_type')->nullable();
+            $table->string('reference_type')->nullable();
             $table->integer('reference_id')->nullable();
             $table->decimal('credit',15,2)->nullable();
             $table->decimal('debit',15,2)->nullable();

@@ -296,6 +296,7 @@
                             <textarea name="remarks" id="" cols="" rows="5" class="form-control" placeholder="Remarks Here...">{{isset($order) ? $order->remarks : ''}}</textarea>
                             </div>
                             <div class="">
+                                @if (!ConfigHelper::getStoreConfig()["use_accounting_module"])
                                 <h4 class="order_section_sub_title" >
                                     Paid Amount ({{ConfigHelper::getStoreConfig()["symbol"]}}):
                                 </h4>
@@ -303,6 +304,7 @@
                                    
                                     <input type="number" name="recieved" id="received-amount" class="form-control"  value="0"  onkeypress="validationForSubmit()" >
                                 </div> 
+                                @endif
                                 <hr>
                                 <div class="row row-customized">
                                     <div class="col">

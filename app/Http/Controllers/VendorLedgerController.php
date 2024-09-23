@@ -161,17 +161,13 @@ class VendorLedgerController extends Controller
         //
     }
 
-    public function update_invoice_bulk_payments(Request $request, int $vendor_id)
+    public function update_invoice_bulk_payments($params = ["amount" => 0, 'date' => null], int $vendor_id)
     {      
      try {
-        $validate = $request->validate([
-            'amount' => 'required | integer | min:1 ',
-            'date' => 'date | required'
-        ]);
-
-
-        if($validate){
-            $amount = $request->amount;
+        
+        if($params["amount"] > 0 && !empty($params["date"])){
+            $amount = $params['amount'];
+            $date = $params["date"];
             $invoices = PurchaseInvoice::where('party_id' , $vendor_id)
             ->whereRaw('net_amount - recieved > (0.99)')->get();
 
@@ -179,22 +175,22 @@ class VendorLedgerController extends Controller
                 foreach ($invoices as $key => $invoice) {
                     $balance = $invoice->net_amount -  $invoice->recieved;
                     if($amount >= $balance){
-                        if($invoice->update(['recieved' =>$invoice->recieved + $balance , 'updated_at' => strtotime($request->date)])){
+                        if($invoice->update(['recieved' =>$invoice->recieved + $balance , 'updated_at' => strtotime($date)])){
                             $amount = $amount - $balance;
                             // $this->create;
-                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$balance,$request->date,'paid');
+                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$balance,$date,'paid');
                         }
                     }else{
-                        if($invoice->update(['recieved' =>$invoice->recieved + $amount, 'updated_at' => strtotime($request->date)])){
-                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$amount,$request->date,'paid');
+                        if($invoice->update(['recieved' =>$invoice->recieved + $amount, 'updated_at' => strtotime($date)])){
+                            $this->createPurchaseTransactionHistory($invoice->id,$invoice->party_id,$amount,$date,'paid');
                             $amount = 0;
                             break;
                         } 
                     }
                 }
             }
-            Alert::toast('Bulk Payment Updated!','success');
-            return redirect()->back();
+            
+            return true;
         }
      } catch (\Throwable $th) {
         throw $th;

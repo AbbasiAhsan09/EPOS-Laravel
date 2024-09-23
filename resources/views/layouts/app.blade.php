@@ -42,8 +42,11 @@
   <input type="hidden" id="storeId" value="{{Auth::user()->store->id ?? 0}}">
   @include('sweetalert::alert')
   @if (Auth::check())
+  @if (ConfigHelper::getStoreConfig()["ui"] === 'classic')
   @include("includes.vertical-nav")
-  {{-- @include("includes.horizontal-nav") --}}
+  @else
+  @include("includes.horizontal-nav")
+  @endif
   @endif
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
     {{-- @include('includes.top_nav') --}}
