@@ -117,25 +117,94 @@ class PartiesController extends Controller
             
             if(ConfigHelper::getStoreConfig()["use_accounting_module"] && ($is_vendor || $is_customer)){
              // Create new account for income category
-           $account =  Account::create([
-                'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : '')  ,
-                'reference_id' => $party->id,'title'=> $party->party_name,'type' => $is_customer ? 'income' : 'expenses',
-                'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
-                'store_id'=> Auth::user()->store_id
-             ]);
-            if($account){
-                AccountTransaction::create([
-                    'account_id' => $account->id,
-                    'store_id' => $account->store_id,
-                    'note' => 'Account opening balance',
-                    'debit' => $account->reference_type === 'customer' ? $account->opening_balance : 0,
-                    'credit' =>  $account->reference_type === 'vendor' ? $account->opening_balance : 0,
-                    'date' => date("Y-m-d",time()),
-                    'reference_type' => 'opening_balance_'.$account->reference_type,
-                    'reference_id' => $account->reference_id,
-                    'recorded_by' => Auth::user()->id,
-                    'transaction_date' => date("Y-m-d",time())
-                ]);
+             $account = Account::firstOrCreate(
+                [
+                    'type' => $is_customer ? 'assets' : ($is_vendor ? 'liabilities' : ''),
+                    'reference_id' => $party->id,
+                    'store_id' => Auth::user()->store_id
+                ],
+                [
+                    'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
+                    'title' => $party->party_name,
+                    'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
+                ]
+            );
+
+             $opening_balance_equity = Account::firstOrCreate(
+                [
+                    'pre_defined' => 1,
+                    'type' => 'equity',
+                    'title' => 'Opening Balance Equity',
+                    'store_id' => Auth::user()->store_id
+                ],
+                [
+                    'reference_type' => null,
+                    'reference_id' => null,
+                    'opening_balance' => 0,
+                ]
+            );
+
+            if($account && $opening_balance_equity){
+                if($is_customer){
+                    AccountTransaction::create([
+                        'account_id' => $account->id,
+                        'store_id' => $account->store_id,
+                        'note' => 'Initial opening account for customer ID: '.$account->reference_id,
+                        'debit' => $account->opening_balance ?? 0,
+                        'credit' => 0,
+                        'date' => date("Y-m-d",time()),
+                        'reference_type' => 'opening_balance_'.$account->reference_type,
+                        'reference_id' => $account->reference_id,
+                        'recorded_by' => Auth::user()->id,
+                        'transaction_date' => date("Y-m-d",time())
+                    ]);
+
+
+                    AccountTransaction::create([
+                        'account_id' => $opening_balance_equity->id,
+                        'store_id' => $opening_balance_equity->store_id,
+                        'note' => 'Initial opening account for customer ID: '.$account->reference_id,
+                        'debit' => 0,
+                        'credit' =>  $account->opening_balance ?? 0,
+                        'date' => date("Y-m-d",time()),
+                        'reference_type' => 'opening_balance_'.$account->reference_type,
+                        'reference_id' => $account->reference_id,
+                        'recorded_by' => Auth::user()->id,
+                        'transaction_date' => date("Y-m-d",time())
+                    ]);
+                }
+
+
+                if($is_vendor){
+
+                    AccountTransaction::create([
+                        'account_id' => $opening_balance_equity->id,
+                        'store_id' => $opening_balance_equity->store_id,
+                        'note' => 'Initial opening account for vendor ID: '.$account->reference_id,
+                        'debit' => $account->opening_balance ?? 0,
+                        'credit' => 0,
+                        'date' => date("Y-m-d",time()),
+                        'reference_type' => 'opening_balance_'.$account->reference_type,
+                        'reference_id' => $account->reference_id,
+                        'recorded_by' => Auth::user()->id,
+                        'transaction_date' => date("Y-m-d",time())
+                    ]);
+
+                    AccountTransaction::create([
+                        'account_id' => $account->id,
+                        'store_id' => $account->store_id,
+                        'note' => 'Initial opening account for vendor ID: '.$account->reference_id,
+                        'debit' => 0,
+                        'credit' => $account->opening_balance ?? 0,
+                        'date' => date("Y-m-d",time()),
+                        'reference_type' => 'opening_balance_'.$account->reference_type,
+                        'reference_id' => $account->reference_id,
+                        'recorded_by' => Auth::user()->id,
+                        'transaction_date' => date("Y-m-d",time())
+                    ]);
+
+                }
+
             }
             }
             

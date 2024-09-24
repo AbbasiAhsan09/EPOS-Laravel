@@ -73,8 +73,8 @@
             <th>Date</th>
             <th>Account</th>
             <th>Description</th>
-            <th>Credit</th>
             <th>Debit</th>
+            <th>Credit</th>
             <th>Actions</th>
         </thead>
         <tbody>
@@ -85,8 +85,8 @@
             <td>{{$item->transaction_date ?? ""}}</td>
             <td>{{ $item->account->title ?? ""}}</td>
             <td>{{$item->note ?? ""}}</td>
-            <td><strong>{{$item->credit ?? 0}}</strong></td>
             <td><strong>{{$item->debit ?? 0}}</strong></td>
+            <td><strong>{{$item->credit ?? 0}}</strong></td>
      
            @if (isset($item->account->pre_defined) && $item->account->pre_defined)
            <td>System Manages</td>

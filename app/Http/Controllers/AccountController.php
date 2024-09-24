@@ -200,7 +200,7 @@ class AccountController extends Controller
 
     $entries = AccountTransaction::where("store_id", Auth::user()->store_id)
     ->with('account')
-    ->orderBy('id', 'DESC');
+    ->orderBy('id', 'ASC');
 
         // Filter by date range
         if ($request->has("from") && $request->from && $request->has('to') && $request->to) {
@@ -267,42 +267,68 @@ class AccountController extends Controller
                     continue;
                 }
 
-                $first_entry = AccountTransaction::create($item);
-                if($first_entry){
+                if($item["debit"]){
+                    $debit_entry = AccountTransaction::create($item);
                     
-                    $second_entry = AccountTransaction::create([
-                        'account_id' => $first_entry->source_account,
-                        'transaction_date' => $first_entry->transaction_date,
-                        'note' => $first_entry->note,
-                        'store_id' => $first_entry->store_id,
-                        'recorded_by' => $first_entry->recorded_by,
-                        'credit' => $first_entry->debit > 0 ? $first_entry->debit: 0, 
-                        'debit' => $first_entry->credit > 0 ? $first_entry->credit: 0, 
+                    $credit_entry = AccountTransaction::create([
+                        'account_id' => $debit_entry->source_account,
+                        'transaction_date' => $debit_entry->transaction_date,
+                        'note' => $debit_entry->note,
+                        'store_id' => $debit_entry->store_id,
+                        'recorded_by' => $debit_entry->recorded_by,
+                        'credit' => $debit_entry->debit > 0 ? $debit_entry->debit: 0, 
+                        'debit' => $debit_entry->credit > 0 ? $debit_entry->credit: 0, 
                     ]);
-                    
-                    // $account = $transaction["account"];
-                    
-                    // if($account["reference_type"] === "vendor" && $transaction["debit"] > 0){
-                        
-                    //     $vendor_req =[
-                    //         'amount' => $transaction["debit"],
-                    //         'date' => $transaction["transaction_date"]
-                    //     ];
-                    //     $vendorLedgerController = new VendorLedgerController();
-                    //     $vendorLedgerController->update_invoice_bulk_payments($vendor_req, $account["reference_id"]);
-                    // }
+                }else{
+                    $debit_entry = AccountTransaction::create([
+                        'account_id' => $item['source_account'],
+                        'transaction_date' => $item['transaction_date'],
+                        'note' => $item['note'],
+                        'store_id' => $item['store_id'],
+                        'recorded_by' => $item["recorded_by"],
+                        'credit' => $item["debit"] > 0 ? $item["debit"] : 0, 
+                        'debit' => $item["credit"] > 0 ? $item["credit"]: 0, 
+                    ]);
 
-                    // if($account["reference_type"] === "customer" && $transaction["credit"] > 0){
-                        
-                    //     $customer_req =[
-                    //         'amount' => $transaction["credit"],
-                    //         'date' => $transaction["transaction_date"]
-                    //     ];
-                    //     $customerLedgerController = new CustomerLedgerController();
-                    //     $customerLedgerController->update_invoice_bulk_payments($customer_req, $account["reference_id"]);
-                    // }
-
+                    $credit_entry = AccountTransaction::create($item);
                 }
+
+                // $first_entry = AccountTransaction::create($item);
+                // if($first_entry){
+                    
+                //     // $second_entry = AccountTransaction::create([
+                //     //     'account_id' => $first_entry->source_account,
+                //     //     'transaction_date' => $first_entry->transaction_date,
+                //     //     'note' => $first_entry->note,
+                //     //     'store_id' => $first_entry->store_id,
+                //     //     'recorded_by' => $first_entry->recorded_by,
+                //     //     'credit' => $first_entry->debit > 0 ? $first_entry->debit: 0, 
+                //     //     'debit' => $first_entry->credit > 0 ? $first_entry->credit: 0, 
+                //     // ]);
+                    
+                //     // $account = $transaction["account"];
+                    
+                //     // if($account["reference_type"] === "vendor" && $transaction["debit"] > 0){
+                        
+                //     //     $vendor_req =[
+                //     //         'amount' => $transaction["debit"],
+                //     //         'date' => $transaction["transaction_date"]
+                //     //     ];
+                //     //     $vendorLedgerController = new VendorLedgerController();
+                //     //     $vendorLedgerController->update_invoice_bulk_payments($vendor_req, $account["reference_id"]);
+                //     // }
+
+                //     // if($account["reference_type"] === "customer" && $transaction["credit"] > 0){
+                        
+                //     //     $customer_req =[
+                //     //         'amount' => $transaction["credit"],
+                //     //         'date' => $transaction["transaction_date"]
+                //     //     ];
+                //     //     $customerLedgerController = new CustomerLedgerController();
+                //     //     $customerLedgerController->update_invoice_bulk_payments($customer_req, $account["reference_id"]);
+                //     // }
+
+                // }
 
 
             }
@@ -393,7 +419,7 @@ class AccountController extends Controller
             ->groupBy('account_id')
             ->get();
 
-            return $ledger;
+            return view("accounts.reports.general-ledger", compact('ledger'));
 
         } catch (\Throwable $th) {
             throw $th;
