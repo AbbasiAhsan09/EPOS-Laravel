@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fields;
 use App\Models\ProductCategory;
+use App\Models\Products;
 use Illuminate\Http\Request;
 
 class ProductCategoryController extends Controller
@@ -106,6 +107,12 @@ class ProductCategoryController extends Controller
        try {
         $cat = ProductCategory::find($id);
         if ($cat) {
+            $products = Products::where("category",$cat->id)->count();
+            if($products){
+                toast('You cannot delete this category because it has ('.$products.') active products', 'error');
+                
+                return redirect()->back();
+            }
             $cat->delete();
             toast("Deleted Category $cat->category!",'error');
         } else {

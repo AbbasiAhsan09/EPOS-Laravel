@@ -13,17 +13,22 @@
         <div class="btn-grp">
          
             <div class="row .row-customized">
-                <div class="col-lg-8">
+                {{-- <div class="col-lg-4">
                     <div class="input-group input-group-outline">
                         <label class="form-label">Search</label>
                         <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
                       </div>
                   
+                </div> --}}
+                <div class="col-lg-3">
+                <button class="btn btn-outline-primary btn-sm mb-0 w-100" data-bs-toggle="modal" data-bs-target="#accountModal">New Account</button>
                 </div>
-                <div class="col-lg-4">
-                <button class="btn btn-outline-primary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#accountModal">New UOM</button>
-
-                </div>
+                <div class="col-lg-3">
+                  <a class="btn btn-outline-info btn-sm mb-0 w-100" href="/account/journal">Journal Entry</a>
+                  </div>
+                <div class="col-lg-5">
+                  <a class="btn btn-outline-secondary btn-sm mb-0 w-100" href="/account/transactions">Recent Transactions</a>
+                  </div>
             </div>
         </div>
     </div>

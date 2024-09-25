@@ -183,6 +183,39 @@
     </div>
   </div>
   {{-- Modal --}}
+
+
+      <!-- Delete Modal -->
+      <div class="modal fade" id="dltModal{{$item->id}}" tabindex="-1" aria-labelledby="newStoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="newStoreModalLabel">Delete Party</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('delete.party',$item->id)}}" method="POST">
+                    @csrf
+                    @method('delete')
+                    <div class="row">
+                    
+                    <label class="form-label">Are you sure you want to delete {{$item->party_name}}?</label>
+                    </div>
+               
+            </div>
+            <div class="modal-footer">
+              
+              <button type="button" class="btn btn-outline-primary">No</button>
+              <button type="submit" class="btn btn-primary">Yes</button>
+            </div>
+        </form>
+          </div>
+        </div>
+      </div>
+      {{-- Delete ModalEnd --}}
+
+
+
        @endforeach
     </tbody>
 </table>

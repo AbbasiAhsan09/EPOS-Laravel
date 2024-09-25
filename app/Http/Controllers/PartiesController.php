@@ -13,6 +13,7 @@ use App\Models\Sales;
 use Illuminate\Http\Request;
 use Excel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PartiesController extends Controller
 {
@@ -414,9 +415,80 @@ class PartiesController extends Controller
      * @param  \App\Models\Parties  $parties
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Parties $parties)
+    public function destroy(int $id)
     {
-        //
+        try {
+            $party = Parties::where("id",$id)->filterByStore()->first();
+
+            if(!$party){
+                toast('No party found','error');
+                return redirect()->back();
+            }
+
+            $group_validation = $this->is_customer_group($party->group_id);
+            $is_customer = $group_validation["is_customer"];
+            $is_vendor = $group_validation["is_vendor"];
+
+            if($is_customer){
+                $sales = Sales::where("customer_id",$id)->count();
+                if($sales){
+                    toast('You cannot update this party group because this party has ('.$sales.') active sale orders. Contact support to update this party','error');
+                    return redirect()->back();
+                }
+            }
+
+            if($is_vendor){
+                $purchases = PurchaseInvoice::where("party_id",$id)->count();
+                
+                if($purchases){
+                    toast('You cannot update this party group because this party has ('.$purchases.') active purchase invoices. Contact support to update this party','error');
+                    return redirect()->back();
+                }
+            }
+
+            DB::beginTransaction();
+
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                $account = Account::where(function($query){
+                    $query->where("reference_type","vendor")->orWhere("reference_type","customer");
+                })
+                ->where("reference_id",$party->id)
+                ->filterByStore()->first();
+
+                if($account){
+                    $transaction = AccountTransaction::select('account_id')
+                ->with("account")
+                ->selectRaw('SUM(debit) AS total_debit')
+                ->selectRaw('SUM(credit) AS total_credit')
+                ->where('store_id', Auth::user()->store_id)
+                ->where("account_id",$account->id)
+                ->groupBy('account_id')
+                ->first()->toArray();
+
+                if($transaction){
+                    if(($transaction["total_debit"] !== 0) ||( $transaction["total_credit"] !== 0)){
+                        toast('This party has account with credit' . $transaction["total_credit"] . ' and debit' . $transaction["total_debit"]. ' You cannot delete this.','error');
+                        return redirect()->back();
+                    }else{
+                        AccountTransaction::where("account_id",$account->id)->delete();
+                        $account->delete();
+                    }
+                }
+                }
+
+            }
+
+            $party->delete();
+
+            DB::commit();
+
+            toast('Party deleted successfully','success');
+            return redirect()->back();
+
+        } catch (\Throwable $th) {
+            DB::rollback();
+            throw $th;
+        }
     }
 
     function importCSV(Request $request)  {

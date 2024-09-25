@@ -9,8 +9,10 @@ use App\Models\AccountTransaction;
 use App\Models\Parties;
 use App\Models\PurchaseInvoice;
 use App\Models\Sales;
+use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -56,24 +58,101 @@ class AccountController extends Controller
             $input['store_id'] = Auth::user()->store_id ?? null;
     
             $account = Account::create($input);
+
+            
     
             if(!$account){
                 toast('Failed to create a new account. please try again or contact support','error');
                 
             }
+
+          // Handle opening balance transaction
+        if ($account->opening_balance !== null) {
+            // Determine whether to debit or credit the opening balance
+            $is_debit = in_array($account->type, ['income', 'equity', 'liabilities']);
+            $is_credit = in_array($account->type, ['expenses', 'assets']);
             
-            // Opening balance
+            $opening_balance_equity = Account::firstOrCreate(
+                [
+                    'pre_defined' => 1,
+                    'type' => 'equity',
+                    'title' => 'Opening Balance Equity',
+                    'store_id' => Auth::user()->store_id
+                ],
+                [
+                    'reference_type' => null,
+                    'reference_id' => null,
+                    'opening_balance' => 0,
+                ]
+            );
+           
+            // If the account is an asset or expense, credit the Opening Balance Equity account
+            if ($is_credit) {
+                
+
+                AccountTransaction::create([
+                    'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
+                    'store_id' => $account->store_id,
+                    'reference_type' => 'opening_balance',
+                    'reference_id' => $account->id,
+                    'debit' => $account->opening_balance, // Credit to Opening Balance Equity
+                    'credit' => 0,
+                    'transaction_date' => now(),
+                    'recorded_by' => Auth::user()->id,
+                    'note' => 'Debit for new account opening balance'
+                ]);
+
+                 // Create the opening balance transaction
             AccountTransaction::create([
                 'account_id' => $account->id,
                 'store_id' => $account->store_id,
                 'reference_type' => 'opening_balance',
                 'reference_id' => $account->id,
-                'debit' => $account->opening_balance !== null ? $account->opening_balance : 0, 
-                'credit' => 0,
-                'transaction_date' => date("Y-m-d",time()),
+                'debit' => 0, // Debit for expenses or assets
+                'credit' => $account->opening_balance, // Credit for income, equity, or liabilities
+                'transaction_date' => now(), // Use Carbon for date handling
                 'recorded_by' => Auth::user()->id,
-                'note' => 'Account opening balance' 
+                'note' => 'Account opening balance'
             ]);
+            }
+
+            // If the account is an asset or expense, credit the Opening Balance Equity account
+            if ($is_debit) {
+                
+
+
+                 // Create the opening balance transaction
+            AccountTransaction::create([
+                'account_id' => $account->id,
+                'store_id' => $account->store_id,
+                'reference_type' => 'opening_balance',
+                'reference_id' => $account->id,
+                'credit' => 0, // Debit for expenses or assets
+                'debit' => $account->opening_balance, // Credit for income, equity, or liabilities
+                'transaction_date' => now(), // Use Carbon for date handling
+                'recorded_by' => Auth::user()->id,
+                'note' => 'Account opening balance'
+            ]);
+
+
+            
+            AccountTransaction::create([
+                'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
+                'store_id' => $account->store_id,
+                'reference_type' => 'opening_balance',
+                'reference_id' => $account->id,
+                'credit' => $account->opening_balance, // Credit to Opening Balance Equity
+                'debit' => 0,
+                'transaction_date' => now(),
+                'recorded_by' => Auth::user()->id,
+                'note' => 'Credit for new account opening balance'
+            ]);
+
+
+            }
+
+            
+        }
 
             toast('New account created successfully','success');
 
@@ -128,45 +207,113 @@ class AccountController extends Controller
 
             if(!$account){
                 toast('Invalid Account ID','error');
-            }else{
-                $account->update($input);
-                $opening_transaction = AccountTransaction::where([
-                    'reference_type' => 'opening_balance',
-                    'reference_id' => $account->id,
-                    'account_id' => $account->id,
-                ])->first();
+            }
+
+            DB::beginTransaction();
+
+            $account->update($input);
+
+            $transactions = AccountTransaction::where(["reference_type"=>"opening_balance", "reference_id" => $account->id ])
+            ->filterByStore()->delete();
+
+
+
+
+            if ($account->opening_balance !== null) {
+                // Determine whether to debit or credit the opening balance
+                $is_debit = in_array($account->type, ['income', 'equity', 'liabilities']);
+                $is_credit = in_array($account->type, ['expenses', 'assets']);
                 
-                if($opening_transaction){
-                    $opening_transaction->update(
-                        [
-                            'debit' => $account->opening_balance !== null  ? $account->opening_balance : 0, 
-                            'credit' => 0,
-                        ]
-                    );
-                }else{
+                $opening_balance_equity = Account::firstOrCreate(
+                    [
+                        'pre_defined' => 1,
+                        'type' => 'equity',
+                        'title' => 'Opening Balance Equity',
+                        'store_id' => Auth::user()->store_id
+                    ],
+                    [
+                        'reference_type' => null,
+                        'reference_id' => null,
+                        'opening_balance' => 0,
+                    ]
+                );
+               
+                // If the account is an asset or expense, credit the Opening Balance Equity account
+                if ($is_credit) {
+                    
+    
                     AccountTransaction::create([
-                        'account_id' => $account->id,
+                        'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
                         'store_id' => $account->store_id,
                         'reference_type' => 'opening_balance',
                         'reference_id' => $account->id,
-                        'debit' => $account->opening_balance !== null  ? $account->opening_balance : 0, 
+                        'debit' => $account->opening_balance, // Credit to Opening Balance Equity
                         'credit' => 0,
-                        'transaction_date' => date("Y-m-d",time()),
+                        'transaction_date' => now(),
                         'recorded_by' => Auth::user()->id,
-                        'note' => 'Account opening balance' 
+                        'note' => 'Debit for new account opening balance'
                     ]);
+    
+                     // Create the opening balance transaction
+                AccountTransaction::create([
+                    'account_id' => $account->id,
+                    'store_id' => $account->store_id,
+                    'reference_type' => 'opening_balance',
+                    'reference_id' => $account->id,
+                    'debit' => 0, // Debit for expenses or assets
+                    'credit' => $account->opening_balance, // Credit for income, equity, or liabilities
+                    'transaction_date' => now(), // Use Carbon for date handling
+                    'recorded_by' => Auth::user()->id,
+                    'note' => 'Account opening balance'
+                ]);
                 }
+    
+                // If the account is an asset or expense, credit the Opening Balance Equity account
+                if ($is_debit) {
+                    
+    
+    
+                     // Create the opening balance transaction
+                AccountTransaction::create([
+                    'account_id' => $account->id,
+                    'store_id' => $account->store_id,
+                    'reference_type' => 'opening_balance',
+                    'reference_id' => $account->id,
+                    'credit' => 0, // Debit for expenses or assets
+                    'debit' => $account->opening_balance, // Credit for income, equity, or liabilities
+                    'transaction_date' => now(), // Use Carbon for date handling
+                    'recorded_by' => Auth::user()->id,
+                    'note' => 'Account opening balance'
+                ]);
+    
+    
+                
+                AccountTransaction::create([
+                    'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
+                    'store_id' => $account->store_id,
+                    'reference_type' => 'opening_balance',
+                    'reference_id' => $account->id,
+                    'credit' => $account->opening_balance, // Credit to Opening Balance Equity
+                    'debit' => 0,
+                    'transaction_date' => now(),
+                    'recorded_by' => Auth::user()->id,
+                    'note' => 'Credit for new account opening balance'
+                ]);
+    
+    
+                }
+    
                 
             }
 
-
-
+            DB::commit();
 
             toast('Account updated successfully','info');
 
             return redirect()->back();
 
         } catch (\Throwable $th) {
+            DB::rollBack();
             throw $th;
         }
     }
@@ -237,109 +384,79 @@ class AccountController extends Controller
         return view('accounts.journal-entries', compact('entries','accounts'));
     }
 
-    public function journal_post(Request $request)  {
+    public function journal_post(Request $request) {
         try {
-            // dd($request->all());
-            $validate = $request->validate([
-                'account_id' => 'required',
-                'transaction_date' => 'required',
-            ]); 
+            // Validate each entry in the array
+            $request->validate([
+                'account_id.*' => 'required',
+                'transaction_date.*' => 'required',
+            ]);
 
-            if(!$validate){
-                toast('Please fill the appropriate fields','error');
-                return redirect()->back();
-            }
-            // dd($request->all());
-
-            for ($i=0; $i < count($request->account_id); $i++) { 
-                $item = [
+            for ($i = 0; $i < count($request->account_id); $i++) { 
+               $item = [];
+                $item[$i] = [
                     'account_id' => $request->account_id[$i],
                     'transaction_date' => $request->transaction_date[$i],
                     'note' => $request->note[$i],
-                    'credit' => isset($request->credit[$i]) ? $request->credit[$i] : 0,
-                    'debit' => isset($request->debit[$i]) ? $request->debit[$i] : 0,
+                    'credit' => isset($request->credit[$i])? (int)$request->credit[$i] : 0,
+                    'debit' =>  isset($request->debit[$i])? (int)$request->debit[$i] : 0,
                     'store_id' => Auth::user()->store_id,
-                    'source_account' => $request->source_account[$i],
+                    'source_account' => $request->source_account[$i] ?? null,
                     'recorded_by' => Auth::user()->id,
                 ];
-                
-                if(!$item["credit"]  && !$item["debit"]){
-                    continue;
-                }
 
-                if($item["debit"]){
-                    $debit_entry = AccountTransaction::create($item);
-                    
-                    $credit_entry = AccountTransaction::create([
-                        'account_id' => $debit_entry->source_account,
-                        'transaction_date' => $debit_entry->transaction_date,
-                        'note' => $debit_entry->note,
-                        'store_id' => $debit_entry->store_id,
-                        'recorded_by' => $debit_entry->recorded_by,
-                        'credit' => $debit_entry->debit > 0 ? $debit_entry->debit: 0, 
-                        'debit' => $debit_entry->credit > 0 ? $debit_entry->credit: 0, 
-                    ]);
-                }else{
-                    $debit_entry = AccountTransaction::create([
-                        'account_id' => $item['source_account'],
-                        'transaction_date' => $item['transaction_date'],
-                        'note' => $item['note'],
-                        'store_id' => $item['store_id'],
-                        'recorded_by' => $item["recorded_by"],
-                        'credit' => $item["debit"] > 0 ? $item["debit"] : 0, 
-                        'debit' => $item["credit"] > 0 ? $item["credit"]: 0, 
-                    ]);
 
-                    $credit_entry = AccountTransaction::create($item);
-                }
-
-                // $first_entry = AccountTransaction::create($item);
-                // if($first_entry){
-                    
-                //     // $second_entry = AccountTransaction::create([
-                //     //     'account_id' => $first_entry->source_account,
-                //     //     'transaction_date' => $first_entry->transaction_date,
-                //     //     'note' => $first_entry->note,
-                //     //     'store_id' => $first_entry->store_id,
-                //     //     'recorded_by' => $first_entry->recorded_by,
-                //     //     'credit' => $first_entry->debit > 0 ? $first_entry->debit: 0, 
-                //     //     'debit' => $first_entry->credit > 0 ? $first_entry->credit: 0, 
-                //     // ]);
-                    
-                //     // $account = $transaction["account"];
-                    
-                //     // if($account["reference_type"] === "vendor" && $transaction["debit"] > 0){
+                if (!empty($item[$i]["source_account"])) {
+                   
+                    if ($item[$i]["debit"] > 0) {
+                        // Create debit entry first
+                        $debit_entry1 = AccountTransaction::create($item[$i]);
                         
-                //     //     $vendor_req =[
-                //     //         'amount' => $transaction["debit"],
-                //     //         'date' => $transaction["transaction_date"]
-                //     //     ];
-                //     //     $vendorLedgerController = new VendorLedgerController();
-                //     //     $vendorLedgerController->update_invoice_bulk_payments($vendor_req, $account["reference_id"]);
-                //     // }
+                        // Create corresponding credit entry
+                        AccountTransaction::create([
+                            'account_id' => $debit_entry1->source_account,
+                            'transaction_date' => $debit_entry1->transaction_date,
+                            'note' => $debit_entry1->note,
+                            'store_id' => $debit_entry1->store_id,
+                            'recorded_by' => $debit_entry1->recorded_by,
+                            'credit' => $debit_entry1->debit > 0 ? $debit_entry1->debit : 0, 
+                            'debit' => $debit_entry1->credit > 0 ? $debit_entry1->credit : 0, 
+                        ]);
+                    } 
+                    if($item[$i]["credit"] > 0){
+                        // Handle the case where debit is not present
+                        AccountTransaction::create([
+                            'account_id' => $item[$i]['source_account'],
+                            'transaction_date' => $item[$i]['transaction_date'],
+                            'note' => $item[$i]['note'],
+                            'store_id' => $item[$i]['store_id'],
+                            'recorded_by' => $item[$i]["recorded_by"],
+                            'credit' => $item[$i]["debit"] > 0 ? $item[$i]["debit"] : 0, 
+                            'debit' => $item[$i]["credit"] > 0 ? $item[$i]["credit"] : 0, 
+                        ]);
+    
+                        // Create the credit entry as well
+                        AccountTransaction::create($item[$i]);
+                    }
 
-                //     // if($account["reference_type"] === "customer" && $transaction["credit"] > 0){
-                        
-                //     //     $customer_req =[
-                //     //         'amount' => $transaction["credit"],
-                //     //         'date' => $transaction["transaction_date"]
-                //     //     ];
-                //     //     $customerLedgerController = new CustomerLedgerController();
-                //     //     $customerLedgerController->update_invoice_bulk_payments($customer_req, $account["reference_id"]);
-                //     // }
-
-                // }
-
+                } else {
+                    // Create entry without source account
+                    AccountTransaction::create($item[$i]);
+                }
 
             }
-
-            toast('Transactions added successfully','success');
+    
+            
+            toast('Transactions added successfully', 'success');
             return redirect()->back();
-
+    
         } catch (\Throwable $th) {
+
             throw $th;
+ 
         }
     }
+    
 
 
     public function account_details(int $account_id, int $store_id){
@@ -409,6 +526,25 @@ class AccountController extends Controller
 
     public function generate_sales_ledger_report(Request $request) {
         try {
+
+            $test = DB::select('SELECT 
+a.id,
+    a.title,
+    a.type,
+    SUM(at.debit) AS total_debit,
+    SUM(at.credit) AS total_credit,
+    (SUM(at.debit) - SUM(at.credit)) AS balance
+FROM 
+    accounts AS a
+LEFT JOIN 
+    account_transactions AS at ON a.id = at.account_id
+GROUP BY 
+    a.id, a.title, a.type
+ORDER BY 
+    a.type, a.title;');
+
+    return($test);
+    
             $ledger_accounts = ["Cash","sales","Purchase"];
 
             $ledger = AccountTransaction::select('account_id')

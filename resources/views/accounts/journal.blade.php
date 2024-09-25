@@ -1,5 +1,7 @@
 @extends('layouts.app')
 @section('content')
+<form action="{{route("journal.post")}}" method="POST">
+    @csrf
 
 <div class="page-wrapper">
     <div class="container-fluid">
@@ -7,11 +9,15 @@
         <div class="col">
             <h1 class="page-title">General Journal</h1>
         </div>
-        <div class="col-lg-1">
-            <form action="{{route("journal.post")}}" method="POST">
-                @csrf
-            <button class="btn btn-primary">Save</button>
+        <div class="col-lg-4">
+            <a class="btn btn-outline-secondary btn-sm mb-0 w-100" href="/account/transactions">Recent Transactions</a>
         </div>
+        <div class="col-lg-1">
+            
+            <button class="btn btn-primary btn-sm mb-0 w-100">Save</button>
+            
+        </div>
+       
       </div>
     </div>
 </div>
@@ -63,7 +69,7 @@
             </td>
             <td>
                 <div class="input-group input-group-outline">  
-                    <select name="source_account[]" id="" class=" account_selection  form-control " required>
+                    <select name="source_account[]" id="" class=" account_selection  form-control " >
                         <option value="">Select Account</option>
                         @foreach ($accounts as $account)
                             <option value="{{$account->id}}">{{$account->title}} {{$account->reference_type ? '('.ucfirst($account->reference_type).')' : '' }}</option>
@@ -93,19 +99,31 @@ $(document).ready(function () {
 
     // Function to add a new row
     $(document).on('click', '.add-row', function () {
-        var newRow = $(this).closest('tr').clone();
+        // Clone the last row in the table
+        var newRow = $('#journal-entry-table tbody tr.journal-entry:last').clone();
 
         // Reset input values for the cloned row
         newRow.find('input').val('');
         newRow.find('input[type="number"]').val('0');
         newRow.find('select').prop('selectedIndex', 0);
-        
+
         // Set default date to today for the new row
         newRow.find('input[type="date"]').val(today);
 
-        // Insert the new row after the current row
-        $(this).closest('tr').after(newRow);
+        // Update the names of the cloned inputs to include a unique index
+        $('#journal-entry-table tbody tr.journal-entry').each(function(index) {
+            $(this).find('input, select').each(function() {
+                var name = $(this).attr('name');
+                if (name) {
+                    $(this).attr('name', name.replace(/\[\d+\]/, '[' + index + ']'));
+                }
+            });
+        });
+
+        // Append the new row after the last row in the table
+        $('#journal-entry-table tbody').append(newRow);
     });
+
 
     // Function to remove a row
     $(document).on('click', '.remove-row', function () {
@@ -122,9 +140,9 @@ $(document).ready(function () {
         var creditValue = parseFloat($(this).val());
 
         if (creditValue > 0) {
-            $row.find('.debit').val(0).prop('disabled', true); // Disable debit if credit > 0
+            $row.find('.debit').val(0).prop('readonly', true); // Disable debit if credit > 0
         } else {
-            $row.find('.debit').prop('disabled', false); // Enable debit if credit = 0
+            $row.find('.debit').prop('readonly', false); // Enable debit if credit = 0
         }
     });
 
@@ -133,9 +151,9 @@ $(document).ready(function () {
         var debitValue = parseFloat($(this).val());
 
         if (debitValue > 0) {
-            $row.find('.credit').val(0).prop('disabled', true); // Disable credit if debit > 0
+            $row.find('.credit').val(0).prop('readonly', true); // Disable credit if debit > 0
         } else {
-            $row.find('.credit').prop('disabled', false); // Enable credit if debit = 0
+            $row.find('.credit').prop('readonly', false); // Enable credit if debit = 0
         }
     });
 
@@ -151,6 +169,29 @@ $(document).ready(function () {
             $(this).val(''); // Reset the current selection
         }
     });
+
+
+       // Function to confirm submission if account selection is empty
+       $('form').on('submit', function (e) {
+        var emptyAccounts = false;
+
+        // Check if any .account_selection fields are empty
+        $('.account_selection').each(function () {
+            if ($(this).val() === "") {
+                emptyAccounts = true;
+                return false; // Break the loop if any are empty
+            }
+        });
+
+        // If any account_selection fields are empty, confirm with the user
+        if (emptyAccounts) {
+            if (!confirm("Some entries are not double entries are you sure you want to procceed ?")) {
+                e.preventDefault(); // Prevent form submission if the user cancels
+            }
+        }
+    });
+
+
 });
 
 

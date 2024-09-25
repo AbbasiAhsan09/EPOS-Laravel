@@ -65,8 +65,6 @@
         </div>
     </div>
 </div>
-  <h1>Total Credit : {{$entries->sum("credit")}}</h1>
-  <h1>Total Debit : {{$entries->sum("debit")}}</h1>
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
             <th>S#</th>

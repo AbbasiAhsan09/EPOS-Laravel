@@ -89,6 +89,7 @@
         </li>
 
 
+        @if (!ConfigHelper::getStoreConfig()["use_accounting_module"])
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('ledgers') || request()->is('customer-ledger') || request()->is('vendor-ledger')  || request()->segment(1) === 'ledgers'  ? 'active bg-gradient-primary' : ''}}" href="{{url('ledgers')}}">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -97,6 +98,16 @@
             <span class="nav-link-text ms-1">Ledgers</span>
           </a>
         </li>
+        @else
+        <li class="nav-item">
+          <a class="nav-link text-white {{request()->is('account') || request()->is('customer-ledger') || request()->is('vendor-ledger')  || request()->segment(1) === 'account'  ? 'active bg-gradient-primary' : ''}}" href="{{url('account')}}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">account_balance</i>
+            </div>
+            <span class="nav-link-text ms-1">Accounting</span>
+          </a>
+        </li>
+        @endif
 
         <li class="nav-item">
           <a class="nav-link text-white {{request()->is('reports') || request()->segment(1) === 'reports' ? 'active bg-gradient-primary' : ''}}" href="{{url('reports')}}">
