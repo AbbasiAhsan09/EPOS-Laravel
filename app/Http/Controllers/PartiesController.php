@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Excel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\TryCatch;
 
 class PartiesController extends Controller
 {
@@ -104,21 +105,45 @@ class PartiesController extends Controller
                 }
             }
 
-            // $party->city = $request->city;
-            // $party->state = $request->state;
             $party->website = $request->website;
             $party->group_id = $request->group_id;
             $party->location = $request->location;
             $party->save();
 
             
-            $group_validation = $this->is_customer_group($request->group_id);
+            
+            
+            if($party && ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                $this->create_party_account($party->id);
+            }
+            
+            toast('Party Added!','success');
+            return redirect()->back();
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    public function create_party_account(int $party_id) {
+        try {
+
+            $party = Parties::find($party_id);
+
+            if(!$party){
+                return false;
+            }
+
+            $group_validation = $this->is_customer_group($party->group_id);
             $is_vendor = $group_validation['is_vendor'];
             $is_customer = $group_validation['is_customer'];
-            
-            if(ConfigHelper::getStoreConfig()["use_accounting_module"] && ($is_vendor || $is_customer)){
-             // Create new account for income category
-             $account = Account::firstOrCreate(
+
+
+            DB::beginTransaction();
+
+            $account = Account::firstOrCreate(
                 [
                     'type' => $is_customer ? 'assets' : ($is_vendor ? 'liabilities' : ''),
                     'reference_id' => $party->id,
@@ -146,77 +171,29 @@ class PartiesController extends Controller
             );
 
             if($account && $opening_balance_equity){
-                if($is_customer){
-                    AccountTransaction::create([
+                    AccountController::record_journal_entry([
                         'account_id' => $account->id,
-                        'store_id' => $account->store_id,
-                        'note' => 'Initial opening account for customer ID: '.$account->reference_id,
-                        'debit' => $account->opening_balance ?? 0,
-                        'credit' => 0,
-                        'date' => date("Y-m-d",time()),
+                        'note' => 'Initial opening account for '.($is_customer ? 'customer' : 'vendor').' ID: '.$account->reference_id,
+                        'debit' => $is_customer ? $account->opening_balance : 0,
+                        'credit' => $is_vendor ? $account->opening_balance : 0,
                         'reference_type' => 'opening_balance_'.$account->reference_type,
                         'reference_id' => $account->reference_id,
-                        'recorded_by' => Auth::user()->id,
-                        'transaction_date' => date("Y-m-d",time())
+                        'source_account' => $opening_balance_equity->id
                     ]);
-
-
-                    AccountTransaction::create([
-                        'account_id' => $opening_balance_equity->id,
-                        'store_id' => $opening_balance_equity->store_id,
-                        'note' => 'Initial opening account for customer ID: '.$account->reference_id,
-                        'debit' => 0,
-                        'credit' =>  $account->opening_balance ?? 0,
-                        'date' => date("Y-m-d",time()),
-                        'reference_type' => 'opening_balance_'.$account->reference_type,
-                        'reference_id' => $account->reference_id,
-                        'recorded_by' => Auth::user()->id,
-                        'transaction_date' => date("Y-m-d",time())
-                    ]);
-                }
-
-
-                if($is_vendor){
-
-                    AccountTransaction::create([
-                        'account_id' => $opening_balance_equity->id,
-                        'store_id' => $opening_balance_equity->store_id,
-                        'note' => 'Initial opening account for vendor ID: '.$account->reference_id,
-                        'debit' => $account->opening_balance ?? 0,
-                        'credit' => 0,
-                        'date' => date("Y-m-d",time()),
-                        'reference_type' => 'opening_balance_'.$account->reference_type,
-                        'reference_id' => $account->reference_id,
-                        'recorded_by' => Auth::user()->id,
-                        'transaction_date' => date("Y-m-d",time())
-                    ]);
-
-                    AccountTransaction::create([
-                        'account_id' => $account->id,
-                        'store_id' => $account->store_id,
-                        'note' => 'Initial opening account for vendor ID: '.$account->reference_id,
-                        'debit' => 0,
-                        'credit' => $account->opening_balance ?? 0,
-                        'date' => date("Y-m-d",time()),
-                        'reference_type' => 'opening_balance_'.$account->reference_type,
-                        'reference_id' => $account->reference_id,
-                        'recorded_by' => Auth::user()->id,
-                        'transaction_date' => date("Y-m-d",time())
-                    ]);
-
-                }
-
             }
-            }
+
+            DB::commit();
+
+            return true;
             
-            toast('Party Added!','success');
-            return redirect()->back();
-
-
         } catch (\Throwable $th) {
+            DB::rollBack();
             throw $th;
         }
     }
+
+
+
 
     public function is_customer_group(int $group_id) {
         try {
@@ -463,11 +440,11 @@ class PartiesController extends Controller
                 ->where('store_id', Auth::user()->store_id)
                 ->where("account_id",$account->id)
                 ->groupBy('account_id')
-                ->first()->toArray();
+                ->first();
 
                 if($transaction){
-                    if(($transaction["total_debit"] !== 0) ||( $transaction["total_credit"] !== 0)){
-                        toast('This party has account with credit' . $transaction["total_credit"] . ' and debit' . $transaction["total_debit"]. ' You cannot delete this.','error');
+                    if((abs($transaction->total_debit) !== 0) ||( abs($transaction->total_credit) !== 0)){
+                        toast('This party has account with credit' . ($transaction->total_credit) . ' and debit' . ($transaction->total_debit) . ' You cannot delete this.','error');
                         return redirect()->back();
                     }else{
                         AccountTransaction::where("account_id",$account->id)->delete();

@@ -235,27 +235,18 @@ class PurchaseInvoiceController extends Controller
                         );
 
                         if($party_account){
-                            $debit = AccountTransaction::create([
-                                'store_id' => Auth::user()->store_id,
-                                'account_id' => $purchase_account->id,
-                                'reference_type' => 'purchase_invoice',
-                                'reference_id' => $invoice->id,
-                                'credit' => 0,
-                                'debit' => $invoice->net_amount,
-                                'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
-                                'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
-                            ]);
-
-                            $credit = AccountTransaction::create([
-                                'store_id' => Auth::user()->store_id,
-                                'account_id' => $party_account->id,
-                                'reference_type' => 'purchase_invoice',
-                                'reference_id' => $invoice->id,
-                                'credit' => $invoice->net_amount,
-                                'debit' => 0,
-                                'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
-                                'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
-                            ]);
+                            AccountController::record_journal_entry(
+                                [
+                                    'account_id' => $party_account->id,
+                                    'reference_type' => 'purchase_invoice',
+                                    'reference_id' => $invoice->id,
+                                    'credit' => $invoice->net_amount,
+                                    'debit' => 0,
+                                    'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
+                                    'source_account' => $purchase_account->id,
+                                ]
+                                );
                         }
                     }
                 }
@@ -455,39 +446,16 @@ class PurchaseInvoiceController extends Controller
 
                 if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
 
-                    $reversible_transactions = AccountTransaction::where([
-                        'store_id' => Auth::user()->store_id,
+                    // Reverse transactions
+                    AccountController::reverse_transaction([
                         'reference_type' => 'purchase_invoice',
                         'reference_id' => $invoice->id,
-                    ])->orderBy("id","DESC")->take(2)->get();
-    
-                    if($reversible_transactions && count($reversible_transactions) > 0){
-                        foreach ($reversible_transactions as $key => $reversible_transaction) {
-                            if($reversible_transaction->credit && $reversible_transaction->credit > 0){
-                                AccountTransaction::create([
-                                    'store_id' => Auth::user()->store_id,
-                                    'account_id' => $reversible_transaction->account_id,
-                                    'reference_type' => 'purchase_invoice',
-                                    'reference_id' => $invoice->id,
-                                    'credit' => 0,
-                                    'debit' => $reversible_transaction->credit,
-                                    'transaction_date' => date('Y-m-d',time()),
-                                    'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
-                                ]);
-                            }else{
-                                AccountTransaction::create([
-                                    'store_id' => Auth::user()->store_id,
-                                    'account_id' => $reversible_transaction->account_id,
-                                    'reference_type' => 'purchase_invoice',
-                                    'reference_id' => $invoice->id,
-                                    'credit' => $reversible_transaction->debit,
-                                    'debit' => 0,
-                                    'transaction_date' => date('Y-m-d',time()),
-                                    'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.'   because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
-                                ]);
-                            }
-                        }
-                    }
+                        'date' => (isset($request->doc_date) && $request->doc_date) ? $request->doc_date : null,
+                        'description' => 'This transaction is reversed transaction because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
+                        'transaction_count' => 2,
+                        'order_by' => 'DESC',
+                        'order_column' => 'id'
+                    ]);
 
                     
                     $purchase_account = Account::firstOrCreate(
@@ -511,28 +479,19 @@ class PurchaseInvoiceController extends Controller
                                     'store_id' => Auth::user()->store_id, // and store_id,
                                     'reference_type' => 'vendor',
                                     'reference_id' => $party->id,
+                                    'type' => 'liabilities',
                                 ],
                                 [
                                     'title' => $party->party_name,
-                                    'type' => 'assets',
                                     'description' => 'This account is created by system on creating Purchase Invoice '.$invoice->doc_num, // Added description key
                                     'opening_balance' => 0,
                                 ]
                             );
+                            
     
                             if($party_account){
-                                $debit = AccountTransaction::create([
-                                    'store_id' => Auth::user()->store_id,
-                                    'account_id' => $purchase_account->id,
-                                    'reference_type' => 'purchase_invoice',
-                                    'reference_id' => $invoice->id,
-                                    'debit' => 0,
-                                    'credit' => $invoice->net_amount,
-                                    'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
-                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
-                                ]);
-    
-                                $credit = AccountTransaction::create([
+                       
+                                AccountController::record_journal_entry([
                                     'store_id' => Auth::user()->store_id,
                                     'account_id' => $party_account->id,
                                     'reference_type' => 'purchase_invoice',
@@ -540,8 +499,10 @@ class PurchaseInvoiceController extends Controller
                                     'credit' => 0,
                                     'debit' => $invoice->net_amount,
                                     'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
-                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .' (Updated)',
+                                    'source_account' => $purchase_account->id,
                                 ]);
+    
                             }
                         }
                     }

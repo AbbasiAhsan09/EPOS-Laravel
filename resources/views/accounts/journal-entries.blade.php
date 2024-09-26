@@ -67,7 +67,7 @@
 </div>
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
-            <th>S#</th>
+            <th>ID</th>
             <th>Date</th>
             <th>Account</th>
             <th>Description</th>
@@ -79,7 +79,7 @@
            @foreach ($entries as $key => $item)
            <tr>
             {{-- @dd($item) --}}
-            <td>{{$key+1}}</td>
+            <td>{{$item->id}}</td>
             <td>{{$item->transaction_date ?? ""}}</td>
             <td>{{ $item->account->title ?? ""}}</td>
             <td>{{$item->note ?? ""}}</td>
@@ -94,9 +94,9 @@
               {{-- <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#newStoreModal{{$item->id}}">
                   <i class="fa fa-edit"></i>
               </button> --}}
-              <button class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
+              {{-- <button class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
                   <i class="fa fa-trash"></i>
-              </button>
+              </button> --}}
            
           </div>
           </td>

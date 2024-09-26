@@ -393,56 +393,17 @@ class AccountController extends Controller
             ]);
 
             for ($i = 0; $i < count($request->account_id); $i++) { 
-               $item = [];
-                $item[$i] = [
+               
+                $item = [
                     'account_id' => $request->account_id[$i],
                     'transaction_date' => $request->transaction_date[$i],
                     'note' => $request->note[$i],
                     'credit' => isset($request->credit[$i])? (int)$request->credit[$i] : 0,
                     'debit' =>  isset($request->debit[$i])? (int)$request->debit[$i] : 0,
-                    'store_id' => Auth::user()->store_id,
                     'source_account' => $request->source_account[$i] ?? null,
-                    'recorded_by' => Auth::user()->id,
                 ];
 
-
-                if (!empty($item[$i]["source_account"])) {
-                   
-                    if ($item[$i]["debit"] > 0) {
-                        // Create debit entry first
-                        $debit_entry1 = AccountTransaction::create($item[$i]);
-                        
-                        // Create corresponding credit entry
-                        AccountTransaction::create([
-                            'account_id' => $debit_entry1->source_account,
-                            'transaction_date' => $debit_entry1->transaction_date,
-                            'note' => $debit_entry1->note,
-                            'store_id' => $debit_entry1->store_id,
-                            'recorded_by' => $debit_entry1->recorded_by,
-                            'credit' => $debit_entry1->debit > 0 ? $debit_entry1->debit : 0, 
-                            'debit' => $debit_entry1->credit > 0 ? $debit_entry1->credit : 0, 
-                        ]);
-                    } 
-                    if($item[$i]["credit"] > 0){
-                        // Handle the case where debit is not present
-                        AccountTransaction::create([
-                            'account_id' => $item[$i]['source_account'],
-                            'transaction_date' => $item[$i]['transaction_date'],
-                            'note' => $item[$i]['note'],
-                            'store_id' => $item[$i]['store_id'],
-                            'recorded_by' => $item[$i]["recorded_by"],
-                            'credit' => $item[$i]["debit"] > 0 ? $item[$i]["debit"] : 0, 
-                            'debit' => $item[$i]["credit"] > 0 ? $item[$i]["credit"] : 0, 
-                        ]);
-    
-                        // Create the credit entry as well
-                        AccountTransaction::create($item[$i]);
-                    }
-
-                } else {
-                    // Create entry without source account
-                    AccountTransaction::create($item[$i]);
-                }
+                $this->record_journal_entry($item);                
 
             }
     
@@ -561,4 +522,175 @@ ORDER BY
             throw $th;
         }
     }
+
+
+    public function post_journal_entry() {
+        try {
+            
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    static function reverse_transaction($reference = ['reference_type' => '', 'reference_id' => 0, 'date' => '','description' => '', 'transaction_count' => 0, 'order_by' => null, 'order_column' => 'id']){
+        try {
+
+            
+            if(empty($reference["date"])){
+                $reference["date"] = date('Y-m-d',time());
+            }
+
+           
+            if(!empty($reference["reference_id"]) && $reference["reference_id"] > 0 && !empty($reference["reference_type"])){
+                $transactions = AccountTransaction::where([
+                    'reference_id' => $reference['reference_id'],
+                    'reference_type' =>$reference["reference_type"]
+                    ])->where("store_id", Auth::user()->store_id);
+
+
+                if((isset($reference["order_by"]) && !empty(isset($reference["order_by"]))) && (isset($reference["order_column"]) && !empty(isset($reference["order_column"])))){
+                   $transactions = $transactions->orderBy($reference["order_column"],$reference["order_by"] ?? "ASC");
+                }
+
+                if(abs($reference["transaction_count"]) > 0){
+                    $transactions = $transactions->take(abs($reference["transaction_count"]))->get();
+                }else{
+                    $transactions = $transactions->get();
+                }
+
+                // dd($transactions);
+                DB::beginTransaction();
+                if($transactions && count($transactions)){
+                    foreach ($transactions as  $transaction) {
+                        if(abs($transaction->credit)> 0){
+                            AccountTransaction::create([
+                                'account_id' => $transaction->account_id,
+                                'transaction_date' => $reference["date"],
+                                'note' => '(Reversed Transaction Ref ID '.$transaction->id.')'.$reference["description"] ?? $transaction->note,
+                                'debit' => $transaction->credit,
+                                'credit' => 0,
+                                'reference_type' => $transaction->reference_type,
+                                'reference_id' => $transaction->reference_id,
+                                'recorded_by' => Auth::user()->id,
+                                'store_id' => Auth::user()->store_id,
+                            ]);
+                        }else{
+                            if(abs($transaction->debit) > 0){
+                                AccountTransaction::create([
+                                    'account_id' => $transaction->account_id,
+                                    'transaction_date' => $reference["date"],
+                                    'note' => '(Reversed Transaction Ref ID '.$transaction->id.')'.$reference["description"] ?? $transaction->note,
+                                    'debit' => 0,
+                                    'credit' => $transaction->debit,
+                                    'reference_type' => $transaction->reference_type,
+                                    'reference_id' => $transaction->reference_id,
+                                    'recorded_by' => Auth::user()->id,
+                                    'store_id' => Auth::user()->store_id,
+                                ]);
+                            }
+                        }
+                    }
+                }
+                DB::commit();
+            }
+
+         
+
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
+    }
+
+
+    static function record_journal_entry(
+        $entry = [
+        'account_id' => 0,
+        'transaction_date' => null,
+        'note' => null,
+        'credit' => 0,
+        'debit' =>  0,
+        'reference_type' => null,
+        'reference_id' => null,
+        'source_account' => null,
+    ]){
+        try {
+            
+            if (empty($entry["account_id"]) || (abs($entry["debit"]) == 0 && abs($entry["credit"]) == 0)) {
+                return false;
+            }
+
+            if(!isset($entry["transaction_date"]) || !($entry["transaction_date"]) ){
+                $entry["transaction_date"] = date('Y-m-d',time());
+            }
+
+            $entry["store_id"] = Auth::user()->store_id;
+            $entry["recorded_by"] = Auth::user()->id;
+            
+            DB::beginTransaction();
+            if (!empty($entry["source_account"])) {
+                   
+                if ($entry["debit"] > 0) {
+                    // Create debit entry first
+                    $debit_entry1 = AccountTransaction::create($entry);
+                    
+                    // Create corresponding credit entry
+                    AccountTransaction::create([
+                        'account_id' => $debit_entry1->source_account,
+                        'transaction_date' => $debit_entry1->transaction_date,
+                        'reference_id' => $entry["reference_id"] ?? $debit_entry1->id,
+                        'reference_type' => $entry["reference_type"] ?? "journal_entry",
+                        'note' => $debit_entry1->note,
+                        'store_id' => $debit_entry1->store_id,
+                        'recorded_by' => $debit_entry1->recorded_by,
+                        'credit' => $debit_entry1->debit > 0 ? $debit_entry1->debit : 0, 
+                        'debit' => $debit_entry1->credit > 0 ? $debit_entry1->credit : 0, 
+                    ]);
+
+                    $debit_entry1->update([
+                        'reference_id' => $entry["reference_id"] ?? $debit_entry1->id,
+                        'reference_type' => $entry["reference_type"] ?? "journal_entry",
+                    ]);
+                } 
+                if($entry["credit"] > 0){
+                    // Handle the case where debit is not present
+                   $debit_entry_2 = AccountTransaction::create([
+                        'account_id' => $entry['source_account'],
+                        'transaction_date' => $entry['transaction_date'],
+                        'note' => $entry['note'],
+                        'store_id' => $entry['store_id'],
+                        'recorded_by' => $entry["recorded_by"],
+                        'credit' => $entry["debit"] > 0 ? $entry["debit"] : 0, 
+                        'debit' => $entry["credit"] > 0 ? $entry["credit"] : 0, 
+                    ]);
+
+                    // Create the credit entry as well
+                    $entry["reference_type"] = $entry["reference_type"] ?? "journal_entry";
+                    $entry["reference_id"] = $entry["reference_id"] ?? $debit_entry_2->id;
+
+                    AccountTransaction::create($entry);
+
+                    $debit_entry_2->update([
+                        'reference_id' => $entry["reference_id"] ?? $debit_entry_2->id,
+                        'reference_type' => $entry["reference_type"] ?? "journal_entry",
+                    ]);
+                }
+
+            } else {
+                // Create entry without source account
+                AccountTransaction::create($entry);
+            }
+
+            DB::commit();
+
+            return true;
+
+        } catch (\Throwable $th) {
+            
+            DB::rollBack();
+            throw $th;
+        }
+    }
+
 }
