@@ -2,6 +2,8 @@
 
 namespace App\Imports;
 
+use App\Helpers\ConfigHelper;
+use App\Http\Controllers\PartiesController;
 use App\Models\City;
 use App\Models\Parties;
 use App\Models\PartyGroups;
@@ -53,6 +55,11 @@ class PartiesImporter implements ToModel, WithHeadingRow
         
         $party->store_id =  Auth::user()->store_id;
         $party->save();
+
+        if($party && ConfigHelper::getStoreConfig()["use_accounting_module"]){
+            $partiesController = new PartiesController();
+            $partiesController->create_party_account($party->id);
+        }
 
         return $party;
         }

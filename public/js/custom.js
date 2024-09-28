@@ -96,7 +96,7 @@ $(document).ready(function(){
                                     '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty"  data-item-id="'+e.id+'" value="'+1+'"></td>'+
                                     '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
                                     '<td class="total">'+(e.mrp * 1)+'</td>'+
-                                    '<td>  <i class="fa fa-trash"></i><td>'+
+                                    '<td>  <i  tabindex="0" class="fa fa-trash focusable"></i><td>'+
                         '</tr>'
                         );
                         removeItemsFromList();
@@ -217,16 +217,31 @@ $(document).ready(function(){
         orderType();
     });
     function orderType(){
+        $is_accounting_module = $("#is_accounting_module").val();
+        // alert($is_accounting_module);
         if($('#posOrder').is(':checked')){
             $('.select_party_wrapper').css('display' , 'none');
             $('#customer_select').prop('required' , false);
             $('#customer_select').val('');
+             $(".payment_methods_wrapper_container").css("display", 'block');
+            $(".payment_methods input").prop("disabled", false);
             $('.other-methods').css('display' , 'none');
             $('.other-methods input').prop('checked',false);
+            $("#received-amount").prop("disabled",false);
         }else{
             $('.select_party_wrapper').css('display' , 'block');
-            $('.other-methods').css('display' , 'inline-block')
             $('#customer_select').prop('required' , true);
+            if($is_accounting_module){
+                $('.other-methods').css('display' , 'none')
+                $(".payment_methods input").prop("disabled", true);
+                $(".payment_methods_wrapper_container").css("display", 'none');
+                $("#received-amount").prop("disabled",true);
+
+            }else{
+                $(".payment_methods input").prop("disabled", false);
+                $("#received-amount").prop("disabled",false);
+                $('.other-methods').css('display' , 'inline-block')
+            }
         }
         
     }
@@ -298,6 +313,11 @@ $(document).ready(function(){
     }
 
     $('body').on('click','i.fa.fa-trash',function(){
+        $(this).closest('tr').remove();
+        calculateOrders();
+    });
+
+    $('body').on('keypress','i.fa.fa-trash',function(){
         $(this).closest('tr').remove();
         calculateOrders();
     });

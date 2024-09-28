@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fields;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -97,6 +98,15 @@ class FieldsController extends Controller
     {
         try {
             $field = Fields::where('id',$id)->byUser()->first();
+
+            $categories = ProductCategory::where("parent_cat",$field->id)->count();
+
+            if($categories){
+                toast('You cannot delete this category because it has ('.$categories.') active categories', 'error');
+                
+                return redirect()->back();
+            }
+
             $field->delete();
             Alert::toast('Field Deleted!', 'success');
             return redirect()->back();

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ConfigHelper;
 use App\Http\Trait\InventoryTrait;
 use App\Http\Trait\TransactionsTrait;
+use App\Models\Account;
+use App\Models\AccountTransaction;
 use App\Models\AppFormFields;
 use App\Models\AppFormFieldsData;
 use App\Models\AppForms;
@@ -89,20 +92,25 @@ class SalesController extends Controller
     public function store(Request $request)
     {
         try {
-
+          
             $validate = $request->validate([
                 'item_id' => 'required',
                 'rate' => 'required',
                 'qty' => 'required',
                 'tax' => 'required',
                 'order_tyoe' => 'required',
-                'payment_method' => 'required',
-                'recieved' => 'required',
+                // 'payment_method' => 'required',
+                // 'recieved' => 'required',
                 'gross_total' => 'required',
                 'discount' => 'required',
                 'other_charges' => 'required',
                 'note' => 'string | nullable'
             ]);
+
+            if(!$validate){
+                toast("Please provide appropriate fields",'error');
+                return redirect()->back();
+            }
 
             if ($validate) {
 
@@ -113,8 +121,8 @@ class SalesController extends Controller
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
                 $order->other_charges = $request->other_charges;
-                $order->recieved = $request->recieved;
-                $order->payment_method = $request->payment_method;
+                $order->recieved = ($request->has('recieved') ? $request->recieved : 0); 
+                $order->payment_method = $request->has('payment_method') ? $request->payment_method : 'cash';
                 $order->note = $request->note;
                 if($request->has('bill_date')){
                     $order->bill_date = $request->bill_date;
@@ -195,11 +203,111 @@ class SalesController extends Controller
                             }
                         }
                     }
+
+                if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                    
+                    $revenue_account = Account::firstOrCreate(
+                        [
+                            'title' => 'Sales Revenue', // Search by title
+                            'pre_defined' => 1,      // and pre_defined
+                            'store_id' => Auth::user()->store_id, // and store_id
+                        ],
+                        [
+                            'type' => 'income',
+                            'description' => 'This account handles the Sales Revenue transactions', // Added description key
+                            'opening_balance' => 0,
+                        ]
+                    );
+
+                    if($request->has('order_tyoe') && $request->order_tyoe === 'pos'){
+                        $cash_account = Account::firstOrCreate(
+                            [
+                                'title' => 'Cash', // Search by title
+                                'pre_defined' => 1,      // and pre_defined
+                                'store_id' => Auth::user()->store_id, // and store_id
+                            ],
+                            [
+                                'type' => 'assets',
+                                'description' => 'This account is created by system on cash sales', // Added description key
+                                'opening_balance' => 0,
+                            ]
+                        );
+
+                        if($revenue_account && $cash_account){
+                           $debit = AccountTransaction::create([
+                                'store_id' => Auth::user()->store_id,
+                                'account_id' => $revenue_account->id,
+                                'reference_type' => 'sales_order',
+                                'reference_id' => $order->id,
+                                'credit' => $order->net_total,
+                                'debit' => 0,
+                                'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                            ]);
+
+                           $credit = AccountTransaction::create([
+                                'store_id' => Auth::user()->store_id,
+                                'account_id' => $cash_account->id,
+                                'reference_type' => 'sales_order',
+                                'reference_id' => $order->id,
+                                'credit' => 0,
+                                'debit' => $order->net_total,
+                                'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                            ]);
+                        }
+                    }
+
+                    if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
+                        $party = Parties::find($order->customer_id);
+                        if($party){
+                           $party_account = Account::firstOrCreate(
+                                [ 
+                                    'store_id' => Auth::user()->store_id, // and store_id,
+                                    'reference_type' => 'customer',
+                                    'reference_id' => $party->id,
+                                ],
+                                [
+                                    'title' => $party->party_name,
+                                    'type' => 'assets',
+                                    'description' => 'This account is created by system on creating sale order '.$order->tran_no, // Added description key
+                                    'opening_balance' => 0,
+                                ]
+                            );
+
+                            if($party_account){
+                                $debit = AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $revenue_account->id,
+                                    'reference_type' => 'sales_order',
+                                    'reference_id' => $order->id,
+                                    'credit' => $order->net_total,
+                                    'debit' => 0,
+                                    'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                ]);
+
+                                $credit = AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $party_account->id,
+                                    'reference_type' => 'sales_order',
+                                    'reference_id' => $order->id,
+                                    'credit' => 0,
+                                    'debit' => $order->net_total,
+                                    'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                ]);
+                            }
+                        }
+                    }
+                }
+                    
+
                     toast('Order Created!', 'success');
                     
-                    return redirect()->back()->with('openNewWindow',$order->id);
+                    return redirect()->back()->with('openNewWindow',$request->has('print_invoice')  ? $order->id : false );
                 } else {
-                    return 'Un-autorized Action';
+                    return 'Un-authorized Action';
                 }
             }
         } catch (\Throwable $th) {
@@ -273,8 +381,8 @@ class SalesController extends Controller
                 'qty' => 'required',
                 'tax' => 'required',
                 'order_tyoe' => 'required',
-                'payment_method' => 'required',
-                'recieved' => 'required',
+                // 'payment_method' => 'required',
+                // 'recieved' => 'required',
                 'gross_total' => 'required',
                 'discount' => 'required',
                 'other_charges' => 'required',
@@ -284,6 +392,7 @@ class SalesController extends Controller
 
             if ($validate) {
                 $order  =  Sales::where('id',$id)->filterByStore()->first();
+                $old_customer_id = $order->customer_id;
                 
                 if (!$order) {
                     Alert::toast('Invalid Request','error');
@@ -294,7 +403,7 @@ class SalesController extends Controller
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
                 $order->other_charges = $request->other_charges;
-                $order->recieved = $request->recieved;
+                $order->recieved = ($request->has('recieved') ? $request->recieved : 0);
                 $order->note = $request->note;
                 if($request->has('bill_date')){
                     $order->bill_date = $request->bill_date;
@@ -303,7 +412,7 @@ class SalesController extends Controller
                 }else{
                     $order->bill_date = date('Y-m-d',time());
                 }
-                $order->payment_method = $request->payment_method;
+                $order->payment_method = $request->has('payment_method') ? $request->payment_method : 'cash';
                 $discount = 0;
                 if ($request->has('discount') && (substr($request->discount, 0, 1) == '%')) {
                     $order->discount_type = 'PERCENT';
@@ -387,9 +496,141 @@ class SalesController extends Controller
                         $details->save();
 
                     }
-                   
+
+                    if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                    
+                        $revenue_account = Account::firstOrCreate(
+                            [
+                                'title' => 'Sales Revenue', // Search by title
+                                'pre_defined' => 1,      // and pre_defined
+                                'store_id' => Auth::user()->store_id, // and store_id
+                            ],
+                            [
+                                'type' => 'income',
+                                'description' => 'This account handles the Sales Revenue transactions', // Added description key
+                                'opening_balance' => 0,
+                            ]
+                        );
+
+                        $reversible_transactions = AccountTransaction::where([
+                            'store_id' => Auth::user()->store_id,
+                            'reference_type' => 'sales_order',
+                            'reference_id' => $order->id,
+                        ])->orderBy("id","DESC")->take(2)->get();
+
+                        if($reversible_transactions && count($reversible_transactions) > 0){
+                            foreach ($reversible_transactions as $key => $reversible_transaction) {
+                                if($reversible_transaction->credit && $reversible_transaction->credit > 0){
+                                    AccountTransaction::create([
+                                        'store_id' => Auth::user()->store_id,
+                                        'account_id' => $reversible_transaction->account_id,
+                                        'reference_type' => 'sales_order',
+                                        'reference_id' => $order->id,
+                                        'credit' => 0,
+                                        'debit' => $reversible_transaction->credit,
+                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Order '.$order->tran_no.'   is updated by '. Auth::user()->name.'',
+                                    ]);
+                                }else{
+                                    AccountTransaction::create([
+                                        'store_id' => Auth::user()->store_id,
+                                        'account_id' => $reversible_transaction->account_id,
+                                        'reference_type' => 'sales_order',
+                                        'reference_id' => $order->id,
+                                        'credit' => $reversible_transaction->debit,
+                                        'debit' => 0,
+                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Order '.$order->tran_no.'  is updated by '. Auth::user()->name.'',
+                                    ]);
+                                }
+                            }
+                        }
+    
+                        if($request->has('order_tyoe') && $request->order_tyoe === 'pos'){
+                            $cash_account = Account::firstOrCreate(
+                                [
+                                    'title' => 'Cash', // Search by title
+                                    'pre_defined' => 1,      // and pre_defined
+                                    'store_id' => Auth::user()->store_id, // and store_id
+                                ],
+                                [
+                                    'type' => 'assets',
+                                    'description' => 'This account is created by system on cash sales', // Added description key
+                                    'opening_balance' => 0,
+                                ]
+                            );
+    
+                            if($revenue_account && $cash_account){
+                               $debit = AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $revenue_account->id,
+                                    'reference_type' => 'sales_order',
+                                    'reference_id' => $order->id,
+                                    'credit' => $order->net_total,
+                                    'debit' => 0,
+                                    'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                ]);
+    
+                               $credit = AccountTransaction::create([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $cash_account->id,
+                                    'reference_type' => 'sales_order',
+                                    'reference_id' => $order->id,
+                                    'credit' => 0,
+                                    'debit' => $order->net_total,
+                                    'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                ]);
+                            }
+                        }
+    
+                        if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
+                            $party = Parties::find($order->customer_id);
+                            if($party){
+                               $party_account = Account::firstOrCreate(
+                                    [ 
+                                        'store_id' => Auth::user()->store_id, // and store_id,
+                                        'reference_type' => 'customer',
+                                        'reference_id' => $party->id,
+                                    ],
+                                    [
+                                        'title' => $party->party_name,
+                                        'type' => 'assets',
+                                        'description' => 'This account is created by system on creating sale order '.$order->tran_no, // Added description key
+                                        'opening_balance' => 0,
+                                    ]
+                                );
+    
+                                if($party_account){
+                                    $debit = AccountTransaction::create([
+                                        'store_id' => Auth::user()->store_id,
+                                        'account_id' => $revenue_account->id,
+                                        'reference_type' => 'sales_order',
+                                        'reference_id' => $order->id,
+                                        'credit' =>  $order->net_total,
+                                        'debit' =>0,
+                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                        'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                    ]);
+    
+                                    $credit = AccountTransaction::create([
+                                        'store_id' => Auth::user()->store_id,
+                                        'account_id' => $party_account->id,
+                                        'reference_type' => 'sales_order',
+                                        'reference_id' => $order->id,
+                                        'credit' => 0,
+                                        'debit' => $order->net_total,
+                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                        'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+
                     toast('Order Updated!', 'info');
-                    return redirect('/sales');
+                    return redirect()->back()->with('openNewWindow',$request->has('print_invoice')  ? $order->id : false );
                 } else {
                     return 'error';
                 }
@@ -416,12 +657,52 @@ class SalesController extends Controller
                      $details = SalesDetails::where('sale_id' , $id);
                      $this->deletedItemsOnOrderUpdate($details->get());
                      $details->delete();
+
+
+                     if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                        $reversible_transactions = AccountTransaction::where([
+                            'store_id' => Auth::user()->store_id,
+                            'reference_type' => 'sales_order',
+                            'reference_id' => $id,
+                        ])->orderBy("id","DESC")->take(2)->get();
+        
+                        if($reversible_transactions && count($reversible_transactions) > 0){
+                            foreach ($reversible_transactions as $key => $reversible_transaction) {
+                                if($reversible_transaction->credit && $reversible_transaction->credit > 0){
+                                    AccountTransaction::create([
+                                        'store_id' => Auth::user()->store_id,
+                                        'account_id' => $reversible_transaction->account_id,
+                                        'reference_type' => 'sales_order',
+                                        'reference_id' => $id,
+                                        'credit' => 0,
+                                        'debit' => $reversible_transaction->credit,
+                                        'transaction_date' => date('Y-m-d',time()),
+                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Order '.$id.'   is deleted by '. Auth::user()->name.'',
+                                    ]);
+                                }else{
+                                    AccountTransaction::create([
+                                        'store_id' => Auth::user()->store_id,
+                                        'account_id' => $reversible_transaction->account_id,
+                                        'reference_type' => 'sales_order',
+                                        'reference_id' => $id,
+                                        'credit' => $reversible_transaction->debit,
+                                        'debit' => 0,
+                                        'transaction_date' => date('Y-m-d',time()),
+                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.'  because Order '.$id.'   is deleted by  '. Auth::user()->name.'',
+                                    ]);
+                                }
+                            }
+                        }
+                    }
                     
-                     Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
-                        return redirect('/sales');
+                    Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
+                    return redirect('/sales');
                     
                 }
             }
+
+            
+
             Alert::toast('invalid_request','error');
             return redirect()->back()->withErrors('error' , 'Invalid Request');
         } catch (\Throwable $th) {

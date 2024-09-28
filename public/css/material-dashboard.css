@@ -27692,6 +27692,10 @@ pre[class*="language-"] {
   width: 11px;
 }
 
+.page-title{
+  font-size: 24px;
+}
+
 /* MS supports */
 @supports (-ms-overflow-style: none) {
   .ps {
@@ -27706,4 +27710,35 @@ pre[class*="language-"] {
   }
 }
 
+  .focusable {
+            outline: none; /* Optional: Remove default focus outline */
+        }
+        .focusable:focus {
+            outline: 2px solid blue; /* Optional: Custom focus style */
+        }
+
+.mid-section{
+  min-height: 65vh;
+}
+
+.short-keys-wrapper{
+  background-color: white;
+  margin-top: 10px;
+  padding : 10px
+}
+
+.short-keys{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.short-key-item{
+  border : solid 2px var(--bs-primary);
+  padding: 5px 10px;
+  font-weight: bold;
+  margin-left: 5px 
+}
 /*# sourceMappingURL=dashboard-free.css.map */
+
+
