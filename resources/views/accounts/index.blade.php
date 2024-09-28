@@ -3,7 +3,7 @@
 @include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/hGkaaHxzxlo'])
 
 <div class="page-wrapper">
-<div class="container">
+<div class="">
  
   <div class="row row-customized">
     <div class="col">
@@ -21,7 +21,7 @@
                   
                 </div> --}}
                 <div class="col-lg-3">
-                <button class="btn btn-outline-primary btn-sm mb-0 w-100" data-bs-toggle="modal" data-bs-target="#accountModal">New Account</button>
+                <button class="btn btn-outline-primary btn-sm mb-0 w-100" data-bs-toggle="modal" data-bs-target="#accountModal">Add {{request()->has('head_accounts') ? 'Head' : ''}} Account</button>
                 </div>
                 <div class="col-lg-3">
                   <a class="btn btn-outline-info btn-sm mb-0 w-100" href="/account/journal">Journal Entry</a>
@@ -32,10 +32,14 @@
             </div>
         </div>
     </div>
-</div>
+</div> 
+  <div class="btn-group w-100 mt-4">
+    <a href="/account" class="btn btn-outline-secondary btn-sm mb-0 {{request()->has('head_accounts') ? '' : 'btn-primary'}}">Accounts</a>
+    <a href="/account?head_accounts" id="head_account_btn" class="btn btn-outline-secondary btn-sm mb-0 {{!request()->has('head_accounts') ? '' : 'btn-primary'}} ">Head Accounts</a>
+  </div>
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
-            <th>S#</th>
+            <th>ID</th>
             <th>Title</th>
             <th>Description</th>
             <th>Type</th>
@@ -46,8 +50,9 @@
         </thead>
         <tbody>
            @foreach ($items as $key => $item)
+           {{-- @dump($item) --}}
            <tr>
-            <td>{{$key+1}}</td>
+            <td>{{$item->id}}</td>
             <td>{{$item->title}}</td>
             <td>{{$item->description}}</td>
             <td>{{ucfirst($item->type ?? "")}}</td>
@@ -55,7 +60,7 @@
             <td>N/A</td>
             
             <td>
-              @if (!$item->reference_type && !$item->reference_id && $item->title !== 'Cash Sales')
+              {{-- @if (!$item->reference_type && !$item->reference_id && $item->title !== 'Cash Sales') --}}
               <div class="s-btn-grp">
                 <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#accountModal{{$item->id}}">
                     <i class="fa fa-edit"></i>
@@ -65,14 +70,14 @@
                 </button> --}}
              
               </div>  
-              @else
+              {{-- @else
               @if ($item->title === 'Cash Sales')
               System Defined
               @else
               {{ucfirst($item->reference_type)}}
                   
               @endif
-              @endif
+              @endif --}}
             </td>
         </tr>
 
@@ -81,7 +86,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="accountModalLabel">Edit UOM</h5>
+          <h5 class="modal-title" id="accountModalLabel">Edit Account</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -102,17 +107,35 @@
                     </div>
                     </div>
                     <div class="col-lg-6">
-                        <label for="">Type</label>
-                    <div class="input-group input-group-outline">
-                      {{-- <input type="number" min="1" step="0.01" class="form-control" name="base_unit_value" required > --}}
-                        <select name="type"  class="form-control" required>
-                            <option value="">Select Account Type</option>
-                            @foreach (['assets', 'expenses', 'income', 'equity', 'liabilities'] as $value)
-                            <option value="{{ $value }}" {{ $item->type && $item->type === $value ? 'selected' : '' }}>{{ ucfirst($value) }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    </div>
+                      <label for="">Chart of Account</label>
+                  <div class="input-group input-group-outline">
+                    {{-- <input type="number" min="1" step="0.01" class="form-control" name="base_unit_value" required > --}}
+                      <select name="coa_id"  class="form-control coa_select" required>
+                          <option value="">Select COA</option>
+                          @foreach ($coas as $coa)
+                          <option value="{{ $coa->id }}"
+                            @if (!request()->has('head_accounts'))
+                            {{isset($item->parent->parent->id) && $item->parent->parent->id  === $coa->id ? 'selected' : '' }}
+                            @else
+                            {{isset($item->parent->id) && $item->parent->id  === $coa->id ? 'selected' : '' }}                                
+                            @endif
+                            >{{ ucfirst($coa->title) }}</option>
+                          @endforeach
+                      </select>
+                  </div>
+                  </div>
+
+                  @if (!request()->has('head_accounts'))
+                  <div class="col-lg-6">
+                    <label for="">Head Account</label>
+                <div class="input-group input-group-outline" data-selected-id="{{$item->parent_id ?? ''}}">
+                  {{-- <input type="number" min="1" step="0.01" class="form-control" name="base_unit_value" required > --}}
+                    <select name="parent_id"  class="form-control head_select" required>
+                        <option value="">Select Head</option>
+                    </select>
+                </div>
+                </div>
+                  @endif
                     <div class="col-lg-6">
                         <label for="">Opening Balance <small>(Use "-" if payable)</small></label>
                     <div class="input-group input-group-outline">
@@ -169,6 +192,7 @@
            @endforeach
         </tbody>
     </table>
+    {{$items->links('pagination::bootstrap-4')}}
 </div>
 </div>
 
@@ -178,7 +202,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="accountModalLabel">Create New Account</h5>
+          <h5 class="modal-title" id="accountModalLabel">Create {{request()->has('head_accounts') ? 'Head' : ''}} Account</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -198,17 +222,32 @@
                     </div>
                     </div>
                     <div class="col-lg-6">
-                        <label for="">Type</label>
+                        <label for="">Chart of Account</label>
                     <div class="input-group input-group-outline">
                       {{-- <input type="number" min="1" step="0.01" class="form-control" name="base_unit_value" required > --}}
-                        <select name="type"  class="form-control" required>
-                            <option value="">Select Account Type</option>
-                            @foreach (['assets', 'expenses', 'income', 'equity', 'liabilities'] as $value)
-                            <option value="{{ $value }}">{{ ucfirst($value) }}</option>
+                        <select name="coa_id"  class="form-control coa_select" required>
+                            <option value="">Select COA</option>
+                            @foreach ($coas as $coa)
+                            <option value="{{ $coa->id }}">{{ ucfirst($coa->title) }}</option>
                             @endforeach
                         </select>
                     </div>
                     </div>
+
+                    @if (!request()->has('head_accounts'))
+                    <div class="col-lg-6">
+                      <label for="">Head Account</label>
+                  <div class="input-group input-group-outline">
+                    {{-- <input type="number" min="1" step="0.01" class="form-control" name="base_unit_value" required > --}}
+                      <select name="parent_id"  class="form-control head_select" required>
+                          <option value="">Select Head</option>
+                      </select>
+                  </div>
+                  </div>
+                    @endif
+                   
+
+
                     <div class="col-lg-6">
                         <label for="">Opening Balance <small>(Use "-" if payable)</small></label>
                     <div class="input-group input-group-outline">
@@ -229,5 +268,62 @@
       </div>
     </div>
   </div>
+
   {{-- Modal --}}
+{{-- 
+  <script>
+    $(document).ready(function() {
+        $('#head_account_btn').on('click', function() {
+            var currentUrl = window.location.href;
+
+            // Check if the URL already has query parameters
+            if (currentUrl.indexOf('?') > -1) {
+                // If 'head_accounts' is already in the URL, don't add it again
+                if (!currentUrl.includes('head_accounts')) {
+                    // Append 'head_accounts' to the existing query string
+                    window.location.href = currentUrl + '&head_accounts=true';
+                }
+            } else {
+                // If there are no query parameters, add 'head_accounts' as the first one
+                window.location.href = currentUrl + '?head_accounts=true';
+            }
+        });
+    });
+</script> --}}
+
+<script>
+      $(document).ready(function() {
+
+        $('.coa_select').change(function(){
+          var selectedCoaId = $(this).val();
+          var $headSelect = $(this).closest('.modal-body').find('.head_select');
+          if($headSelect && selectedCoaId){
+            // Clear previous head account options
+            $headSelect.empty().append('<option value="">Select Head</option>');
+
+            if(selectedCoaId){
+               // Make AJAX call to fetch head accounts
+              $.ajax({
+                  url: `/api/account/coa/${+selectedCoaId}/{{Auth::user()->store_id}}`, // Replace with your API endpoint
+                  method: 'GET',
+                  data: { coa_id: selectedCoaId },
+                  success: function(response) {
+                      // Assuming response is an array of head accounts
+                      $.each(response, function(index, headAccount) {
+                          // Append head account options
+                          $headSelect.append('<option value="' + headAccount.id + '">' + headAccount.title + '</option>');
+                      });
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error fetching head accounts:', error);
+                      // Handle error (optional)
+                  }
+              });
+            }
+          }
+         
+        })
+
+      });
+</script>
 @endsection

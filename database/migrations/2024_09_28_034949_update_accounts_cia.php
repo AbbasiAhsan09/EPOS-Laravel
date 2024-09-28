@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('account_transactions', function (Blueprint $table) {
-            // $table->integer('')
+        Schema::table('accounts', function (Blueprint $table) {
+            $table->boolean('coa')->default(false);
+            $table->boolean('head_account')->default(false);
         });
     }
 
@@ -25,8 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('account_transactions', function (Blueprint $table) {
-            //
+        Schema::table('accounts', function (Blueprint $table) {
+            $table->dropColumn(["coa",'head_account']);
         });
     }
 };

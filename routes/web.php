@@ -89,12 +89,13 @@ Route::middleware('manager.role')->prefix('uom')->group(function(){
 Route::middleware('manager.role')->prefix("account")->group(function(){
     Route::get("/",[AccountController::class, 'index']);
     Route::post('/',[AccountController::class, 'store'])->name('account.add');
-    Route::put('/{id}',[AccountController::class, 'update'])->name('account.update');
     Route::get('/journal',[AccountController::class, 'journal'])->name('journal.index');
     Route::post('/journal',[AccountController::class, 'journal_post'])->name('journal.post');
     Route::delete('/journal/{id}',[AccountController::class, 'transaction_destroy'])->name('journal.delete');
     Route::get('/transactions',[AccountController::class, 'journal_entries'])->name('account.transactions');
-    Route::get('general-ledger',[AccountController::class,'generate_sales_ledger_report']);
+    Route::get('/general-ledger',[AccountController::class,'generate_sales_ledger_report']);
+    Route::get('/generate-coa',[AccountController::class, 'generate_coa']);
+    Route::put('/{id}',[AccountController::class, 'update'])->name('account.update');
 });
 
 

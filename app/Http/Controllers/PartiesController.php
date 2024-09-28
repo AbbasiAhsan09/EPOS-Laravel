@@ -147,10 +147,11 @@ class PartiesController extends Controller
                 [
                     'type' => $is_customer ? 'assets' : ($is_vendor ? 'liabilities' : ''),
                     'reference_id' => $party->id,
-                    'store_id' => Auth::user()->store_id
+                    'store_id' => Auth::user()->store_id,
+                    'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
                 ],
                 [
-                    'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
+                    
                     'title' => $party->party_name,
                     'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
                 ]
@@ -255,12 +256,20 @@ class PartiesController extends Controller
 
             $party =  Parties::where('id',$id)->byUser()->first();
 
+            if(!$party){
+                toast('Party does not exist', 'error');
+                return redirect()->back();
+            }
+
             // dd($party->toArray(),$request->all());
-            
-            if($party && $request->has('group_id') && ((int)$request->group_id !== (int)$party->group_id)){
+                $old_opening_balance = $party->opening_balance;
+                $old_group_id = $party->group_id;
                 $group_validation = $this->is_customer_group($party->group_id);
                 $is_customer = $group_validation["is_customer"];
                 $is_vendor = $group_validation["is_vendor"];
+
+            if($party && $request->has('group_id') && ((int)$request->group_id !== (int)$party->group_id)){
+               
 
                 if($is_customer){
                     $sales = Sales::where("customer_id",$id)->count();
@@ -280,7 +289,7 @@ class PartiesController extends Controller
                 }
             }
             
-          
+            
             $party->party_name = $request->party_name;
             $party->email = $request->email;
             $party->phone = $request->phone;
@@ -306,26 +315,44 @@ class PartiesController extends Controller
             $party->location = $request->location;
             $party->save();
 
+
             $group_validation = $this->is_customer_group($party->group_id);
             $is_vendor = $group_validation['is_vendor'];
             $is_customer = $group_validation['is_customer'];
 
+
+
+
             if(ConfigHelper::getStoreConfig()["use_accounting_module"] && ($is_vendor || $is_customer)){
 
-                $account = Account::where(function ($query) {
-                    $query->where('reference_type', 'customer')
-                          ->orWhere('reference_type', 'vendor');
+                
+            $was_group_validation = $this->is_customer_group($old_group_id);
+            $was_vendor = $was_group_validation['is_vendor'];
+            $was_customer = $was_group_validation['is_customer'];
+
+                $account = Account::where(function ($query) use($was_customer) {
+                    $query->where(['reference_type' => ($was_customer ? 'customer' : "vendor")]);
                 })
                 ->where('reference_id', $party->id)
                 ->where('store_id', Auth::user()->store_id)
                 ->first();
 
                 if($account){
+                // Reverse transactions
+                AccountController::reverse_transaction([
+                    'reference_type' => 'opening_balance_'.$account->reference_type, 
+                    'reference_id' => $party->id,
+                    'description' => 'This transaction has been reversed because this party was updated  on '. date('Y-m-d',time()) .' by '. Auth::user()->name,
+                    'transaction_count' => 2,
+                    'order_by' => 'DESC',
+                    'order_column' => 'id'
+                ]);
+
                     $account->update([
                     'title' => $party->party_name,
                     'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0, 
                     'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
-                    'type' => $is_customer ? 'income' : 'expenses',
+                    'type' => $is_customer ? 'income' : 'liabilities',
                 ]);
                 }else{
                     // Create new account for income or liabilities category
@@ -337,43 +364,15 @@ class PartiesController extends Controller
                         ],
                         [
                             'title' => $party->party_name,
-                            'type' => $is_customer ? 'income' : 'expenses',
+                            'type' => $is_customer ? 'income' : 'liabilities',
                             'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
                         ]
                     );
                 }
 
-                $opening_transaction = AccountTransaction::where(function ($query) {
-                    $query->where('reference_type', 'opening_balance_customer')
-                          ->orWhere('reference_type', 'opening_balance_vendor');
-                })
-                ->where("reference_id",$party->id)->where("account_id", $account->id)
-                ->first();
+                $this->create_party_account($party->id);
 
-                if($opening_transaction){
-                    
-                    if($is_customer){
-                        $opening_transaction->update(['credit' => 0, 'debit' => $party->opening_balance, 'reference_type' => 'opening_balance_customer']);
-                    }
-
-                    if($is_vendor){
-                        $opening_transaction->update(['credit' => $party->opening_balance, 'debit' => 0, 'reference_type' => 'opening_balance_vendor']);
-                    }
-                    
-                }else{
-                    AccountTransaction::create([
-                        'account_id' => $account->id,
-                        'store_id' => $account->store_id,
-                        'note' => 'Account opening balance',
-                        'debit' => $account->reference_type === 'customer' ? $account->opening_balance : 0,
-                        'credit' =>  $account->reference_type === 'vendor' ? $account->opening_balance : 0,
-                        'date' => date("Y-m-d",time()),
-                        'reference_type' => 'opening_balance_'.$account->reference_type,
-                        'reference_id' => $account->reference_id,
-                        'recorded_by' => Auth::user()->id,
-                        'transaction_date' => date("Y-m-d",time())
-                    ]);
-                }
+       
 
             }
             

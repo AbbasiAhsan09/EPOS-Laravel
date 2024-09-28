@@ -21,10 +21,27 @@ class AccountController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $items = Account::orderBy('title', 'ASC')->byUser()->filterByStore()->get();
-        return view('accounts.index',compact('items'));
+        DB::enableQueryLog();
+        // dd($request->all());
+        $items = Account::orderBy('title', 'ASC')
+            ->where('coa', false)
+            ->byUser()
+            ->with('parent.parent')
+            ->filterByStore();
+       
+        if($request->has('head_accounts')){
+            $items = $items->where('head_account', true);
+        }else{
+            $items = $items->where('head_account', false);
+        }
+
+        // Assign the paginated result back to $items and keep query strings intact
+        $items = $items->paginate(20)->withQueryString();
+        // dd($items);
+        $coas = Account::orderBy('title', 'ASC')->where('coa', true)->byUser()->filterByStore()->get();
+        return view('accounts.index',compact('items','coas'));
     }
 
     /**
@@ -46,14 +63,25 @@ class AccountController extends Controller
     public function store(StoreAccountRequest $request)
     {
         try {
+            // dd($request->all());
 
             $input = [
                 'title' => $request->title,
-                'type' => $request->type,
+                'parent_id' => $request->has('parent_id') ? $request->parent_id : null, 
                 'opening_balance' => $request->opening_balance ?? null,
                 'description' => $request->description ?? null,
                 'color_code' => $request->color_code ?? null
             ];
+
+            $coa = Account::where(['coa' => true, 'id' => $request->coa_id, 'store_id' => Auth::user()->store_id])->first();
+            
+            if(!$coa){
+                toast('Bad Request Please Contact Support','error');
+                return redirect()->back();
+            }
+
+            $input["type"] = $coa->type;
+            $input["head_account"] = $request->has('parent_id') ? false : true; 
     
             $input['store_id'] = Auth::user()->store_id ?? null;
     
@@ -195,13 +223,24 @@ class AccountController extends Controller
     public function update(UpdateAccountRequest $request, int $id)
     {
         try {
+            // dd($request->all());
             $input = [
                 'title' => $request->title,
-                'type' => $request->type,
+                'parent_id' => $request->has('parent_id') ? $request->parent_id : null, 
                 'opening_balance' => $request->opening_balance ?? null,
                 'description' => $request->description ?? null,
                 'color_code' => $request->color_code ?? null
             ];
+
+            $coa = Account::where(['coa' => true, 'id' => $request->coa_id, 'store_id' => Auth::user()->store_id])->first();
+            
+            if(!$coa){
+                toast('Bad Request Please Contact Support','error');
+                return redirect()->back();
+            }
+
+            $input["type"] = $coa->type;
+            $input["head_account"] = $request->has('parent_id') ? false : true; 
 
             $account = Account::where("id",$id)->byUser()->filterByStore()->first();
 
@@ -213,10 +252,15 @@ class AccountController extends Controller
 
             $account->update($input);
 
-            $transactions = AccountTransaction::where(["reference_type"=>"opening_balance", "reference_id" => $account->id ])
-            ->filterByStore()->delete();
-
-
+            $this->reverse_transaction([
+                "reference_type"=>"opening_balance", 
+                "reference_id" => $account->id,
+                "date" => '',
+                "description" => 'Reversed Opening balance transaction because this account ('.$account->id.') is updated by '. Auth::user()->name,
+                "transaction_count" => 2,
+                "order_by" => "DESC",
+                "order_column" => "id"
+            ]);
 
 
             if ($account->opening_balance !== null) {
@@ -333,7 +377,7 @@ class AccountController extends Controller
     function journal() {
 
         $accounts =  Account::orderBy('title', 'ASC')->where('title','!=','Cash Sales')
-        ->byUser()->filterByStore()->get();
+        ->byUser()->filterByStore()->where('coa',false)->get();
 
         return view('accounts.journal',compact('accounts'));
     }
@@ -504,7 +548,6 @@ GROUP BY
 ORDER BY 
     a.type, a.title;');
 
-    return($test);
     
             $ledger_accounts = ["Cash","sales","Purchase"];
 
@@ -689,6 +732,266 @@ ORDER BY
         } catch (\Throwable $th) {
             
             DB::rollBack();
+            throw $th;
+        }
+    }
+
+
+    // Chart of Accounts
+
+    static function first_or_create_coa($item = ["title" => '', 'type' => '']) {
+        try {
+
+            if(!$item["title"] || !$item["type"]){
+                return false;
+            }
+
+            $coa  = Account::firstOrCreate(
+                [
+                    'store_id' => Auth::user()->store_id,
+                    'title' => $item["title"],
+                    'type' => $item["type"],
+                    'pre_defined' => 1,
+                    'coa' => true
+                ],
+                [
+                    'opening_balance' => 0,
+                    'current_balance' => 0,
+                    'This COA is system generated'
+                ]
+                );
+            
+            return $coa;
+            
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    public function generate_coa(){
+        try {
+            
+            $assets_chat_of_accounts = [
+                'Current Assets',
+                'Fixed Assets',
+                'Other Assets',
+            ];
+
+            $liabilities_chat_of_accounts = [
+                'Current Liabilities',
+                'Long-Term Liabilities'
+            ];
+
+
+            $equity_chat_of_accounts = [
+                `Owner's Equity`,
+                'Retained Earnings'
+            ];
+
+            $revenue_chat_of_accounts = [
+                'Revenue'
+            ];
+
+            $expenses_chat_of_accounts = [
+                'Operating Expenses',
+                'Other Expenses'
+            ];
+
+            
+
+            // generate asset accounts 
+            foreach ($assets_chat_of_accounts as $key => $asset_coa) {
+                AccountController::first_or_create_coa(['title' => $asset_coa, 'type' => 'assets']);
+            }
+
+            // generate liability accounts 
+            foreach ($liabilities_chat_of_accounts as $key => $liability_coa) {
+                AccountController::first_or_create_coa(['title' => $liability_coa, 'type' => 'liabilities']);
+            }
+
+            // generate equity accounts 
+            foreach ($equity_chat_of_accounts as $key => $equity_coa) {
+                AccountController::first_or_create_coa(['title' => $equity_coa, 'type' => 'equity']);
+            }
+
+             // generate income accounts 
+             foreach ($revenue_chat_of_accounts as $key => $income_coa) {
+                AccountController::first_or_create_coa(['title' => $income_coa, 'type' => 'income']);
+            }
+
+             // generate income accounts 
+             foreach ($expenses_chat_of_accounts as $key => $expenses_coa) {
+                AccountController::first_or_create_coa(['title' => $expenses_coa, 'type' => 'expenses']);
+            }
+
+            $this->generate_heads();
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function generate_heads(){
+        try {
+            
+            $heads = [
+                'assets' => [
+                    'Current Assets'=> [
+                        'Cash',
+                        'Petty Cash',
+                        'Accounts Receivable',
+                        'Inventory',
+                        'Prepaid Expenses',
+                        'Short-Term Investments',
+                    ],
+            
+                    'Fixed Assets'=> [
+                        'Property, Plant, and Equipment',
+                        'Accumulated Depreciation',
+                    ],
+               
+                    'Other Assets'=> [
+                        'Long-Term Investments',
+                        'Intangible Assets (Goodwill, Patents)',
+                    ]
+                ],
+            'liabilities' => [
+                'Current Liabilities'=> [
+                    'Accounts Payable',
+                    'Short-Term Loans',
+                    'Accrued Expenses',
+                    'Taxes Payable',
+                    'Unearned Revenue'
+                ],
+                'Long-Term Liabilities'=> [
+                    'Long-Term Loans',
+                    'Mortgage Payable',
+                ]
+            ],
+            'equity' => [
+                `Owner's Equity`=> [
+                    `Owner's Capital`,
+                    `Owner's Drawings/Withdrawals`
+                ],
+                'Retained Earnings'=> [
+                    'Retained Earnings'
+                ]
+            ],
+            'income' => [
+                'Revenue'=> [
+                    'Sales Revenue',
+                    'Service Revenue',
+                    'Other Income',
+                ]
+            ],
+            'expenses' => [
+                'Operating Expenses'=> [
+                    'Cost of Goods Sold (COGS)',
+                    'Rent Expense',
+                    'Salaries and Wages',
+                    'Utilities',
+                    'Advertising and Marketing',
+                    'Office Supplies',
+                    'Depreciation Expense'
+                ],
+                'Other Expenses'=> [
+                    'Interest Expense',
+                    'Taxes Expense',
+                    'Miscellaneous Expenses',
+                ]
+            ]
+        ];
+
+        // Strictly Defined numbers
+        $head_account_numbers = [
+            "Cash" => "1000",
+            "Petty Cash" => "1010",
+            "Accounts Receivable" => "1020",
+            "Inventory" => "1030",
+            "Prepaid Expenses" => "1040",
+            "Short-Term Investments" => "1050",
+            "Property, Plant, and Equipment" => "1500",
+            "Accumulated Depreciation" => "1510",
+            "Long-Term Investments" => "1700",
+            "Intangible Assets" => "1710",
+            "Accounts Payable" => "2000",
+            "Short-Term Loans" => "2010",
+            "Accrued Expenses" => "2020",
+            "Taxes Payable" => "2030",
+            "Unearned Revenue" => "2040",
+            "Long-Term Loans" => "2500",
+            "Mortgage Payable" => "2510",
+            "Owner's Capital" => "3000",
+            "Owner's Drawings/Withdrawals" => "3010",
+            "Retained Earnings" => "3100",
+            "Sales Revenue" => "4000",
+            "Service Revenue" => "4010",
+            "Other Income" => "4020",
+            "Cost of Goods Sold (COGS)" => "5000",
+            "Rent Expense" => "5010",
+            "Salaries and Wages" => "5020",
+            "Utilities" => "5030",
+            "Advertising and Marketing" => "5040",
+            "Office Supplies" => "5050",
+            "Depreciation Expense" => "5060",
+            "Interest Expense" => "6000",
+            "Taxes Expense" => "6010",
+            "Miscellaneous Expenses" => "6020"
+        ];
+        
+
+        foreach ($heads as $key => $heads) {
+            $type = $key;
+            foreach ($heads as $coa_title => $titles) {
+                $coa = Account::where([
+                    'coa' => true, 
+                    'store_id' => Auth::user()->store_id, 
+                    'title' => trim($coa_title),
+                    'pre_defined' => true,
+                    'type' => trim($type)
+                ])->first();
+                
+                if($coa){
+                    foreach ($titles as  $title) {
+                         Account::firstOrCreate([
+                            'title' => $title,
+                            'account_number' => $head_account_numbers[$title] ?? null,
+                            'store_id' => Auth::user()->store_id, 
+                            'parent_id' => $coa->id,
+                            'pre_defined' => true,
+                            'type' => $type,
+                            'head_account' => true,
+                            'description' => 'This is system generated account'
+                        ],
+                        [
+                            'opening_balance' => 0,
+                            'current_balance' => 0
+                        ]);
+                    }
+                }
+            } 
+            # code...
+        }
+            
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function get_heads_by_coa(int $coa_id, int $store_id){
+        try {
+
+            if(!$coa_id || !$store_id){
+                return [];
+            }
+            
+            return Account::orderBy('title', 'ASC')->where(['coa' => false, 'store_id' => $store_id, 'parent_id' => $coa_id,
+            'head_account' => true])
+            ->get() ?? [];
+
+        } catch (\Throwable $th) {
             throw $th;
         }
     }

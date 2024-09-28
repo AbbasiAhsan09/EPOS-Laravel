@@ -25,7 +25,7 @@ class StoreAccountRequest extends FormRequest
     {
         return [
            'title.required' => 'Title is required',  
-           'type.required' => 'Type is required',
+           'coa_id.required' => 'COA is required',
         ];
     }
 }
