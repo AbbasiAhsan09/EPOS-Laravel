@@ -575,4 +575,21 @@ class PurchaseInvoiceController extends Controller
         throw $th;
       }
     }
+
+
+    function print_invoice($id)  {
+        try {
+            $order = PurchaseInvoice::where('id',$id)->filterByStore()->first();
+            // dd($invoice);
+            if(!$order){
+                Alert::toast("Invalid Request",'error');
+                return redirect()->back();
+            }
+            return view('purchase.invoices.print-invoice', compact('order'));
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
 }

@@ -99,11 +99,13 @@ class PartiesController extends Controller
                 $party->state = $request->state;
             }
 
+
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                 if($request->has('opening_balance')){
                     $party->opening_balance = $request->opening_balance ?? 0;
                 }
             }
+
 
             $party->website = $request->website;
             $party->group_id = $request->group_id;
@@ -303,12 +305,14 @@ class PartiesController extends Controller
             if($request->has('state') && $request->state){
                 $party->state = $request->state;
             }
+
             
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                 if($request->has('opening_balance')){
                     $party->opening_balance = $request->opening_balance ?? 0;
                 }
             }
+
 
             $party->website = $request->website;
             $party->group_id = $request->group_id;

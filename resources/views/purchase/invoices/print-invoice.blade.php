@@ -1,6 +1,5 @@
-
-        @php
-        $net_total=(Round($order->sub_total) - Round($order->discount)) + Round($order->shipping_cost);
+		@php
+        $net_total= $order->net_amount;
                 $formatter = new NumberFormatter("en", NumberFormatter::SPELLOUT);
                 $amount_in_words = $formatter->format($net_total);
         @endphp
@@ -136,7 +135,7 @@
 								<td class="title">
 									
 									
-									<h6 style="margin-bottom: 5px !important">P.O:  {{$order->doc_num}}  
+									<h6 style="margin-bottom: 5px !important">Invoice:  {{$order->doc_num}}  
 										<br>
 {{-- 									
 									<br>
@@ -148,7 +147,7 @@
 								</td>
 
 								<td>
-									P.O Date: {{$order->bill_date !== null ? date('D, d M Y',strtotime($order->bill_date )) :date('D, d M Y', strtotime($order->created_at))}} <br />
+									Invoice Date: {{$order->bill_date !== null ? date('D, d M Y',strtotime($order->bill_date )) :date('D, d M Y', strtotime($order->created_at))}} <br />
 									Printed On:{{date('D, d M Y', time())}}
 								</td>
 							</tr>
@@ -184,8 +183,6 @@
 				<thead>
 					<tr>
                         <th>S#</th>
-						{{-- <th>Field</th>
-						<th>Category</th> --}}
 						<th>Description</th>
 						<th>Rate</th>
 						<th>Tax</th>
@@ -199,8 +196,6 @@
                 <tr class="items-table" >
                     
                     <td>{{$key+1}}</td>
-                    {{-- <td>{{$item->item_details->categories->field->name ?? ''}}</td>
-                    <td>{{$item->item_details->categories->category ?? ''}}</td> --}}
                     <td>{{$item->items->name ?? ''}}</td>
                     <td>{{$item->rate}}</td>
                     <td>{{$item->tax }}</td>
@@ -213,7 +208,7 @@
                   <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Gross Total</th>
-                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->sub_total)}}</th>
+                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->total)}}</th>
                   </tr>
                   @if ($order->discount > 0)
 				  <tr class="footer-total">
@@ -226,11 +221,11 @@
                   </tr>
 				  @endif
 
-                  @if ( $order->shipping_cost > 0)
+                  @if ( $order->others > 0)
 				  <tr class="footer-total">
                     {{-- <th colspan="7"></th> --}}
                     <th colspan="5">Other Charges</th>
-                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->shipping_cost)}}</th>
+                    <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($order->others)}}</th>
                   </tr>
 				  @endif
 				  <tr class="footer-total">
@@ -239,6 +234,16 @@
                     <th colspan="2">
                         {{
                          ConfigHelper::getStoreConfig()["symbol"].round($net_total)
+                        }}
+                    </th>
+                  </tr>
+
+				  <tr class="footer-total">
+                    {{-- <th colspan="7"></th> --}}
+                    <th colspan="5">Paid</th>
+                    <th colspan="2">
+                        {{
+                         ConfigHelper::getStoreConfig()["symbol"].round($order->recieved ?? 0)
                         }}
                     </th>
                   </tr>
