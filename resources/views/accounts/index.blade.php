@@ -137,7 +137,7 @@
                 </div>
                   @endif
                     <div class="col-lg-6">
-                        <label for="">Opening Balance <small>(Use "-" if payable)</small></label>
+                        <label for="">Opening Balance </label>
                     <div class="input-group input-group-outline">
                       <input type="number"  step="0.01" class="form-control" value="{{$item->opening_balance}}" name="opening_balance" >
                     </div>
@@ -249,7 +249,7 @@
 
 
                     <div class="col-lg-6">
-                        <label for="">Opening Balance <small>(Use "-" if payable)</small></label>
+                        <label for="">Opening Balance </label>
                     <div class="input-group input-group-outline">
                       <input type="number"  step="0.01" class="form-control" name="opening_balance" >
                     </div>
