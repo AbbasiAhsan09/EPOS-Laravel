@@ -785,7 +785,7 @@ ORDER BY
 
 
             $equity_chat_of_accounts = [
-                `Owner's Equity`,
+                "Owner's Equity",
                 'Retained Earnings'
             ];
 
@@ -870,9 +870,9 @@ ORDER BY
                 ]
             ],
             'equity' => [
-                `Owner's Equity`=> [
-                    `Owner's Capital`,
-                    `Owner's Drawings/Withdrawals`
+                "Owner's Equity"=> [
+                    "Owner's Capital",
+                    "Owner's Drawings/Withdrawals"
                 ],
                 'Retained Earnings'=> [
                     'Retained Earnings'
