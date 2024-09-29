@@ -143,6 +143,8 @@ class PartiesController extends Controller
             $is_customer = $group_validation['is_customer'];
 
 
+            $party_head = AccountController::get_head_account(["account_number" => ($is_customer ? 1020 : 2000)]);
+
             DB::beginTransaction();
 
             $account = Account::firstOrCreate(
@@ -151,6 +153,7 @@ class PartiesController extends Controller
                     'reference_id' => $party->id,
                     'store_id' => Auth::user()->store_id,
                     'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
+                    'parent_id' => $party_head->id ?? null,
                 ],
                 [
                     
@@ -158,13 +161,15 @@ class PartiesController extends Controller
                     'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
                 ]
             );
+             $opening_balance_head = AccountController::get_head_account(["account_number" => 3000]);
 
              $opening_balance_equity = Account::firstOrCreate(
                 [
                     'pre_defined' => 1,
                     'type' => 'equity',
                     'title' => 'Opening Balance Equity',
-                    'store_id' => Auth::user()->store_id
+                    'store_id' => Auth::user()->store_id,
+                    'parent_id' => $opening_balance_head->id ?? null,
                 ],
                 [
                     'reference_type' => null,
@@ -255,13 +260,13 @@ class PartiesController extends Controller
     public function update(Request $request, int $id)
     {
         try {
-
             $party =  Parties::where('id',$id)->byUser()->first();
-
+            
             if(!$party){
                 toast('Party does not exist', 'error');
                 return redirect()->back();
             }
+            DB::beginTransaction();
 
             // dd($party->toArray(),$request->all());
                 $old_opening_balance = $party->opening_balance;
@@ -334,6 +339,8 @@ class PartiesController extends Controller
             $was_vendor = $was_group_validation['is_vendor'];
             $was_customer = $was_group_validation['is_customer'];
 
+            $head_account = AccountController::get_head_account(["account_number" => ($is_customer ? 1020 : 2000)]);
+
                 $account = Account::where(function ($query) use($was_customer) {
                     $query->where(['reference_type' => ($was_customer ? 'customer' : "vendor")]);
                 })
@@ -342,6 +349,21 @@ class PartiesController extends Controller
                 ->first();
 
                 if($account){
+
+                    $have_any_transaction = AccountTransaction::
+                    where("account_id" , $account->id)
+                    ->where(function($qry){
+                        $qry->where("debit", '>', 0)
+                        ->orWhere("credit", '>', 0);
+                    })
+                    ->first();
+                    
+                    if($have_any_transaction && ($was_customer !== $is_customer)){
+                        DB::rollBack();
+                        toast('You cannot updated this party group type because this party has active transactions','error');
+                        return redirect()->back();
+                    }
+
                 // Reverse transactions
                 AccountController::reverse_transaction([
                     'reference_type' => 'opening_balance_'.$account->reference_type, 
@@ -357,6 +379,7 @@ class PartiesController extends Controller
                     'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0, 
                     'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
                     'type' => $is_customer ? 'income' : 'liabilities',
+                    'parent_id' => $head_account->id,
                 ]);
                 }else{
                     // Create new account for income or liabilities category
@@ -379,12 +402,15 @@ class PartiesController extends Controller
        
 
             }
+
+            DB::commit();
             
             toast('Party Updated!','info');
             return redirect()->back();
 
 
         } catch (\Throwable $th) {
+            DB::rollBack();
             throw $th;
         }
     }
@@ -476,6 +502,35 @@ class PartiesController extends Controller
             // dd($request);
              Excel::import(new PartiesImporter, $request->file("file"));
             return redirect()->back();
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    function get_party_balance(int $party_id) {
+        try {
+            
+            $party = Parties::find($party_id);
+
+            if(!$party){
+                return 0;
+            }
+
+            $group_validation = $this->is_customer_group($party->group_id);
+            $is_customer = $group_validation["is_customer"];
+            $is_vendor = $group_validation["is_vendor"];
+
+            $opening_balance = $party->opening_balance ?? 0;
+            $balance = 0;
+            if($is_customer){
+                $c_balance = Sales::where("customer_id",$party->id)
+                ->selectRaw("(SUM(net_total) - SUM(recieved)) as balance ")
+                ->get();
+                dd($c_balance);
+            }
+
 
         } catch (\Throwable $th) {
             throw $th;

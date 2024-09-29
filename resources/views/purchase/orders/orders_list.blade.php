@@ -56,7 +56,7 @@
                     <td>{{$item->doc_num}}</td>
                     <td><a href="" style="font-style: italic">{{$item->quotation_num ?? '(Null)'}}</a></td>
                     <td>{{$item->type ?? "STANDARD"}}</td>
-                    <td>{{$item->party->party_name}}</td>
+                    <td>{{$item->party->party_name ?? 'deleted '}}</td>
                     <td>{{ConfigHelper::getStoreConfig()["symbol"].' '.$item->sub_total}}</td>
                     <td class="text-primary">
                       <b>  {{ConfigHelper::getStoreConfig()["symbol"].' '.($item->sub_total - $item->discount) + $item->other_charges }}</b>

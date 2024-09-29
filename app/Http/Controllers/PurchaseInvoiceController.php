@@ -19,6 +19,7 @@ use App\Models\PurchaseInvoiceDetails;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class PurchaseInvoiceController extends Controller
@@ -97,6 +98,7 @@ class PurchaseInvoiceController extends Controller
             ]);
 
             if($validate){
+            DB::beginTransaction();
             $invoice = new PurchaseInvoice();
             $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. (PurchaseInvoice::max("id") ?? 0) + 1;
             $invoice->party_id = $request->party_id;
@@ -203,28 +205,19 @@ class PurchaseInvoiceController extends Controller
             }
 
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
-                    
-                $purchase_account = Account::firstOrCreate(
-                    [
-                        'title' => 'Purchase', // Search by title
-                        'pre_defined' => 1,      // and pre_defined
-                        'store_id' => Auth::user()->store_id, // and store_id
-                    ],
-                    [
-                        'type' => 'expenses',
-                        'description' => 'This account handles the purchases transactions', // Added description key
-                        'opening_balance' => 0,
-                    ]
-                );
+                $inventory_head= AccountController::get_head_account(['account_number' => 1030]);
+                
 
                 if($invoice->party_id){
                     $party = Parties::find($invoice->party_id);
                     if($party){
+                       $party_head = AccountController::get_head_account(['account_number' => 2000]);
                        $party_account = Account::firstOrCreate(
                             [ 
                                 'store_id' => Auth::user()->store_id, // and store_id,
                                 'reference_type' => 'vendor',
                                 'reference_id' => $party->id,
+                                'parent_id' => $party_head->id,
                             ],
                             [
                                 'title' => $party->party_name,
@@ -244,19 +237,20 @@ class PurchaseInvoiceController extends Controller
                                     'debit' => 0,
                                     'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
                                     'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .'',
-                                    'source_account' => $purchase_account->id,
+                                    'source_account' => $inventory_head->id,
                                 ]
                                 );
                         }
                     }
                 }
             }
-
+            DB::commit();
             Alert::toast('PO Invoice Created!','success');
                 return redirect("/purchase/invoice");
         }
             
         } catch (\Throwable $th) {
+            DB::rollBack();
             throw $th;
         }
     }
@@ -321,6 +315,7 @@ class PurchaseInvoiceController extends Controller
             ]);
 
             if($validate){
+                DB::beginTransaction();
                 $invoice =  PurchaseInvoice::where('id',$id)->filterByStore()->first();
                 if(!$invoice){
                     Alert::toast('Invalid Request','error');
@@ -457,29 +452,20 @@ class PurchaseInvoiceController extends Controller
                         'order_column' => 'id'
                     ]);
 
+                    $inventory_head= AccountController::get_head_account(['account_number' => 1030]);
                     
-                    $purchase_account = Account::firstOrCreate(
-                        [
-                            'title' => 'Purchase', // Search by title
-                            'pre_defined' => 1,      // and pre_defined
-                            'store_id' => Auth::user()->store_id, // and store_id
-                        ],
-                        [
-                            'type' => 'expenses',
-                            'description' => 'This account handles the purchases transactions', // Added description key
-                            'opening_balance' => 0,
-                        ]
-                    );
-    
                     if($invoice->party_id){
                         $party = Parties::find($invoice->party_id);
                         if($party){
+                           $party_head = AccountController::get_head_account(['account_number' => 2000]);
+                    
                            $party_account = Account::firstOrCreate(
                                 [ 
                                     'store_id' => Auth::user()->store_id, // and store_id,
                                     'reference_type' => 'vendor',
                                     'reference_id' => $party->id,
                                     'type' => 'liabilities',
+                                    'parent_id' => $party_head->id,
                                 ],
                                 [
                                     'title' => $party->party_name,
@@ -496,11 +482,11 @@ class PurchaseInvoiceController extends Controller
                                     'account_id' => $party_account->id,
                                     'reference_type' => 'purchase_invoice',
                                     'reference_id' => $invoice->id,
-                                    'credit' => 0,
-                                    'debit' => $invoice->net_amount,
+                                    'credit' => $invoice->net_amount,
+                                    'debit' =>0, 
                                     'transaction_date' => $request->has('doc_date') ?  $request->doc_date : date('Y-m-d',time()),
                                     'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Invoice '. $invoice->doc_num .' (Updated)',
-                                    'source_account' => $purchase_account->id,
+                                    'source_account' => $inventory_head->id,
                                 ]);
     
                             }
@@ -508,10 +494,13 @@ class PurchaseInvoiceController extends Controller
                     }
                 }
 
+                DB::commit();
+
                 Alert::toast('Invoice Updated!','info');
                 return redirect("/purchase/invoice");
             }
         } catch (\Throwable $th) {
+            DB::rollBack();
             throw $th;
         }
     }
@@ -526,52 +515,33 @@ class PurchaseInvoiceController extends Controller
     {
       try {
         $invoice = PurchaseInvoice::where('id',$id)->filterByStore()->first();
+        DB::beginTransaction();
         if($invoice){
             $details = PurchaseInvoiceDetails::where('inv_id', $invoice->id);
             $this->deleteItemOnPurchaseInvoice($details->get());
             $details->delete();
 
-            $reversible_transactions = AccountTransaction::where([
-                'store_id' => Auth::user()->store_id,
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+            AccountController::reverse_transaction([
                 'reference_type' => 'purchase_invoice',
                 'reference_id' => $invoice->id,
-            ])->orderBy("id","DESC")->take(2)->get();
-
-            if($reversible_transactions && count($reversible_transactions) > 0){
-                foreach ($reversible_transactions as $key => $reversible_transaction) {
-                    if($reversible_transaction->credit && $reversible_transaction->credit > 0){
-                        AccountTransaction::create([
-                            'store_id' => Auth::user()->store_id,
-                            'account_id' => $reversible_transaction->account_id,
-                            'reference_type' => 'purchase_invoice',
-                            'reference_id' => $invoice->id,
-                            'credit' => 0,
-                            'debit' => $reversible_transaction->credit,
-                            'transaction_date' => date('Y-m-d',time()),
-                            'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
-                        ]);
-                    }else{
-                        AccountTransaction::create([
-                            'store_id' => Auth::user()->store_id,
-                            'account_id' => $reversible_transaction->account_id,
-                            'reference_type' => 'purchase_invoice',
-                            'reference_id' => $invoice->id,
-                            'credit' => $reversible_transaction->debit,
-                            'debit' => 0,
-                            'transaction_date' => date('Y-m-d',time()),
-                            'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.'   because Purchase Invoice'.$invoice->doc_num.'   is update by '. Auth::user()->name.'',
-                        ]);
-                    }
-                }
-            }
+                'order_by' => 'DESC',
+                'order_column' => 'id',
+                'transaction_count' => 0,
+                'This transaction is reversed because Purchase Invoice'.$invoice->doc_num.'   is deleted by '. Auth::user()->name.'',
+            ]);
+           }
 
             $invoice->delete();
+            DB::commit();
             Alert::toast('Purchase Invoice Deleted!', 'info');
             return redirect()->back();
         }
+        DB::rollBack();
         Alert::toast('Invalid Request','error');
         return redirect()->back();
       } catch (\Throwable $th) {
+        DB::rollBack();
         throw $th;
       }
     }
