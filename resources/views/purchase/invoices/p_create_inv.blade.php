@@ -30,11 +30,11 @@
                             @endif
                            </div>
                            {{-- Form start --}}
-                        @if (isset($order))
+                        {{-- @if (isset($order)) --}}
                         <form action="{{route('invoice.store')}}" method="POST">
                             @csrf
                             @method('post')
-                        @endif
+                        {{-- @endif --}}
                               <table class="table table-sm table-responsive-sm table-striped table-bordered ">
                                 <thead>
                                     <th>Description</th>

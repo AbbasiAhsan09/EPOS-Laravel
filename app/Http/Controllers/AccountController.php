@@ -951,6 +951,11 @@ class AccountController extends Controller
         }
     }
 
+
+    public function general_ledger_report(Request $request){
+        
+    }
+
     public function generate_sales_ledger_report(Request $request) {
         try {
 
