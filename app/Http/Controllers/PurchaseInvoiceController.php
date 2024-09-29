@@ -102,7 +102,7 @@ class PurchaseInvoiceController extends Controller
             $invoice = new PurchaseInvoice();
             $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. (PurchaseInvoice::max("id") ?? 0) + 1;
             $invoice->party_id = $request->party_id;
-            $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id;
+            $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id ?? null;
             $invoice->total = $request->gross_total;
             if($request->has('discount') && (substr($request->discount,0,1) == '%')){
                 $invoice->discount_type = 'PERCENT';

@@ -45,7 +45,29 @@
   </div>
    @endif    
    @endif
-   
+    {{-- Quick Buttons --}}
+    <div class="row mb-3">
+      <div class="col-lg-2">
+        <a href="/sales/add" class="btn btn-primary w-100 btn-large btn-dashboard">Create Sale</a>
+      </div>
+      <div class="col-lg-2">
+        <a href="/purchase/invoice/0/create" class="btn btn-info w-100 btn-large btn-dashboard">Create Purchase</a>
+      </div>
+      <div class="col-lg-2">
+        <a href="/account/journal" class="btn btn-secondary w-100 btn-large btn-dashboard">Transactions</a>
+      </div>
+
+      <div class="col-lg-2">
+        <a href="/reports/inventory-report" class="btn btn-warning w-100 btn-large btn-dashboard">Inventory Balance</a>
+      </div>
+      <div class="col-lg-2">
+        <a href="/products" class="btn btn-success w-100 btn-large btn-dashboard">Items</a>
+      </div>
+      <div class="col-lg-2">
+        <a href="/reports/" class="btn btn-secondary w-100 btn-large btn-dashboard">Reports</a>
+      </div>
+    </div>
+    {{-- Quick Buttons --}}
     <div class="row">
       <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4">
         <div class="card">
@@ -84,6 +106,7 @@
 
    
     </div>
+   
     <div class="row mt-4">
       <div class="col-lg-4 col-md-6 mt-4 mb-4">
         <div class="card z-index-2 ">

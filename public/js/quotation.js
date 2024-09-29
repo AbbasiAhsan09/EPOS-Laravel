@@ -290,7 +290,7 @@ $(document).ready(function(){
             var dis_val = $('#discount').val().substring(1);
 
             if(dis_val > 100){
-                alert('Discount Value Cannot Be Greated Than Hundred');
+                alert('Discount Value Cannot Be Greater Than Hundred');
                 $('#discount').val('%100');
             }
             discount =  ((total_amount / 100) * (dis_val *1));
