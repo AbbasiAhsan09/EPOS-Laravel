@@ -16,7 +16,7 @@ $(document).ready(function(){
         array.forEach(element => {
                    
                    $('#item_selection_list').append(
-                   '<button class="selection_list_item" data-id="'+element.barcode+'">'+
+                   '<button type="button" class="selection_list_item" data-id="'+element.barcode+'">'+
                                 '<h5>'+element.categories.category+' | '+element.name+ '</h5>'+                   
                                '<p>Field: '+element.categories.field.name+' | Code: '+ element.barcode + '</p>'+
                             //    '<p>Lorem ipsum dolor sit amet.</p>'+

@@ -17,8 +17,8 @@
         <th>Created at</th>
         <th>User</th>
         <th>Net Amount</th>
-        <th>Recieved</th>
-        <th>Balance</th>
+        {{-- <th>Recieved</th> --}}
+        {{-- <th>Balance</th> --}}
       
     </thead>
     <tbody>
@@ -30,11 +30,15 @@
                 <td>{{date('d-M-y | h:m' , strtotime($item->created_at))}}</td>
                 <td>{{$item->user->name}}</td>   
                 <td> {{ConfigHelper::getStoreConfig()["symbol"].$item->net_total}}</td>
-                <td>{{ConfigHelper::getStoreConfig()["symbol"]. $item->recieved}}</td> 
-                <td>{{ConfigHelper::getStoreConfig()["symbol"]. (round($item->net_total - $item->recieved)) }}</td> 
+                {{-- <td>{{ConfigHelper::getStoreConfig()["symbol"]. $item->recieved}}</td>  --}}
+                {{-- <td>{{ConfigHelper::getStoreConfig()["symbol"]. (round($item->net_total - $item->recieved)) }}</td>  --}}
                 </tr>
                 @endforeach
     </tbody>
+    <tfoot>
+        <th colspan="5">Total</th>
+        <th>{{ConfigHelper::getStoreConfig()["symbol"].number_format($records->sum("net_total"),2)}}</th>
+      </tfoot>
 </table>
 <style>
     table{

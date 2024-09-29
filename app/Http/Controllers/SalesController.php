@@ -180,7 +180,8 @@ class SalesController extends Controller
                         $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];
-
+                        $details->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
+                        $details->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
                         $details->rate = $request->rate[$i];
                         if ($request->has('item_disc')) {
                             $details->total = (($request->qty[$i] * $request->rate[$i]) + ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->tax[$i]) - ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->item_disc[$i]));
@@ -613,6 +614,8 @@ class SalesController extends Controller
 
                         $details->sale_id = $order->id;
                         $details->item_id = $request->item_id[$i];
+                        $details->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
+                        $details->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
                         $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];

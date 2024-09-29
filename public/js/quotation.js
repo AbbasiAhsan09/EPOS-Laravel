@@ -22,7 +22,7 @@ $(document).ready(function(){
         array.forEach(element => {
                    
                    $('#item_selection_list').append(
-                   '<button class="selection_list_item" data-id="'+ element.barcode +'">'+
+                   '<button type="button" class="selection_list_item" data-id="'+ element.barcode +'">'+
                    '<h5>'+element.categories.category+' | '+element.name+'</h5>'+                   
                    '<p>Field: '+element.categories.field.name+' | Code: '+ element.barcode + '</p>'+ //    '<p>Lorem ipsum dolor sit amet.</p>'+
                            '</button>'
@@ -93,6 +93,8 @@ $(document).ready(function(){
                             '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
                             '</select>'+
                             '</td>'+
+                            '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>'+
+                            '<td><input name="bags[]" type="number" step="0.001" placeholder="Bags" min="0" class="form-control bags" value="0"></td>'+
                             '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+e.tp+'"></td>'+
                             '<td><input name="mrp[]" type="number" step="0.01" placeholder="MRP" min="1" class="form-control mrp" value="'+e.mrp+'"></td>'+
                             '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+

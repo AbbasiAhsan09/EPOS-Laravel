@@ -27749,6 +27749,16 @@ pre[class*="language-"] {
 
 }
 
+ *{
+            outline: none; /* Optional: Remove default focus outline */
+        }
+    *:focus {
+            outline: 2px solid red !important;  /* Optional: Custom focus style */
+    }
+
+    .mid-order-selection{
+      min-height: 60vh;
+    }
 /*# sourceMappingURL=dashboard-free.css.map */
 
 

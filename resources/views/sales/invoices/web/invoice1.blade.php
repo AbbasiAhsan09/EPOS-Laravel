@@ -320,6 +320,8 @@
                                     {{-- <th>Field</th>
                                     <th>Category</th> --}}
                                     <th>Description</th>
+                                    <th>Bag Size</th>
+                                    <th>Bags</th>
                                     <th>Rate</th>
                                     <th>Tax</th>
                                     <th>Disc.</th>
@@ -334,6 +336,8 @@
                                 {{-- <td>{{$item->item_details->categories->field->name ?? ''}}</td>
                                 <td>{{$item->item_details->categories->category ?? ''}}</td> --}}
                                 <td>{{$item->item_details->name ?? ''}}</td>
+                                <td>{{$item->bag_size ?? '-'}}</td>
+                                <td>{{$item->bags ?? '-'}}</td>
                                 <td>{{$item->rate}}</td>
                                 <td>{{$item->tax}}</td>
                                 <td>{{$item->disc}}</td>
@@ -375,7 +379,7 @@
 							</div>
                             @if ( $order->other_charges > 0)
 							<div class="field">
-								Other Charges <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</span>
+								Bardana Charges <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</span>
 							</div>
                             @endif
                             @if ($order->discount > 0)

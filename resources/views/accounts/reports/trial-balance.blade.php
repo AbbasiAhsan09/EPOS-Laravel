@@ -3,8 +3,14 @@
 
 @extends('layouts.app')
 @section('content')
-
-<h2>Trial Balance</h2>
+<div class="row align-items-center  justify-content-between">
+    <div class="col-lg-2">
+<h2>Balance Sheet</h2>
+    </div>
+    <div class="col-lg-1">
+        <a href="?pdf" target="_blank" class="btn btn-primary btn-small">PDF</a>
+    </div>
+</div>
 @foreach ($data as $key => $item)
 {{-- <hr style="background: gray"> --}}
 <h5 class="title">{{ucfirst($key)}}</h5>
@@ -62,8 +68,17 @@
 @endforeach
 
 <style>
-    .tria-balance-table > th{
-        width: 200px !important
+    table{
+        width: 100% ;
+    }
+    
+    table, th, td {
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+
+    .dates{
+        float: right
     }
 </style>
 @endsection

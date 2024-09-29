@@ -13,11 +13,14 @@
                 <li class="submenu-item"><a href="/reports/sales-report?filter_deleted=true">Report (Deleted) </a></li>
             </ul>
         </li>
-        <li class="menu-item">Purchase
+        <li class="menu-item"><a href="/purchase">Purchase</a> 
             <ul class="submenu">
-                <li class="submenu-item">New Purchase</li>
-                <li class="submenu-item">Zoom Out</li>
-                <li class="submenu-item">Full Screen</li>
+                <li class="submenu-item"><a href="/purchase/invoice/0/create">New</a></li>
+                <li class="submenu-item"><a href="/purchase/invoice">List</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-report">Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-detail-report">Detail Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-summary-report">Summary Report</a></li>
+                
             </ul>
         </li>
 
@@ -26,7 +29,8 @@
                 <li class="submenu-item"><a href="/account">Accounts</a></li>
                 <li class="submenu-item"><a href="/account/journal">New Transactions</a></li>
                 <li class="submenu-item"><a href="/account/transactions">Transaction</a></li>
-                <li class="submenu-item">Reports</li>
+                <li class="submenu-item"><a href="/account/report/trial-balance">Balance Sheet</a></li>
+                <li class="submenu-item"><a href="/account/report/general-ledger">Ledger</a></li>
             </ul>
         </li>
 
@@ -37,15 +41,18 @@
 
         <li class="menu-item">Products
             <ul class="submenu">
-                <li class="submenu-item">List</li>
-                <li class="submenu-item">Fields</li>
-                <li class="submenu-item">Categories</li>
+                <li class="submenu-item"><a href="/uom">UOM</a></li>
+                <li class="submenu-item"><a href="/fields">Fields</a></li>
+                <li class="submenu-item"><a href="/product-category">Categories</a></li>
+                <li class="submenu-item"><a href="/products">Products</a></li>
             </ul>
         </li>
 
-        <li class="menu-item">Favorites</li>
-        <li class="menu-item">Tools</li>
-        <li class="menu-item">Help</li>
+        <li class="menu-item"><a href="/system/configurations">Settings</a></li>
+        <li class="menu-item"><a href="{{route('auth.logout')}}">Logout</a></li>
+        <li class="menu-item">
+            <a class="" target="_blank" href="https://wa.me/03200681969?text=Hello,%20%0AName:%20{{Auth::check() ? Auth::user()->name : ''}}%0AStore:%20{{Auth::check() && isset(Auth::user()->store)? Auth::user()->store->store_name : ''}}%0AUser%20Role:%20{{Auth::check() && isset(Auth::user()->userroles->role_name) ? Auth::user()->userroles->role_name : ''}}%0AI%20need%20help%20regarding...."  type="button">Need Help?</a>
+        </li>
     </ul>
 </div>
 

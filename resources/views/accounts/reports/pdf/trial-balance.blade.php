@@ -3,7 +3,7 @@
 
 
 
-<h2>Trial Balance ({{\Carbon\Carbon::now()}})</h2>
+<h2>Balance Sheet ({{\Carbon\Carbon::now()->format('Y-m-d h:s:A')}})</h2>
 @foreach ($data as $key => $item)
 {{-- <hr style="background: gray"> --}}
 <h5 class="title">{{ucfirst($key)}}</h5>
@@ -25,13 +25,13 @@
             <tr style="border: solid 2px">
                 <td style="border: solid 2px">{{$child["title"]}}</td>
                 <td style="border: solid 2px">{{ucfirst($child["type"])}}</td>
-                <td style="border: solid 2px"> {{$child["sum"]["total_credit"]}}</td>
-                <td style="border: solid 2px"> {{$child["sum"]["total_debit"]}}</td>
+                <td style="border: solid 2px"> {{number_format($child["sum"]["total_credit"],2)}}</td>
+                <td style="border: solid 2px"> {{number_format($child["sum"]["total_debit"],2)}}</td>
                 <td>
                     @if (in_array($child["type"], ['expenses', 'assets']))
-                        {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($child['sum']["total_debit"] - $child['sum']["total_credit"]) < 0 ? '('.abs($child['sum']["total_debit"] - $child['sum']["total_credit"]).')' : $child['sum']["total_debit"] - $child['sum']["total_credit"] }}
+                        {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($child['sum']["total_debit"] - $child['sum']["total_credit"]) < 0 ? '('.number_format(abs($child['sum']["total_debit"] - $child['sum']["total_credit"]),2).')' : number_format($child['sum']["total_debit"] - $child['sum']["total_credit"],2) }}
                     @else
-                    {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($child['sum']["total_credit"] - $child['sum']["total_debit"]) < 0 ? '('.abs($child['sum']["total_credit"] - $child['sum']["total_debit"]).')' : $child['sum']["total_credit"] - $child['sum']["total_debit"] }}
+                    {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($child['sum']["total_credit"] - $child['sum']["total_debit"]) < 0 ? '('.number_format(abs($child['sum']["total_credit"] - $child['sum']["total_debit"]),2).')' : number_format($child['sum']["total_credit"] - $child['sum']["total_debit"],2) }}
                     @endif
                 </td>
                 {{-- <th>{{($child["total_debit"] - $child["total_credit"]) < 0 ? '('.abs($child["total_debit"] - $child["total_credit"]).')' : $child["total_debit"] - $child["total_credit"]}}</th> --}}
@@ -46,9 +46,9 @@
         <th>{{ConfigHelper::getStoreConfig()["symbol"]}} {{($head["total_debit"])}}</th>
         <th>
         @if (in_array($head["type"], ['expenses', 'assets']))
-        {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($head["total_debit"] - $head["total_credit"]) < 0 ? '('.abs($head["total_debit"] - $head["total_credit"]).')' : $head["total_debit"] - $head["total_credit"] }}
+        {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($head["total_debit"] - $head["total_credit"]) < 0 ? '('.number_format(abs($head["total_debit"] - $head["total_credit"]),2).')' : number_format($head["total_debit"] - $head["total_credit"],2) }}
         @else
-        {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($head["total_credit"] - $head["total_debit"]) < 0 ? '('.abs($head["total_credit"] - $head["total_debit"]).')' : $head["total_credit"] - $head["total_debit"] }}
+        {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($head["total_credit"] - $head["total_debit"]) < 0 ? '('.abs($head["total_credit"] - $head["total_debit"]).')' : ($head["total_credit"] - $head["total_debit"]) }}
         @endif
         </th>
     </tfoot>

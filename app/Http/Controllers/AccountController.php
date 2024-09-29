@@ -953,7 +953,54 @@ class AccountController extends Controller
 
 
     public function general_ledger_report(Request $request){
+
+        $range = [date('Y-m-d',time()),date('Y-m-d',time())]; 
+        $pdf = $request->has("type") && $request->type === "pdf" ;
         
+        if($request->has("from") && !empty($request->from)){
+            $range[0] = $request->from;
+            
+        }
+
+        if($request->has("to") && !empty($request->to)){
+            $range[1] = $request->to;
+        }
+        
+
+        $data = Account::filterByStore()
+        ->whereHas('transactions', function ($query) use ($range) {
+            // Filter the transactions based on the date range
+            $query->whereBetween('transaction_date', $range);
+        })
+        ->orderBy("parent_id",'ASC')
+        ->with("parent") // Ensures only accounts with transactions are fetched
+        ->with(['transactions' => function ($query)use($range) {
+            session()->put('general_ledger_from',$range[0]);
+            session()->put('general_ledger_to',$range[1]);
+            $query->orderBy('transaction_date', 'ASC')->whereBetween('transaction_date',$range); // Orders the transactions by transaction_date DESC
+        }]);
+
+        if($request->has("account_id") && !empty($request->account_id) && $request->account_id > 0){
+            $data = $data->where("id",$request->account_id);
+            session()->put('general_account_id',abs($request->account_id));
+
+        }else{
+            session()->put('general_account_id',null);
+
+        }
+
+        $data = $data->get();
+
+        if($pdf){
+            $data = ["data" => $data];
+            $pdf = Pdf::loadView('accounts.reports.pdf.general-ledger', $data)->setPaper('a4', 'landscape');
+            return $pdf->stream();
+        }
+
+        $accounts = Account::filterByStore()
+        ->where("coa", false)->whereHas('transactions')->orderBy("title",'ASC')->get();
+
+        return view("accounts.reports.general-ledger", compact('data','accounts'));
     }
 
     public function generate_sales_ledger_report(Request $request) {

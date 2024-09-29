@@ -90,7 +90,7 @@ class PurchaseInvoiceController extends Controller
             $validate = $request->validate([
                 'order_tyoe' => 'required',
                 'party_id' => 'required | integer',
-                'payment_method' => 'required',
+                // 'payment_method' => 'required',
                 'item_id' => 'required',
                 'uom' => 'required',
                 'tax' => 'required',
@@ -98,6 +98,7 @@ class PurchaseInvoiceController extends Controller
             ]);
 
             if($validate){
+                
             DB::beginTransaction();
             $invoice = new PurchaseInvoice();
             $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. (PurchaseInvoice::max("id") ?? 0) + 1;
@@ -166,6 +167,8 @@ class PurchaseInvoiceController extends Controller
                         $detail->mrp = $request->mrp[$i];
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];
+                        $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
+                        $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
                         $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                         $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                         $detail->save();
@@ -324,7 +327,7 @@ class PurchaseInvoiceController extends Controller
                 $old_amount = $invoice->recieved;
                 $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. $invoice->id;
                 $invoice->party_id = $request->party_id;
-                $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id;
+                $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id ?? null;
                 $invoice->total = $request->gross_total;
                 if($request->has('discount') && (substr($request->discount,0,1) == '%')){
                     $invoice->discount_type = 'PERCENT';
@@ -429,6 +432,9 @@ class PurchaseInvoiceController extends Controller
                             $detail->mrp = $request->mrp[$i];
                             $detail->qty = $request->qty[$i];
                             $detail->tax = $request->tax[$i];
+                            $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
+                            $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
+                           
                             $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                             $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                             $detail->save();

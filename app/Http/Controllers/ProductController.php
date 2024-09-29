@@ -47,6 +47,7 @@ class ProductController extends Controller
     {
         
         try {
+            // dd($request->all());
             $validate = $request->validate([
                 'code' => 'required|unique:products,barcode,id,store_id',
                 'category' => 'required',
