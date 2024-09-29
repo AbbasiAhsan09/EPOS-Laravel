@@ -15,6 +15,7 @@ use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SendBackupToMailController;
 use App\Http\Controllers\VendorLedgerController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,10 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::resource('/register',RegisterStoreController::class);
+Route::get('/optimize', function() {
+    Artisan::call('optimize');
+    return 'Application optimized successfully!';
+});
 Route::get('/payment',[PaymentMethodController::class, 'index']);
 Route::get('/check-order',[SalesController::class, 'showOrderDetailsClient']);
 Route::get('/check-status',[SalesController::class, 'cliendCheckStatusView']);
