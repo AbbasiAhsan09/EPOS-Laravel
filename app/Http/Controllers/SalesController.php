@@ -205,12 +205,16 @@ class SalesController extends Controller
                     }
 
                 if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
-                    
+                    $revenue_coa = AccountController::get_coa_account(['title' => 'Revenue']);
+
                     $revenue_account = Account::firstOrCreate(
                         [
                             'title' => 'Sales Revenue', // Search by title
                             'pre_defined' => 1,      // and pre_defined
                             'store_id' => Auth::user()->store_id, // and store_id
+                            'account_number' => 4000,
+                            'parent_id' => $revenue_coa->id ?? null,
+                            'head_account' => true
                         ],
                         [
                             'type' => 'income',
@@ -220,11 +224,16 @@ class SalesController extends Controller
                     );
 
                     if($request->has('order_tyoe') && $request->order_tyoe === 'pos'){
+                        $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                         $cash_account = Account::firstOrCreate(
                             [
                                 'title' => 'Cash', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
+                                'account_number' => 1000,
+                                'parent_id' => $current_asset_coa->id,
+                                'head_account' => true// and store_id
+
                             ],
                             [
                                 'type' => 'assets',
@@ -234,7 +243,8 @@ class SalesController extends Controller
                         );
 
                         if($revenue_account && $cash_account){
-                           $debit = AccountTransaction::create([
+
+                            AccountController::record_journal_entry([
                                 'store_id' => Auth::user()->store_id,
                                 'account_id' => $revenue_account->id,
                                 'reference_type' => 'sales_order',
@@ -243,18 +253,10 @@ class SalesController extends Controller
                                 'debit' => 0,
                                 'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
                                 'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                'source_account' => $cash_account->id
+                            
                             ]);
-
-                           $credit = AccountTransaction::create([
-                                'store_id' => Auth::user()->store_id,
-                                'account_id' => $cash_account->id,
-                                'reference_type' => 'sales_order',
-                                'reference_id' => $order->id,
-                                'credit' => 0,
-                                'debit' => $order->net_total,
-                                'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
-                                'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
-                            ]);
+                         
                         }
                     }
 
@@ -276,7 +278,8 @@ class SalesController extends Controller
                             );
 
                             if($party_account){
-                                $debit = AccountTransaction::create([
+
+                                AccountController::record_journal_entry([
                                     'store_id' => Auth::user()->store_id,
                                     'account_id' => $revenue_account->id,
                                     'reference_type' => 'sales_order',
@@ -285,18 +288,32 @@ class SalesController extends Controller
                                     'debit' => 0,
                                     'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
                                     'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                    'source_account' => $party_account->id
+                                
                                 ]);
 
-                                $credit = AccountTransaction::create([
-                                    'store_id' => Auth::user()->store_id,
-                                    'account_id' => $party_account->id,
-                                    'reference_type' => 'sales_order',
-                                    'reference_id' => $order->id,
-                                    'credit' => 0,
-                                    'debit' => $order->net_total,
-                                    'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
-                                    'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
-                                ]);
+
+                                // $debit = AccountTransaction::create([
+                                //     'store_id' => Auth::user()->store_id,
+                                //     'account_id' => $revenue_account->id,
+                                //     'reference_type' => 'sales_order',
+                                //     'reference_id' => $order->id,
+                                //     'credit' => $order->net_total,
+                                //     'debit' => 0,
+                                //     'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                //     'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                // ]);
+
+                                // $credit = AccountTransaction::create([
+                                //     'store_id' => Auth::user()->store_id,
+                                //     'account_id' => $party_account->id,
+                                //     'reference_type' => 'sales_order',
+                                //     'reference_id' => $order->id,
+                                //     'credit' => 0,
+                                //     'debit' => $order->net_total,
+                                //     'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                //     'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                // ]);
                             }
                         }
                     }
@@ -391,6 +408,7 @@ class SalesController extends Controller
             ]);
 
             if ($validate) {
+                DB::beginTransaction();
                 $order  =  Sales::where('id',$id)->filterByStore()->first();
                 $old_customer_id = $order->customer_id;
                 
@@ -498,13 +516,18 @@ class SalesController extends Controller
                     }
 
                     if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
-                    
+                        $revenue_coa = AccountController::get_coa_account(['title' => 'Revenue']);
+
                         $revenue_account = Account::firstOrCreate(
                             [
                                 'title' => 'Sales Revenue', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
-                            ],
+                                'account_number' => 4000,
+                                'account_number' => 4000,
+                                'parent_id' => $revenue_coa->id ?? null,
+                                'head_account' => true    
+                            ],  
                             [
                                 'type' => 'income',
                                 'description' => 'This account handles the Sales Revenue transactions', // Added description key
@@ -512,46 +535,28 @@ class SalesController extends Controller
                             ]
                         );
 
-                        $reversible_transactions = AccountTransaction::where([
-                            'store_id' => Auth::user()->store_id,
+
+                        AccountController::reverse_transaction([
                             'reference_type' => 'sales_order',
                             'reference_id' => $order->id,
-                        ])->orderBy("id","DESC")->take(2)->get();
+                            'transaction_count'=> 2,
+                            'order_by' => 'DESC',
+                            'order_column' => 'id',
+                            'description' => 'Transaction reversed because Order '.$order->tran_no.'   is updated by '. Auth::user()->name.''
+                        ]);
 
-                        if($reversible_transactions && count($reversible_transactions) > 0){
-                            foreach ($reversible_transactions as $key => $reversible_transaction) {
-                                if($reversible_transaction->credit && $reversible_transaction->credit > 0){
-                                    AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
-                                        'account_id' => $reversible_transaction->account_id,
-                                        'reference_type' => 'sales_order',
-                                        'reference_id' => $order->id,
-                                        'credit' => 0,
-                                        'debit' => $reversible_transaction->credit,
-                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
-                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Order '.$order->tran_no.'   is updated by '. Auth::user()->name.'',
-                                    ]);
-                                }else{
-                                    AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
-                                        'account_id' => $reversible_transaction->account_id,
-                                        'reference_type' => 'sales_order',
-                                        'reference_id' => $order->id,
-                                        'credit' => $reversible_transaction->debit,
-                                        'debit' => 0,
-                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
-                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Order '.$order->tran_no.'  is updated by '. Auth::user()->name.'',
-                                    ]);
-                                }
-                            }
-                        }
+                    
     
                         if($request->has('order_tyoe') && $request->order_tyoe === 'pos'){
+                            $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                             $cash_account = Account::firstOrCreate(
                                 [
                                     'title' => 'Cash', // Search by title
                                     'pre_defined' => 1,      // and pre_defined
-                                    'store_id' => Auth::user()->store_id, // and store_id
+                                    'store_id' => Auth::user()->store_id, 
+                                    'account_number' => 1000,
+                                    'parent_id' => $current_asset_coa->id,
+                                    'head_account' => true// and store_id
                                 ],
                                 [
                                     'type' => 'assets',
@@ -561,26 +566,17 @@ class SalesController extends Controller
                             );
     
                             if($revenue_account && $cash_account){
-                               $debit = AccountTransaction::create([
-                                    'store_id' => Auth::user()->store_id,
-                                    'account_id' => $revenue_account->id,
+
+
+                                AccountController::record_journal_entry([
+                                    'account_id' => $revenue_account->id, 
                                     'reference_type' => 'sales_order',
                                     'reference_id' => $order->id,
                                     'credit' => $order->net_total,
                                     'debit' => 0,
-                                    'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
                                     'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
-                                ]);
-    
-                               $credit = AccountTransaction::create([
-                                    'store_id' => Auth::user()->store_id,
-                                    'account_id' => $cash_account->id,
-                                    'reference_type' => 'sales_order',
-                                    'reference_id' => $order->id,
-                                    'credit' => 0,
-                                    'debit' => $order->net_total,
+                                    'source_account' => $cash_account->id,
                                     'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
-                                    'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
                                 ]);
                             }
                         }
@@ -603,39 +599,55 @@ class SalesController extends Controller
                                 );
     
                                 if($party_account){
-                                    $debit = AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
+
+                                    AccountController::record_journal_entry([
                                         'account_id' => $revenue_account->id,
                                         'reference_type' => 'sales_order',
                                         'reference_id' => $order->id,
                                         'credit' =>  $order->net_total,
-                                        'debit' =>0,
-                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                        'debit' => 0,
                                         'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                        'source_account' => $party_account->id,
+                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
                                     ]);
+
+                                    // $debit = AccountTransaction::create([
+                                    //     'store_id' => Auth::user()->store_id,
+                                    //     'account_id' => $revenue_account->id,
+                                    //     'reference_type' => 'sales_order',
+                                    //     'reference_id' => $order->id,
+                                    //     'credit' =>  $order->net_total,
+                                    //     'debit' =>0,
+                                    //     'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                    //     'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                    // ]);
     
-                                    $credit = AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
-                                        'account_id' => $party_account->id,
-                                        'reference_type' => 'sales_order',
-                                        'reference_id' => $order->id,
-                                        'credit' => 0,
-                                        'debit' => $order->net_total,
-                                        'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
-                                        'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
-                                    ]);
+                                    // $credit = AccountTransaction::create([
+                                    //     'store_id' => Auth::user()->store_id,
+                                    //     'account_id' => $party_account->id,
+                                    //     'reference_type' => 'sales_order',
+                                    //     'reference_id' => $order->id,
+                                    //     'credit' => 0,
+                                    //     'debit' => $order->net_total,
+                                    //     'transaction_date' => $request->has('bill_date') ? $request->bill_date : date('Y-m-d',time()),
+                                    //     'note' => 'This transaction is made by '.Auth::user()->name.' for order '. $order->tran_no .'',
+                                    // ]);
                                 }
                             }
                         }
                     }
 
+                    DB::commit();
+
                     toast('Order Updated!', 'info');
                     return redirect()->back()->with('openNewWindow',$request->has('print_invoice')  ? $order->id : false );
                 } else {
+                    DB::rollBack();
                     return 'error';
                 }
             }
         } catch (\Throwable $th) {
+            DB::rollBack();
             throw $th;
         }
     }

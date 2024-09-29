@@ -9,6 +9,7 @@ use App\Models\AccountTransaction;
 use App\Models\Parties;
 use App\Models\PurchaseInvoice;
 use App\Models\Sales;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,7 +69,7 @@ class AccountController extends Controller
             $input = [
                 'title' => $request->title,
                 'parent_id' => $request->has('parent_id') ? $request->parent_id : null, 
-                'opening_balance' => $request->opening_balance ?? null,
+                'opening_balance' => $request->opening_balance !== null ?  $request->opening_balance : 0,
                 'description' => $request->description ?? null,
                 'color_code' => $request->color_code ?? null
             ];
@@ -97,15 +98,18 @@ class AccountController extends Controller
           // Handle opening balance transaction
         if ($account->opening_balance !== null) {
             // Determine whether to debit or credit the opening balance
-            $is_debit = in_array($account->type, ['income', 'equity', 'liabilities']);
-            $is_credit = in_array($account->type, ['expenses', 'assets']);
+             $is_debit =  in_array($account->type, ['expenses', 'assets']);
+             $is_credit =in_array($account->type, ['income', 'equity', 'liabilities']);
             
+            $opening_balance_equity_head = $this->get_head_account(['account_number' => 3000]);
             $opening_balance_equity = Account::firstOrCreate(
                 [
                     'pre_defined' => 1,
                     'type' => 'equity',
                     'title' => 'Opening Balance Equity',
-                    'store_id' => Auth::user()->store_id
+                    'store_id' => Auth::user()->store_id,
+                    'parent_id' => $opening_balance_equity_head->id ?? null,
+
                 ],
                 [
                     'reference_type' => null,
@@ -114,70 +118,17 @@ class AccountController extends Controller
                 ]
             );
            
-            // If the account is an asset or expense, credit the Opening Balance Equity account
-            if ($is_credit) {
-                
-
-                AccountTransaction::create([
-                    'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
-                    'store_id' => $account->store_id,
-                    'reference_type' => 'opening_balance',
-                    'reference_id' => $account->id,
-                    'debit' => $account->opening_balance, // Credit to Opening Balance Equity
-                    'credit' => 0,
-                    'transaction_date' => now(),
-                    'recorded_by' => Auth::user()->id,
-                    'note' => 'Debit for new account opening balance'
-                ]);
-
-                 // Create the opening balance transaction
-            AccountTransaction::create([
-                'account_id' => $account->id,
-                'store_id' => $account->store_id,
+            $this->record_journal_entry([
+                'account_id' => $account->id, // Replace with the ID of your Opening Balance Equity account
                 'reference_type' => 'opening_balance',
                 'reference_id' => $account->id,
-                'debit' => 0, // Debit for expenses or assets
-                'credit' => $account->opening_balance, // Credit for income, equity, or liabilities
-                'transaction_date' => now(), // Use Carbon for date handling
-                'recorded_by' => Auth::user()->id,
-                'note' => 'Account opening balance'
-            ]);
-            }
-
-            // If the account is an asset or expense, credit the Opening Balance Equity account
-            if ($is_debit) {
-                
-
-
-                 // Create the opening balance transaction
-            AccountTransaction::create([
-                'account_id' => $account->id,
-                'store_id' => $account->store_id,
-                'reference_type' => 'opening_balance',
-                'reference_id' => $account->id,
-                'credit' => 0, // Debit for expenses or assets
-                'debit' => $account->opening_balance, // Credit for income, equity, or liabilities
-                'transaction_date' => now(), // Use Carbon for date handling
-                'recorded_by' => Auth::user()->id,
-                'note' => 'Account opening balance'
-            ]);
-
-
-            
-            AccountTransaction::create([
-                'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
-                'store_id' => $account->store_id,
-                'reference_type' => 'opening_balance',
-                'reference_id' => $account->id,
-                'credit' => $account->opening_balance, // Credit to Opening Balance Equity
-                'debit' => 0,
+                'debit' => $is_debit  ? $account->opening_balance : 0, // Credit to Opening Balance Equity
+                'credit' => $is_credit ? $account->opening_balance : 0,
                 'transaction_date' => now(),
                 'recorded_by' => Auth::user()->id,
-                'note' => 'Credit for new account opening balance'
+                'note' => 'Debit for new account opening balance',
+                'source_account' => $opening_balance_equity->id
             ]);
-
-
-            }
 
             
         }
@@ -227,7 +178,7 @@ class AccountController extends Controller
             $input = [
                 'title' => $request->title,
                 'parent_id' => $request->has('parent_id') ? $request->parent_id : null, 
-                'opening_balance' => $request->opening_balance ?? null,
+                'opening_balance' => $request->opening_balance !== null ? $request->opening_balance : 0,
                 'description' => $request->description ?? null,
                 'color_code' => $request->color_code ?? null
             ];
@@ -263,92 +214,44 @@ class AccountController extends Controller
             ]);
 
 
-            if ($account->opening_balance !== null) {
-                // Determine whether to debit or credit the opening balance
-                $is_debit = in_array($account->type, ['income', 'equity', 'liabilities']);
-                $is_credit = in_array($account->type, ['expenses', 'assets']);
-                
-                $opening_balance_equity = Account::firstOrCreate(
-                    [
-                        'pre_defined' => 1,
-                        'type' => 'equity',
-                        'title' => 'Opening Balance Equity',
-                        'store_id' => Auth::user()->store_id
-                    ],
-                    [
-                        'reference_type' => null,
-                        'reference_id' => null,
-                        'opening_balance' => 0,
-                    ]
-                );
-               
-                // If the account is an asset or expense, credit the Opening Balance Equity account
-                if ($is_credit) {
-                    
-    
-                    AccountTransaction::create([
-                        'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
-                        'store_id' => $account->store_id,
-                        'reference_type' => 'opening_balance',
-                        'reference_id' => $account->id,
-                        'debit' => $account->opening_balance, // Credit to Opening Balance Equity
-                        'credit' => 0,
-                        'transaction_date' => now(),
-                        'recorded_by' => Auth::user()->id,
-                        'note' => 'Debit for new account opening balance'
-                    ]);
-    
-                     // Create the opening balance transaction
-                AccountTransaction::create([
-                    'account_id' => $account->id,
-                    'store_id' => $account->store_id,
-                    'reference_type' => 'opening_balance',
-                    'reference_id' => $account->id,
-                    'debit' => 0, // Debit for expenses or assets
-                    'credit' => $account->opening_balance, // Credit for income, equity, or liabilities
-                    'transaction_date' => now(), // Use Carbon for date handling
-                    'recorded_by' => Auth::user()->id,
-                    'note' => 'Account opening balance'
-                ]);
-                }
-    
-                // If the account is an asset or expense, credit the Opening Balance Equity account
-                if ($is_debit) {
-                    
-    
-    
-                     // Create the opening balance transaction
-                AccountTransaction::create([
-                    'account_id' => $account->id,
-                    'store_id' => $account->store_id,
-                    'reference_type' => 'opening_balance',
-                    'reference_id' => $account->id,
-                    'credit' => 0, // Debit for expenses or assets
-                    'debit' => $account->opening_balance, // Credit for income, equity, or liabilities
-                    'transaction_date' => now(), // Use Carbon for date handling
-                    'recorded_by' => Auth::user()->id,
-                    'note' => 'Account opening balance'
-                ]);
-    
-    
-                
-                AccountTransaction::create([
-                    'account_id' => $opening_balance_equity->id, // Replace with the ID of your Opening Balance Equity account
-                    'store_id' => $account->store_id,
-                    'reference_type' => 'opening_balance',
-                    'reference_id' => $account->id,
-                    'credit' => $account->opening_balance, // Credit to Opening Balance Equity
-                    'debit' => 0,
-                    'transaction_date' => now(),
-                    'recorded_by' => Auth::user()->id,
-                    'note' => 'Credit for new account opening balance'
-                ]);
-    
-    
-                }
-    
-                
-            }
+             // Handle opening balance transaction
+        if ($account->opening_balance !== null) {
+            // Determine whether to debit or credit the opening balance
+             $is_debit =  in_array($account->type, ['expenses', 'assets']);
+             $is_credit =in_array($account->type, ['income', 'equity', 'liabilities']);
+            
+            $opening_balance_equity_head = $this->get_head_account(['account_number' => 3000]);
+            $opening_balance_equity = Account::firstOrCreate(
+                [
+                    'pre_defined' => 1,
+                    'type' => 'equity',
+                    'title' => 'Opening Balance Equity',
+                    'store_id' => Auth::user()->store_id,
+                    'parent_id' => $opening_balance_equity_head->id ?? null,
+
+                ],
+                [
+                    'reference_type' => null,
+                    'reference_id' => null,
+                    'opening_balance' => 0,
+                ]
+            );
+           
+            $this->record_journal_entry([
+                'account_id' => $account->id, // Replace with the ID of your Opening Balance Equity account
+                'reference_type' => 'opening_balance',
+                'reference_id' => $account->id,
+                'debit' => $is_debit  ? $account->opening_balance : 0, // Credit to Opening Balance Equity
+                'credit' => $is_credit ? $account->opening_balance : 0,
+                'transaction_date' => now(),
+                'recorded_by' => Auth::user()->id,
+                'note' => ' New account opening balance Updated',
+                'source_account' => $opening_balance_equity->id
+            ]);
+
+            
+        }
+
 
             DB::commit();
 
@@ -529,43 +432,7 @@ class AccountController extends Controller
     }
 
 
-    public function generate_sales_ledger_report(Request $request) {
-        try {
-
-            $test = DB::select('SELECT 
-a.id,
-    a.title,
-    a.type,
-    SUM(at.debit) AS total_debit,
-    SUM(at.credit) AS total_credit,
-    (SUM(at.debit) - SUM(at.credit)) AS balance
-FROM 
-    accounts AS a
-LEFT JOIN 
-    account_transactions AS at ON a.id = at.account_id
-GROUP BY 
-    a.id, a.title, a.type
-ORDER BY 
-    a.type, a.title;');
-
-    
-            $ledger_accounts = ["Cash","sales","Purchase"];
-
-            $ledger = AccountTransaction::select('account_id')
-            ->with("account")
-            ->selectRaw('SUM(debit) AS total_debit')
-            ->selectRaw('SUM(credit) AS total_credit')
-            ->where('store_id', Auth::user()->store_id)
-            ->groupBy('account_id')
-            ->get();
-
-            return view("accounts.reports.general-ledger", compact('ledger'));
-
-        } catch (\Throwable $th) {
-            throw $th;
-        }
-    }
-
+  
 
     public function post_journal_entry() {
         try {
@@ -991,6 +858,151 @@ ORDER BY
             'head_account' => true])
             ->get() ?? [];
 
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    public function trial_balance_report(Request $request){
+        try {
+            
+            $pdf = $request->has("pdf");
+            $data = [];
+            $heads = Account::where('head_account',true)->with('parent')->orderBy('type','ASC')
+            // ->with("children.transactions",'parent','transactions')
+            ->filterByStore()->get();
+
+            $account_types = [];
+            // set account type array 
+            foreach ($heads as $key => $head) {
+                $head_credit_debit = $this->get_credit_debit_sum(["account_id" => $head->id]);
+                $item = [];
+                $item["account_id"] = $head->id;
+                $item["parent_account"] = $head->parent->title;
+                $item["title"] = $head->title;
+                $item["type"] = $head->type;
+                $item["parent"] = true;
+                $item["sum"]["total_credit"] = $head_credit_debit[0]['total_credit'] ;
+                $item["sum"]["total_debit"] = $head_credit_debit[0]['total_debit'] ;
+                $item["total_credit"] = $head_credit_debit[0]['total_credit'];
+                $item["total_debit"] = $head_credit_debit[0]['total_debit'];
+                $item["children"] = [];
+
+                
+                $accounts = Account::where("head_account",false)->where('parent_id',$head->id)
+                ->filterByStore()->get();
+
+                if($accounts && count($accounts)){
+                    foreach ($accounts as $key => $account) {
+                        $account_credit_debit = $this->get_credit_debit_sum(["account_id" => $account->id]);
+                        $sub_item = [];
+                        $sub_item["title"] = $account->title;
+                        $sub_item["account_id"] = $account->id;
+                        $sub_item["type"] = $account->type;
+                        $sub_item["sum"]["total_credit"] = $account_credit_debit[0]['total_credit'];
+                        $sub_item["sum"]["total_debit"] = $account_credit_debit[0]['total_debit'];
+                        $item["total_credit"] = $item["total_credit"] +  $account_credit_debit[0]['total_credit'];
+                        $item["total_debit"] = $item["total_debit"] +  $account_credit_debit[0]['total_debit'];
+                        array_push($item["children"],$sub_item); 
+                    }
+                }
+
+                if($item["total_debit"] > 0 || $item["total_credit"] > 0){
+
+                    array_push($data,$item);
+                }
+                
+        
+            }
+            // return $data;
+            
+            $data = collect($data)->groupBy('parent_account');
+            
+            if($pdf){
+                $data = ["data" => $data->toArray()];
+                $pdf = Pdf::loadView('accounts.reports.pdf.trial-balance', $data)->setPaper('a4', 'landscape');
+                return $pdf->stream();
+            }
+            
+            return view('accounts.reports.trial-balance', compact('data'));
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    static function get_credit_debit_sum($where = []){
+        try {
+            // dd($where);
+            $credit_debit = AccountTransaction::
+            selectRaw('SUM(debit) AS total_debit')
+            ->selectRaw('SUM(credit) AS total_credit')
+            ->where('store_id', Auth::user()->store_id)
+            ->where($where)
+            ->get()->toArray();
+
+            return $credit_debit;
+            // dd($credit_debit);
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function generate_sales_ledger_report(Request $request) {
+        try {
+
+            $test = DB::select('SELECT 
+                    a.id,
+                        a.title,
+                        a.type,
+                        SUM(at.debit) AS total_debit,
+                        SUM(at.credit) AS total_credit,
+                        (SUM(at.debit) - SUM(at.credit)) AS balance
+                    FROM 
+                        accounts AS a
+                    LEFT JOIN 
+                        account_transactions AS at ON a.id = at.account_id
+                    GROUP BY 
+                        a.id, a.title, a.type
+                    ORDER BY 
+                        a.type, a.title;');
+
+    
+            $ledger_accounts = ["Cash","sales","Purchase"];
+
+            $ledger = AccountTransaction::select('account_id')
+            ->with("account")
+            ->selectRaw('SUM(debit) AS total_debit')
+            ->selectRaw('SUM(credit) AS total_credit')
+            ->where('store_id', Auth::user()->store_id)
+            ->groupBy('account_id')
+            ->get();
+
+            return view("accounts.reports.general-ledger", compact('ledger'));
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    static function get_head_account($where = []){
+        try {
+
+            return Account::where($where)->filterByStore()->first();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    static function get_coa_account($where = []){
+        try {
+            return Account::where($where)->where('head_account',false)->where("pre_defined",true)
+            ->where('coa',true)->filterByStore()->first();
         } catch (\Throwable $th) {
             throw $th;
         }
