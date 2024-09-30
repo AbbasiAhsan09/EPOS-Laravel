@@ -69,7 +69,7 @@ class AccountController extends Controller
             $input = [
                 'title' => $request->title,
                 'parent_id' => $request->has('parent_id') ? $request->parent_id : null, 
-                'opening_balance' => $request->opening_balance !== null ?  $request->opening_balance : 0,
+                'opening_balance' => $request->opening_balance !== null && !empty($request->opening_balance) ?  $request->opening_balance : 0,
                 'description' => $request->description ?? null,
                 'color_code' => $request->color_code ?? null
             ];
