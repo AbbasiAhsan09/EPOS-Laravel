@@ -446,12 +446,12 @@ class AccountController extends Controller
         try {
 
             
-            if(empty($reference["date"])){
+            if(!isset($reference["date"]) || !$reference["date"] || empty($reference["date"])){
                 $reference["date"] = date('Y-m-d',time());
             }
 
            
-            if(!empty($reference["reference_id"]) && $reference["reference_id"] > 0 && !empty($reference["reference_type"])){
+            if(isset($reference["reference_id"]) && !empty($reference["reference_id"]) && $reference["reference_id"] > 0 && isset($reference["reference_type"]) && !empty($reference["reference_type"])){
                 $transactions = AccountTransaction::where([
                     'reference_id' => $reference['reference_id'],
                     'reference_type' =>$reference["reference_type"]
@@ -476,7 +476,7 @@ class AccountController extends Controller
                             AccountTransaction::create([
                                 'account_id' => $transaction->account_id,
                                 'transaction_date' => $reference["date"],
-                                'note' => '(Reversed Transaction Ref ID '.$transaction->id.')'.$reference["description"] ?? $transaction->note,
+                                'note' => '(Reversed Transaction Ref ID '.$transaction->id.')'.(isset($reference["description"]) && !empty($reference["description"]) ? $reference["description"] : $transaction->note) ,
                                 'debit' => $transaction->credit,
                                 'credit' => 0,
                                 'reference_type' => $transaction->reference_type,
@@ -489,7 +489,7 @@ class AccountController extends Controller
                                 AccountTransaction::create([
                                     'account_id' => $transaction->account_id,
                                     'transaction_date' => $reference["date"],
-                                    'note' => '(Reversed Transaction Ref ID '.$transaction->id.')'.$reference["description"] ?? $transaction->note,
+                                    'note' => '(Reversed Transaction Ref ID '.$transaction->id.')'.(isset($reference["description"]) && !empty($reference["description"]) ? $reference["description"] : $transaction->note) ,
                                     'debit' => 0,
                                     'credit' => $transaction->debit,
                                     'reference_type' => $transaction->reference_type,
