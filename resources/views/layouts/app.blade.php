@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="{{asset('css/custom.css')}}">
 
   {{-- Sweet Alert CDN --}}
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script src="{{asset("js/sweetalert.min.js")}}"></script>
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
   <!-- Nucleo Icons -->
@@ -403,13 +403,13 @@
     }
   </script>
   <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <script async defer src="{{asset("externals/github/buttons.js")}}"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="{{asset('js/material-dashboard.min.js?v=3.0.4')}}"></script>
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="{{asset("externals/select2/select2.min.css")}}" rel="stylesheet" />
 
  @yield('scripts')
- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+ <script src="{{asset("externals/select2/select2.min.js")}}"></script>
 
  <script>
    $(document).on('keydown', function(event) {
