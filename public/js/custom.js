@@ -333,7 +333,7 @@ $(document).ready(function(){
       var is_base_unit =  curr.val() > 1 ? true : false;
        var item_id = $(this).parent().parent().find('.pr_qty').attr('data-item-id');
       
-      if (checkInventory != 0) {
+      if (checkInventory) {
         $.ajax({
             url : '/check-inventory/'+item_id+'/'+(is_base_unit ? 1: 0),
             type : 'GET',
