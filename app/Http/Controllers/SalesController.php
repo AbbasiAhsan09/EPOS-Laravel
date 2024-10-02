@@ -25,6 +25,8 @@ use Illuminate\Support\Str;
 class SalesController extends Controller
 {
     use InventoryTrait ,TransactionsTrait;
+
+
     /**
      * Display a listing of the resource.
      *
@@ -92,7 +94,10 @@ class SalesController extends Controller
      */
     public function store(Request $request)
     {
+        $this->configInventoryChecks();
+       
         try {
+            
           
             $validate = $request->validate([
                 'item_id' => 'required',

@@ -78,6 +78,7 @@ class ConfigurationController extends Controller
                 $config->show_ptn = ($request->has('show_ptn') ? $request->show_ptn : false);
                 $config->mutltiple_sales_order = ($request->has('is_multi_order') ? $request->is_multi_order : false);
                 $config->inventory_tracking = ($request->has('track_inventory') ? $request->track_inventory : false);
+                $config->allow_low_inventory = ($request->has('allow_low_inventory') ? $request->allow_low_inventory : false);
                 $config->save();
                 Alert::toast('Configurations Updated!','success');
                 return redirect('/system/configurations');
