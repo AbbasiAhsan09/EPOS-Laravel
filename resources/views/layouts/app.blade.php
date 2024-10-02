@@ -39,6 +39,7 @@
 
 <body class="g-sidenav-show  bg-gray-200">
   <input type="hidden" id="checkInventory" value="{{$currenConfig->inventory_tracking ?? 0}}">
+  <input type="hidden" id="lowInventoryCheck" value="{{$currenConfig->allow_low_inventory ?? 0}}">
   <input type="hidden" id="storeId" value="{{Auth::user()->store->id ?? 0}}">
   @include('sweetalert::alert')
   @if (Auth::check())

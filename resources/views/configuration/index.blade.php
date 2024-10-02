@@ -165,6 +165,12 @@
                         <input type="checkbox" class="form-check-input" id="" name="track_inventory" value="1" {{isset($currenConfig) ? ($currenConfig->inventory_tracking ? 'checked' : '') : '' }}> 
                     </div>
                 </div>
+                <div class="mt-3 d-flex">
+                  <label for="" class="mb-0">Allow Low Inventory: </label>
+                  <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                      <input type="checkbox" class="form-check-input" id="" name="allow_low_inventory" value="1" {{isset($currenConfig) ? ($currenConfig->allow_low_inventory ? 'checked' : '') : '' }}> 
+                  </div>
+              </div>
                 
 
 

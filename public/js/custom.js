@@ -340,12 +340,19 @@ $(document).ready(function(){
             success : function(res){
                
                 if((res * 1) < qty){
-                    swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
-                    qty_ins.val(Math.round(res));
-                    if((res *1) === 0){
-                        curr.parent().parent().closest('tr').remove();
-                        
+                    const lowInventoryCheck = +$("#lowInventoryCheck").val();
+                  
+                    if(!lowInventoryCheck){
+                        swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
+                        qty_ins.val(Math.round(res));
+                        if((res *1) === 0){
+                            curr.parent().parent().closest('tr').remove();
+                            
+                        }
+                    }else{
+                        swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)} this will be show as -Qty in inventory`,'error');
                     }
+                    
                 }
             }
         });
@@ -363,12 +370,18 @@ $(document).ready(function(){
             url : '/check-inventory/'+item_id+'/'+(is_base_unit ? 1: 0),
             type : 'GET',
             success : function(res){
+
                 if((res * 1) < qty){
-                    swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
-                    curr.val(Math.round(res));
-                    if((res *1) === 0){
-                        curr.parent().parent().closest('tr').remove();
-                        
+                    const lowInventoryCheck = +$("#lowInventoryCheck").val();
+                    if(!lowInventoryCheck){
+                        swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)}`,'error');
+                        curr.val(Math.round(res));
+                        if((res *1) === 0){
+                            curr.parent().parent().closest('tr').remove();
+                            
+                        }
+                    }else{
+                        swal('Low Quantity',`Required Qty is Not Available. Available Qty is ${Math.round(res)} this will be show as -Qty in inventory`,'error');
                     }
                 }
             }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Trait;
 
+use App\Helpers\ConfigHelper;
 use App\Models\Configuration;
 use App\Models\Inventory;
 use App\Models\Products;
@@ -12,6 +13,11 @@ trait InventoryTrait
   
     public $allowInventoryCheck = true;
     public $allowLowInventory = false;
+
+    public function configInventoryChecks(){
+        $this->allowInventoryCheck = ConfigHelper::getStoreConfig()["inventory_tracking"];
+        $this->allowLowInventory = ConfigHelper::getStoreConfig()["allow_low_inventory"];
+    }
 
 
     
