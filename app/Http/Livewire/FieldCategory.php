@@ -8,7 +8,7 @@ use Livewire\Component;
 
 class FieldCategory extends Component
 {
-    public $selectedField = null, $live_categories = [], $selectedCategory = null;
+    public $selectedField = null, $live_categories = [], $selectedCategory = null, $required = true;
 
     public function changeField()
     {

@@ -1,10 +1,10 @@
 <div class="row">
     <div class="col">
         <div class="">
-            <label for="">Field *</label>
+            <label for="">Field {{$required ? '*' : ''}}</label>
             <div class="input-group input-group-outline">
                 <select name="field" id="" class="form-control" wire:change="changeField()" wire:model="selectedField">
-                <option value="">Select Category</option>
+                <option value="">Select Field</option>
                 @foreach ($fields as $field)
                     <option value="{{$field->id}}" >{{$field->name}}</option>
                 @endforeach
@@ -14,7 +14,7 @@
     </div>
     <div class="col">
             <div class="">
-                <label for="">Category *</label>
+                <label for="">Category {{$required ? '*' : ''}}</label>
                 <div class="input-group input-group-outline">
                     <select name="category" id="" class="form-control">
                     <option value="">Select Category</option>

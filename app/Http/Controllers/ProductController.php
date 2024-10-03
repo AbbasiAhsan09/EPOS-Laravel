@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ConfigHelper;
 use App\Imports\ProductImport;
 use App\Models\AppFormFields;
 use App\Models\AppFormFieldsData;
 use App\Models\AppForms;
+use App\Models\Fields;
 use App\Models\Inventory;
 use App\Models\MOU;
 use App\Models\ProductArrtributes;
@@ -50,14 +52,13 @@ class ProductController extends Controller
             // dd($request->all());
             $validate = $request->validate([
                 'code' => 'required|unique:products,barcode,id,store_id',
-                'category' => 'required',
             ]);
             if($validate){
                 $product = new Products();
                 $product->name = $request->product;
                 $product->barcode = $request->code;
                 $product->uom = $request->uom;
-                $product->category = $request->category;
+                $product->category = $request->has("category") && !empty($request->category) ? $request->category : $this->get_common_field_category_ids()["category_id"];
                 $product->mrp = $request->mrp;
                 $product->low_stock = $request->low_stock;
                 $product->tp = $request->tp;
@@ -128,13 +129,13 @@ class ProductController extends Controller
     public function update(int $id, Request $request)
     {
         try {
-            // dd($request->all());
+     
             $product =  Products::find($id);
             $oldQty = $product->opening_stock;
             $product->name = $request->product;
             $product->barcode = $request->code;
             $product->uom = $request->uom;
-            $product->category = $request->category;
+            $product->category = $request->has("category") && !empty($request->category) ? $request->category : $this->get_common_field_category_ids()["category_id"];
             $product->mrp = $request->mrp;
             $product->low_stock = $request->low_stock;
             $product->opening_stock = $request->opening_stock;
@@ -195,6 +196,43 @@ class ProductController extends Controller
         }
     }
 
+
+    static function get_common_field_category_ids(){
+        try {
+            $config = ConfigHelper::getStoreConfig();
+
+            if(!$config){
+                toast('Not configured the store yet contact support','error');
+            }
+
+            $field = Fields::firstOrCreate([
+                'name' => $config["app_title"] ?? "Common",
+            ],
+            [
+                'store_id' => $config["store_id"] 
+            ]
+            );
+
+            $category = ProductCategory::firstOrCreate([
+                'category' => $config["app_title"] ?? "Common",
+                'parent_cat' => $field->id,
+            ],
+            [
+                'store_id' => $config["store_id"] 
+            ]
+            );
+
+            if($field && $category){
+                return ["category_id" => $category->id, 'field_id' => $field->id];
+            }
+
+            return false;
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 
     // API CONTROLLER FOR PRODUCTS
     public function getProductApi($exact,$param,$storeId)

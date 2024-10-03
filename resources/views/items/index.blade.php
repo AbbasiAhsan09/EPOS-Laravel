@@ -129,7 +129,7 @@
                         </div>
                     </div> --}}
                     <div class="col-lg-6">
-                        @livewire('field-category', ['selectedCategory' => $item->category])
+                        @livewire('field-category', ['selectedCategory' => $item->category, 'required' => false])
                     </div>
                     
                <div class="col-lg-6">
@@ -279,7 +279,7 @@
                     <div class="col-lg-6">
                         <label for="">Name *</label>
                         <div class="input-group input-group-outline">
-                            <input type="text" class="form-control" value="{{old('product')}}" name="product" required >
+                            <input type="text" class="form-control" value="{{old('product')}}" id="product_name" name="product" required >
                         </div>
                     </div>
                     {{-- <div class="col-lg-6">
@@ -301,7 +301,7 @@
                             <div class="col-lg-6">
                                 <label for="">Code *</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" name="code" value="{{old('code')}}" required>
+                                    <input type="text" class="form-control" name="code" id="product_code" value="{{old('code')}}" required>
                                 </div>
                             </div>
                             
@@ -340,7 +340,7 @@
                             <div class="col-lg-4">
                                 <label for="">TAX % *</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="number" step="0.01" class="form-control" name="tax"  required value="{{old('tax') ? old('tax'): 17 }}" min="0">
+                                    <input type="number" step="0.01" class="form-control" name="tax"  required value="{{old('tax') ? old('tax'): 0 }}" min="0">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -506,6 +506,32 @@ $(".imageUpload").change(function() {
     }
 });
 
+
+
+function generateCode(text) {
+        // Extract initials from the text
+        let initials = text
+            .split(' ')             // Split the text by spaces
+            .map(word => word[0])    // Get the first letter of each word
+            .join('')                // Join them to form initials
+            .toUpperCase();           // Convert initials to uppercase
+
+        // Generate a random 3-digit number
+        let randomNumber = Math.floor(100 + Math.random() * 900); // Generates number between 100 and 999
+
+        // Combine initials with random number
+        return initials + randomNumber;
+    }
+
+
+    $("#product_name").on("input", function(){
+        let text = $(this).val();
+
+        if(text.trim()){
+            $("#product_code").val(generateCode(text));
+        }
+
+    });
 
       </script>
 
