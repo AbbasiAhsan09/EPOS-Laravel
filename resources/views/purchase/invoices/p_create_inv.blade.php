@@ -106,7 +106,7 @@
                                     <th>Bags</th>
                                     <th>TP</th>
                                     <th>MRP</th>
-                                    <th>Qty</th>
+                                    <th>Weight</th>
                                     <th>Tax</th>
                                     <th>Total</th>
                                 </thead>
@@ -218,7 +218,7 @@
                                     </h4>
                                     <div class="input-group input-group-outline">
                                         <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" 
-                                        onkeypress="validationForSubmit()"  value="{{isset($order) ? $order->shipping_cost : 0}}">
+                                        onkeypress="validationForSubmit()"  value="{{isset($order) ? $order->others : 0}}">
                                     </div>
                                 </div>
                                 <div class="col-lg-3">

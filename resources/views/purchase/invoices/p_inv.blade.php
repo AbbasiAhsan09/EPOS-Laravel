@@ -63,7 +63,7 @@
                     <td>{{$item->party->party_name}}</td>
                     <td>{{ConfigHelper::getStoreConfig()["symbol"].' '.$item->total}}</td>
                     <td class="text-primary">
-                      <b>  {{ConfigHelper::getStoreConfig()["symbol"].' '.($item->total - $item->discount) + $item->other_charges }}</b>
+                      <b>  {{ConfigHelper::getStoreConfig()["symbol"].' '.($item->net_amount ?? 0)}}</b>
                     </td>
                     <td>{{$item->created_by_user->name}}</td>
                     <td>{{date('d.m.y | h:m A' , strtotime($item->created_at))}}</td>

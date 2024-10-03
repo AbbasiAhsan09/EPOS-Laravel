@@ -116,6 +116,7 @@ class PurchaseInvoiceController extends Controller
                 $discount =  $request->discount;
             }
 
+            // dd((($request->gross_total + $request->other_charges) - ($discount)));
             $invoice->others = $request->other_charges;
             $invoice->tax = 0;
             $invoice->shipping = 0;
@@ -167,8 +168,8 @@ class PurchaseInvoiceController extends Controller
                         $detail->mrp = $request->mrp[$i];
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];
-                        $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
-                        $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
+                        $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : 0;
+                        $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : 0;
                         $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                         $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                         $detail->save();
@@ -432,8 +433,8 @@ class PurchaseInvoiceController extends Controller
                             $detail->mrp = $request->mrp[$i];
                             $detail->qty = $request->qty[$i];
                             $detail->tax = $request->tax[$i];
-                            $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
-                            $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
+                            $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : 0;
+                            $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : 0;
                            
                             $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                             $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);

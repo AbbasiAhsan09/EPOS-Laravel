@@ -38,7 +38,7 @@
                                     <th>Bags</th>
                                     <th>TP</th>
                                     <th>MRP</th>
-                                    <th>Qty</th>
+                                    <th>Weight</th>
                                     <th>Tax</th>
                                     <th>Total</th>
                                 </thead>
@@ -283,10 +283,10 @@
                             </div>
                             <hr>
                             <h4 class="order_section_sub_title">
-                                Bardana Charges:
+                                Bardana Charges: 
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" onkeypress="validationForSubmit()"  value="{{$invoice->other_charges  ?? 0}}">
+                                <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" onkeypress="validationForSubmit()"  value="{{$invoice->others  ?? 0}}">
                             </div>
 
                             <hr>

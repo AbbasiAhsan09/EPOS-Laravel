@@ -145,7 +145,7 @@
                                         <th>Bag Size</th>
                                         <th>Bags</th>
                                         <th>Rate</th>
-                                        <th>Qty</th>
+                                        <th>Weight</th>
                                         <th>Tax</th>
                                         <th>Total</th>
                                     </thead>
