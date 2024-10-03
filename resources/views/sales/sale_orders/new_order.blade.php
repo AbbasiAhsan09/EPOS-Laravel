@@ -350,6 +350,39 @@
                       
                        {{-- Payment Methods --}}
                            </div>
+                          
+                           <div class="col-lg-3">
+                            <h4 class="order_section_sub_title">
+                                Broker Name:
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="broker" id="broker" class="form-control" required value="{{$isEditMode ? $order->broker : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
+                           <div class="col-lg-3">
+                            <h4 class="order_section_sub_title">
+                                Condition:
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="condition" id="condition" class="form-control" required value="{{$isEditMode ? $order->condition : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
+                           <div class="col-lg-3">
+                            <h4 class="order_section_sub_title">
+                                Gate Pass No.
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="gp_no" id="gp_no" class="form-control" required value="{{$isEditMode ? $order->gp_no : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
+                           <div class="col-lg-2">
+                            <h4 class="order_section_sub_title">
+                                Truck No.
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="truck_no" id="truck_no" class="form-control" required value="{{$isEditMode ? $order->truck_no : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
                            <div class="col-lg">
                             <h4 class="order_section_sub_title">
                                 Print Invoice

@@ -126,6 +126,10 @@ class SalesController extends Controller
                 $order->tran_no = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(Sales::latest()->first()->id) ? (Sales::max("id") + 1) : 1);
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
+                $order->gp_no = $request->gp_no;
+                $order->condition = $request->condition;
+                $order->truck_no = $request->truck_no;
+                $order->broker = $request->broker;
                 $order->other_charges = $request->other_charges;
                 $order->recieved = ($request->has('recieved') ? $request->recieved : 0); 
                 $order->payment_method = $request->has('payment_method') ? $request->payment_method : 'cash';
@@ -560,6 +564,10 @@ class SalesController extends Controller
                 }
                 $order->user_id = Auth::user()->id;
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
+                $order->gp_no = $request->gp_no;
+                $order->condition = $request->condition;
+                $order->truck_no = $request->truck_no;
+                $order->broker = $request->broker;
                 $order->save();
 
                    // Dynamic Fields Storing

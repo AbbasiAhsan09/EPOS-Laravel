@@ -16,7 +16,7 @@
 }
 
 .receipt-content .invoice-wrapper .payment-details span {
-  color: #A9B0BB;
+  color: #000000;
   display: block; 
 }
 .receipt-content .invoice-wrapper .payment-details a {
@@ -80,12 +80,12 @@
 }
 
 .receipt-content .invoice-wrapper .payment-info span {
-  color: #A9B0BB; 
+  color: #000000; 
 }
 
 .receipt-content .invoice-wrapper .payment-info strong {
   display: block;
-  color: #444;
+  color: #000000;
   margin-top: 3px; 
 }
 
@@ -111,7 +111,7 @@
   margin-top: 40px; 
 }
 .receipt-content .invoice-wrapper .line-items .headers {
-  color: #A9B0BB;
+  color: #000000;
   font-size: 13px;
   letter-spacing: .3px;
   border-bottom: 2px solid #EBECEE;
@@ -119,7 +119,7 @@
 }
 .receipt-content .invoice-wrapper .line-items .items {
   margin-top: 8px;
-  border-bottom: 2px solid #EBECEE;
+  border-bottom: 2px solid #000000;
   padding-bottom: 8px; 
 }
 .receipt-content .invoice-wrapper .line-items .items .item {
@@ -133,7 +133,7 @@
 }
 .receipt-content .invoice-wrapper .line-items .items .item .amount {
   letter-spacing: 0.1px;
-  color: #84868A;
+  color: #000000;
   font-size: 16px;
  }
 @media (max-width: 767px) {
@@ -150,7 +150,7 @@
   width: 40%;
   text-align: left;
   font-size: 13px;
-  color: #7A7A7A;
+  color: #000000;
   line-height: 20px; 
 }
 
@@ -164,23 +164,25 @@
 .receipt-content .invoice-wrapper .line-items .total .extra-notes strong {
   display: block;
   margin-bottom: 5px;
-  color: #454545; 
+  color: #000000; 
 }
 
 .receipt-content .invoice-wrapper .line-items .total .field {
   margin-bottom: 7px;
+  font-weight: 700;
   font-size: 14px;
-  color: #555; 
+  color: #000000; 
 }
 
 .receipt-content .invoice-wrapper .line-items .total .field.grand-total {
   margin-top: 10px;
   font-size: 16px;
-  font-weight: 500; 
+  font-weight: 700; 
 }
 
 .receipt-content .invoice-wrapper .line-items .total .field.grand-total span {
-  color: #20A720;
+  color: #000000;
+  font-weight: 700;
   font-size: 16px; 
 }
 
@@ -188,7 +190,8 @@
   display: inline-block;
   margin-left: 20px;
   min-width: 85px;
-  color: #84868A;
+  color: #000000;
+  font-weight: 700;
   font-size: 15px; 
 }
 
@@ -260,12 +263,12 @@
 						@if (isset($config) && $config->logo)
 									<img src="{{asset("images/logo/$config->logo")}}"  alt="Not Available" style="margin-top : 20px" width="120px" class="inv_logo">
 									@else
-										{{isset($config) ? $config->app_title : 'Demo'}}
+										<h2 style="text-transform: uppercase">{{isset($config) ? $config->app_title : 'Demo'}}</h2>
 									@endif
 					</div>
 
 					<div class="payment-info">
-						<div class="row">
+						{{-- <div class="row">
 							<div class="col-sm-4">
 								<span>Order No.</span>
 								<strong>{{$order->tran_no ?? ""}}</strong>
@@ -279,33 +282,58 @@
 								<span>Printed On:</span>
 								<strong>{{date('D, d M Y', time())}}</strong>
 							</div>
-						</div>
+						</div> --}}
 					</div>
 
 					<div class="payment-details">
 						<div class="row">
 							<div class="col-sm-6">
-								<span>Buyer's Details</span>
-								<strong>
-									{{isset($order->customer ) ? $order->customer->business_name : '' }}
+								<span><strong>Party Details</strong></span>
+								@if (isset($order->customer->business_name) && $order->customer->business_name)
+                <strong>
+									Business Name : {{isset($order->customer ) ? $order->customer->business_name : '' }}
 								</strong>
+                @endif
 								<p>
-									{{isset($order->customer ) ? $order->customer->party_name : 'Cash' }} <br>
-									{{isset($order->customer ) ? $order->customer->phone : '' }}  <br>
-									{{isset($order->customer ) ? $order->customer->location : '' }}  <br>
-									<a href="#">
-                                        {{isset($order->customer ) ? $order->customer->email : '' }}
-									</a>
+                  @if (isset($order->customer ))
+                  <strong>Party Name: {{$order->customer->party_name}}</strong> <br>
+                  @if ($order->customer->phone)
+                    {{$order->customer->phone}}                      
+                  @endif
+                  @if ($order->customer->location)
+                      {{$order->customer->location}}
+                  @endif
+                  @if ($order->customer->email)
+                      {{$order->customer->email}}
+                  @endif
+                  @else
+                  Cash
+                  @endif
+
+                  @if (isset($order->broker) && $order->broker)
+                      <b>Broker :</b> {{$order->broker}} <br>
+                  @endif
+
+                  @if (isset($order->condition) && $order->condition)
+                  <b>Condition :</b> {{$order->condition}}
+                  @endif
+									
 								</p>
 							</div>
 							<div class="col-sm-6 text-right">
-								<span>Payment To</span>
-								<strong>
-									{{$config->app_title ?? ""}}
-								</strong>
-								<p>
-									{{$config->address ?? ""}} <br>
-									{{$config->phone ?? ""}} <br>
+								{{-- <span>Payment To</span> --}}
+							
+									<strong>Bill No. {{$order->tran_no ?? ""}}</strong>
+                  
+                  <p>
+									<strong>Date : {{$order->bill_date !== null ? date('D, d M Y',strtotime($order->bill_date )) :date('D, d M Y', strtotime($order->created_at))}}</strong> <br>
+									@if (isset($order->gp_no) && $order->gp_no)
+                      Gate Pass : {{$order->gp_no}} <br>
+                  @endif
+                  @if (isset($order->truck_no) && $order->truck_no)
+                      Truck No. {{$order->truck_no}} <br>
+                  @endif
+								
 								</p>
 							</div>
 						</div>
@@ -320,12 +348,12 @@
                                     {{-- <th>Field</th>
                                     <th>Category</th> --}}
                                     <th>Description</th>
-                                    <th>Bag Size</th>
-                                    <th>Bags</th>
+                                    <th>Bag Pack.</th>
+                                    <th>Qty</th>
+                                    {{-- <th>Tax</th> --}}
+                                    {{-- <th>Disc.</th> --}}
+                                    <th>Weight.</th>
                                     <th>Rate</th>
-                                    <th>Tax</th>
-                                    <th>Disc.</th>
-                                    <th>Qty.</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
@@ -338,10 +366,10 @@
                                 <td>{{$item->item_details->name ?? ''}}</td>
                                 <td>{{$item->bag_size ?? '-'}}</td>
                                 <td>{{$item->bags ?? '-'}}</td>
-                                <td>{{$item->rate}}</td>
-                                <td>{{$item->tax}}</td>
-                                <td>{{$item->disc}}</td>
+                                {{-- <td>{{$item->tax}}</td> --}}
+                                {{-- <td>{{$item->disc}}</td> --}}
                                 <td>{{$item->qty}}</td>
+                                <td>{{$item->rate}}</td>
                                 <td>{{$item->total}}</td>
                             </tr>
                               @endforeach
@@ -388,7 +416,7 @@
 							</div>
                             @endif
 							<div class="field grand-total">
-								Total <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->net_total)}}</span>
+								Net Total. <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->net_total)}}</span>
 							</div>
 
               @if (!ConfigHelper::getStoreConfig()["use_accounting_module"])
