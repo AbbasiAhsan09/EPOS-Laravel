@@ -201,7 +201,7 @@
                     <div class="col-lg-6">
                         <label class="form-label">Opening Inventory </label>
                         <div class="input-group input-group-outline">
-                        <input type="number" class="form-control" name="opening_stock" required value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                        <input type="number" class="form-control" step="0.01" name="opening_stock" required value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>
@@ -367,7 +367,7 @@
                             <div class="col-lg-6">
                                 <label class="form-label">Opening Inventory </label>
                                 <div class="input-group input-group-outline">
-                                <input type="number" class="form-control" name="opening_stock" required value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                <input type="number" class="form-control" step="0.01" name="opening_stock" required value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                                   </div>
                               
                             </div>
