@@ -45,8 +45,12 @@
                 <div class="input-group input-group-outline">  
                     <select name="account_id[]" id="" class=" account_selection  form-control " required>
                         <option value="">Select Account</option>
-                        @foreach ($accounts as $account)
-                            <option value="{{$account->id}}">{{$account->title}} {{$account->reference_type ? '('.ucfirst($account->reference_type).')' : '' }}</option>
+                        @foreach ($accounts as $key => $accountList)
+                            <optgroup   label="{{ucfirst($key)}}">
+                        @foreach ($accountList as $account)
+                        <option value="{{$account->id}}">{{$account->title}} {{$account->reference_type ? '('.ucfirst($account->reference_type).')' : '' }}</option>
+                        @endforeach
+                    </optgroup>
                         @endforeach
                     </select>
                 </div>  
@@ -71,8 +75,12 @@
                 <div class="input-group input-group-outline">  
                     <select name="source_account[]" id="" class=" account_selection  form-control " >
                         <option value="">Select Account</option>
-                        @foreach ($accounts as $account)
-                            <option value="{{$account->id}}">{{$account->title}} {{$account->reference_type ? '('.ucfirst($account->reference_type).')' : '' }}</option>
+                        @foreach ($accounts as $key => $accountList)
+                            <optgroup   label="{{ucfirst($key)}}">
+                        @foreach ($accountList as $account)
+                        <option value="{{$account->id}}">{{$account->title}} {{$account->reference_type ? '('.ucfirst($account->reference_type).')' : '' }}</option>
+                        @endforeach
+                    </optgroup>
                         @endforeach
                     </select>
                 </div> 

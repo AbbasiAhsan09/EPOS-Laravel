@@ -33,9 +33,14 @@
                         <div class="input-group input-group-outline">
                           <select name="account_id" id="" class="form-control">
                             <option value="">All</option>
-                            @foreach ($accounts as $account)
-                            <option value="{{$account->id}}" {{ (session('j_entry_account_id')) && (session('j_entry_account_id')) == $account->id ? 'selected' : ''  }}>{{$account->title}}</option>
+                            @foreach ($accounts as $key => $accountList)
+                                <optgroup label="{{ucfirst($key)}}">
+                                  @foreach ($accountList as $account)
+                                  <option value="{{$account->id}}" {{ (session('j_entry_account_id')) && (session('j_entry_account_id')) == $account->id ? 'selected' : ''  }}>{{$account->title}}</option>
+                                  @endforeach
+                                </optgroup>
                             @endforeach
+                            
                           </select>
                         </div>
                       </div>
@@ -69,6 +74,7 @@
         <thead>
             <th>ID</th>
             <th>Date</th>
+            <th>Head</th>
             <th>Account</th>
             <th>Description</th>
             <th>Debit</th>
@@ -81,6 +87,7 @@
             {{-- @dd($item) --}}
             <td>{{$item->id}}</td>
             <td>{{$item->transaction_date ?? ""}}</td>
+            <td>{{$item->account->parent->title ?? $item->account->title}}</td>
             <td>{{ $item->account->title ?? ""}}</td>
             <td>{{$item->note ?? ""}}</td>
             <td><strong>{{$item->debit ?? 0}}</strong></td>

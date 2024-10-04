@@ -1,11 +1,18 @@
 
 
+@php
+    $config = ConfigHelper::getStoreConfig();
+@endphp
 
-
-
-<h2>Trial Balance ({{\Carbon\Carbon::now()}})</h2>
+{{ (isset($config) && $config['app_title']) ? $config['app_title'] : 'Demo' }} <br>
+<small>{{date("d-m-Y", time())}}</small>
+<div class="custom-box" style="margin-bottom: 10px">
+    <h2>Financial Report </h2>
+   
+</div>
 @foreach ($data as $key => $item)
-{{-- <hr style="background: gray"> --}}
+<div class="custom-box">
+    {{-- <hr style="background: gray"> --}}
 <h5 class="title">{{ucfirst($key)}}</h5>
 
 {{-- Head Loop --}}
@@ -28,7 +35,7 @@
                 <td style="border: solid 2px"> {{$child["sum"]["total_credit"]}}</td>
                 <td style="border: solid 2px"> {{$child["sum"]["total_debit"]}}</td>
                 <td>
-                    @if (in_array($child["type"], ['expenses', 'assets']))
+                    @if (in_array($child["type"], ['expenses', 'assets','drawings']))
                         {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($child['sum']["total_debit"] - $child['sum']["total_credit"]) < 0 ? '('.abs($child['sum']["total_debit"] - $child['sum']["total_credit"]).')' : $child['sum']["total_debit"] - $child['sum']["total_credit"] }}
                     @else
                     {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($child['sum']["total_credit"] - $child['sum']["total_debit"]) < 0 ? '('.abs($child['sum']["total_credit"] - $child['sum']["total_debit"]).')' : $child['sum']["total_credit"] - $child['sum']["total_debit"] }}
@@ -45,7 +52,7 @@
         <th>{{ConfigHelper::getStoreConfig()["symbol"]}} {{($head["total_credit"])}}</th>
         <th>{{ConfigHelper::getStoreConfig()["symbol"]}} {{($head["total_debit"])}}</th>
         <th>
-        @if (in_array($head["type"], ['expenses', 'assets']))
+        @if (in_array($head["type"], ['expenses', 'assets','drawings']))
         {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($head["total_debit"] - $head["total_credit"]) < 0 ? '('.abs($head["total_debit"] - $head["total_credit"]).')' : $head["total_debit"] - $head["total_credit"] }}
         @else
         {{ConfigHelper::getStoreConfig()["symbol"]}} {{ ($head["total_credit"] - $head["total_debit"]) < 0 ? '('.abs($head["total_credit"] - $head["total_debit"]).')' : $head["total_credit"] - $head["total_debit"] }}
@@ -56,6 +63,7 @@
 <hr style="background: gray">
     {{-- @dump($head) --}}
 @endforeach
+</div>
 
 {{-- End head loop --}}
 @endforeach
@@ -67,9 +75,23 @@
     table, th, td {
   border: 1px solid gray;
   border-collapse: collapse;
+  font-size: 12px;
 }
 
     .dates{
         float: right
     }
+
+    .custom-box{
+border : solid 1px gray;
+
+background: #fbfbfb;
+}
+.custom-box > h2, .custom-box > h3, .custom-box > h4, .custom-box > h5{
+    text-align: center;
+    text-transform: capitalize;
+    background: rgb(55, 55, 55);
+    color: white;
+    margin:0  
+}
 </style>
