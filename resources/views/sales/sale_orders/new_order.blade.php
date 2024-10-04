@@ -356,7 +356,7 @@
                                 Broker Name:
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="text" name="broker" id="broker" class="form-control" required value="{{$isEditMode ? $order->broker : ''}}" min="0" onkeypress="validationForSubmit()" >
+                                <input type="text" name="broker" id="broker" class="form-control"  value="{{$isEditMode ? $order->broker : ''}}" min="0" onkeypress="validationForSubmit()" >
                             </div>
                            </div>
                            <div class="col-lg-3">
@@ -364,7 +364,7 @@
                                 Condition:
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="text" name="condition" id="condition" class="form-control" required value="{{$isEditMode ? $order->condition : ''}}" min="0" onkeypress="validationForSubmit()" >
+                                <input type="text" name="condition" id="condition" class="form-control"  value="{{$isEditMode ? $order->condition : ''}}" min="0" onkeypress="validationForSubmit()" >
                             </div>
                            </div>
                            <div class="col-lg-3">
@@ -372,7 +372,7 @@
                                 Gate Pass No.
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="text" name="gp_no" id="gp_no" class="form-control" required value="{{$isEditMode ? $order->gp_no : ''}}" min="0" onkeypress="validationForSubmit()" >
+                                <input type="text" name="gp_no" id="gp_no" class="form-control"  value="{{$isEditMode ? $order->gp_no : ''}}" min="0" onkeypress="validationForSubmit()" >
                             </div>
                            </div>
                            <div class="col-lg-2">
@@ -380,7 +380,7 @@
                                 Truck No.
                             </h4>
                             <div class="input-group input-group-outline">
-                                <input type="text" name="truck_no" id="truck_no" class="form-control" required value="{{$isEditMode ? $order->truck_no : ''}}" min="0" onkeypress="validationForSubmit()" >
+                                <input type="text" name="truck_no" id="truck_no" class="form-control"  value="{{$isEditMode ? $order->truck_no : ''}}" min="0" onkeypress="validationForSubmit()" >
                             </div>
                            </div>
                            <div class="col-lg">

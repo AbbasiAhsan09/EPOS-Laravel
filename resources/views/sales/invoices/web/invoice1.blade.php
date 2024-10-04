@@ -265,6 +265,8 @@
 									@else
 										<h2 style="text-transform: uppercase">{{isset($config) ? $config->app_title : 'Demo'}}</h2>
 									@endif
+                  <br> <br>
+                  <strong style="text-transform: uppercase">{{isset($config) ? $config->app_title : 'Demo'}}</strong>
 					</div>
 
 					<div class="payment-info">
@@ -288,15 +290,15 @@
 					<div class="payment-details">
 						<div class="row">
 							<div class="col-sm-6">
-								<span><strong>Party Details</strong></span>
+								{{-- <span><strong>Party Details</strong></span> --}}
 								@if (isset($order->customer->business_name) && $order->customer->business_name)
-                <strong>
+                <strong style="font-size: 20px">
 									Business Name : {{isset($order->customer ) ? $order->customer->business_name : '' }}
 								</strong>
                 @endif
 								<p>
                   @if (isset($order->customer ))
-                  <strong>Party Name: {{$order->customer->party_name}}</strong> <br>
+                  <strong style="font-size: 20px">Party Name: {{$order->customer->party_name}}</strong> <br>
                   @if ($order->customer->phone)
                     {{$order->customer->phone}}                      
                   @endif
@@ -307,7 +309,7 @@
                       {{$order->customer->email}}
                   @endif
                   @else
-                  Cash
+                  <strong style="font-size: 20px">Party : Cash</strong> <br>
                   @endif
 
                   @if (isset($order->broker) && $order->broker)
@@ -436,7 +438,7 @@
                   <p style="text-align: center"> {{$config->invoice_message ?? ""}} </p>                  
               </td>
 						</div>
-                        <div class="footer">
+                        <div class="footer" style="color: black; font-weight: 700">
                             The Software is Developed by TradeWisePOS | +92 320 0681969
                         </div>
 					</div>
