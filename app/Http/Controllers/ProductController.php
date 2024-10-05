@@ -58,15 +58,15 @@ class ProductController extends Controller
                 $product->barcode = $request->code;
                 $product->uom = $request->uom;
                 $product->category = $request->has("category") && !empty($request->category) ? $request->category : $this->get_common_field_category_ids()["category_id"];
-                $product->mrp = $request->mrp;
-                $product->low_stock = $request->low_stock;
-                $product->tp = $request->tp;
-                $product->taxes = $request->tax;
-                $product->store_id = 1;
+                $product->mrp = (int)$request->mrp ?? 0;
+                $product->low_stock = (int)$request->low_stock ?? 0;
+                $product->tp = (int)$request->tp ?? 0;
+                $product->taxes = (int)$request->tax ?? 0;
+                $product->store_id = Auth::user()->store_id;
                 $product->img = $request->img;
                 $product->brand = $request->brand;
                 $product->description = $request->description;
-                $product->opening_stock = $request->opening_stock;
+                $product->opening_stock = (int)$request->opening_stock ?? 0;
                 $product->check_inv = isset($request->check_inv) && $request->check_inv ? true : false;
                 // Product IMage Logic
                 if ($request->hasFile('image')) {
@@ -130,16 +130,16 @@ class ProductController extends Controller
         try {
      
             $product =  Products::find($id);
-            $oldQty = $product->opening_stock;
+            $oldQty = (int)$product->opening_stock ?? 0;
             $product->name = $request->product;
             $product->barcode = $request->code;
             $product->uom = $request->uom;
             $product->category = $request->has("category") && !empty($request->category) ? $request->category : $this->get_common_field_category_ids()["category_id"];
-            $product->mrp = $request->mrp;
-            $product->low_stock = $request->low_stock;
-            $product->opening_stock = $request->opening_stock;
-            $product->tp = $request->tp;
-            $product->taxes = $request->tax;
+            $product->mrp = (int)$request->mrp ?? 0;
+            $product->low_stock = (int)$request->low_stock ?? 0;
+            $product->opening_stock = !empty($request->opening_stock) ? $request->opening_stock : 0;
+            $product->tp = (int)$request->tp ?? 0;
+            $product->taxes = (int)$request->tax ?? 0;
             $product->check_inv = isset($request->check_inv) && $request->check_inv ? true : false;
             // $product->store_id = 1;
             // Product IMage Logic
@@ -159,7 +159,7 @@ class ProductController extends Controller
             $product->save();
 
             if($product){
-                $newQty = $product->opening_stock;
+                $newQty = ((int)($product->opening_stock)) ? (int)($product->opening_stock) : 0;
                 $diffQty = $newQty - $oldQty;
                 $uom = MOU::find($request->uom);
                 $inventory = Inventory::firstOrCreate([
@@ -205,7 +205,7 @@ class ProductController extends Controller
             }
 
             $field = Fields::firstOrCreate([
-                'name' => $config["app_title"] ?? "Common",
+                'name' => "General",
             ],
             [
                 'store_id' => $config["store_id"] 
@@ -213,7 +213,7 @@ class ProductController extends Controller
             );
 
             $category = ProductCategory::firstOrCreate([
-                'category' => $config["app_title"] ?? "Common",
+                'category' => "General",
                 'parent_cat' => $field->id,
             ],
             [

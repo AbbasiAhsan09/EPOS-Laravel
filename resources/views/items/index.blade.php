@@ -143,12 +143,12 @@
                     </div>
 
                       <div class="col-lg-6">
-                        <label for="">Brand *</label>
+                        <label for="">Brand </label>
                         <div class="input-group input-group-outline">
-                            <input type="text" class="form-control" name="brand" required value="{{$item->brand}}">
+                            <input type="text" class="form-control" name="brand"  value="{{$item->brand}}">
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    {{-- <div class="col-lg-6">
                         <label for="">Arrtribute *</label>
                         <div class="input-group input-group-outline">
 
@@ -159,9 +159,9 @@
                             @endforeach
                         </select>
                     </div>
-                    </div>
+                    </div> --}}
                     <div class="col-lg-6">
-                        <label for="">UOM *</label>
+                        <label for="">UOM </label>
                         <div class="input-group input-group-outline">
                             
                         <select name="uom" id="" class="form-control" {{Auth::user()->role_id != 1 ? 'readonly' : ''}}>
@@ -173,35 +173,35 @@
                         </select>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <label for="">TAX % *</label>
+                    <div class="col-lg-6">
+                        <label for="">TAX % </label>
                         <div class="input-group input-group-outline">
-                            <input type="number" step="0.01" class="form-control" name="tax" required value="{{$item->taxes}}" min="0">
+                            <input type="number" step="0.01" class="form-control" name="tax"  value="{{$item->taxes}}" min="0">
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <label for="">MRP *</label>
+                    <div class="col-lg-6">
+                        <label for=""> Rate </label>
                         <div class="input-group input-group-outline">
-                            <input type="number" step="0.01" class="form-control" name="mrp" value="{{$item->mrp}}" required  min="0">
+                            <input type="number" step="0.01" class="form-control" name="mrp" value="{{$item->mrp}}"   min="0">
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <label for="">Trade Price *</label>
+                    <div class="col-lg-6">
+                        <label for="">Cost </label>
                         <div class="input-group input-group-outline">
-                            <input type="number" step="0.01" class="form-control" name="tp" value="{{$item->tp}}" required  min="0">
+                            <input type="number" step="0.01" class="form-control" name="tp" value="{{$item->tp}}"   min="0">
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <label class="form-label">Low Stock Alert </label>
                         <div class="input-group input-group-outline">
-                        <input type="number" class="form-control" name="low_stock" required value="{{$item->low_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                        <input type="number" class="form-control" name="low_stock"  value="{{$item->low_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>
                     <div class="col-lg-6">
                         <label class="form-label">Opening Inventory </label>
                         <div class="input-group input-group-outline">
-                        <input type="number" class="form-control" name="opening_stock" required value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                        <input type="number" class="form-control" name="opening_stock"  value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>
@@ -306,14 +306,14 @@
                             </div>
                             
                             <div class="col-lg-6">
-                                <label for="">Brand *</label>
+                                <label for="">Brand </label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" name="brand" value="{{old('brand')}}" required>
+                                    <input type="text" class="form-control" name="brand" value="{{old('brand')}}" >
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
-                                <label for="">Arrtribute *</label>
+                            {{-- <div class="col-lg-6">
+                                <label for="">Arrtribute </label>
                                 <div class="input-group input-group-outline">
         
                                 <select name="arrt" id="" class="form-control" disabled>
@@ -323,7 +323,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            </div>
+                            </div> --}}
                             <div class="col-lg-6">
                                 <label for="">UOM *</label>
                                 <div class="input-group input-group-outline">
@@ -337,37 +337,37 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-4">
-                                <label for="">TAX % *</label>
+                            <div class="col-lg-6">
+                                <label for="">TAX % </label>
                                 <div class="input-group input-group-outline">
-                                    <input type="number" step="0.01" class="form-control" name="tax"  required value="{{old('tax') ? old('tax'): 0 }}" min="0">
+                                    <input type="number" step="0.01" class="form-control" name="tax"   value="{{old('tax') ? old('tax'): 0 }}" min="0">
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <label for="">MRP *</label>
+                            <div class="col-lg-6">
+                                <label for="">Sale Price </label>
                                 <div class="input-group input-group-outline">
-                                    <input type="number" step="0.01" class="form-control" name="mrp" value="{{old('mrp') ? old('mrp') : 0}}" required  min="0">
+                                    <input type="number" step="0.01" class="form-control" name="mrp" value="{{old('mrp') ? old('mrp') : 0}}"   min="0">
                                 </div>
                             </div>
 
-                            <div class="col-lg-4">
-                                <label for="">Trade Price *</label>
+                            <div class="col-lg-6">
+                                <label for="">Cost *</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="number" step="0.01" class="form-control" name="tp" value="{{old('tp') ? old('tp') : 0}}" required  min="0">
+                                    <input type="number" step="0.01" class="form-control" name="tp" value="{{old('tp') ? old('tp') : 0}}"   min="0">
                                 </div>
                             </div>
 
                             <div class="col-lg-6">
                                 <label class="form-label">Low Stock Alert </label>
                                 <div class="input-group input-group-outline">
-                                <input type="number" class="form-control" name="low_stock" required value="{{old('low_stock') ? old('low_stock') : 20}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                <input type="number" class="form-control" name="low_stock"  value="{{old('low_stock') ? old('low_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                                   </div>
                               
                             </div>
                             <div class="col-lg-6">
                                 <label class="form-label">Opening Inventory </label>
                                 <div class="input-group input-group-outline">
-                                <input type="number" class="form-control" name="opening_stock" required value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                <input type="number" class="form-control" name="opening_stock"  value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                                   </div>
                               
                             </div>
@@ -424,9 +424,9 @@
                     <div class="col-lg-3">
                         <div class="mt-3 d-flex">
                         
-                            <label for="checkInventroyAdd" class="mb-0">Check Inventory </label>
+                            <label for="checkInventroyAdd" class="mb-0">Stock Item </label>
                             <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
-                                <input type="checkbox" id="checkInventroyAdd" class="form-check-input"  name="check_inv" 
+                                <input type="checkbox" id="checkInventroyAdd" class="form-check-input" checked name="check_inv" 
                                 value="1" > 
                             </div>
                         </div>
