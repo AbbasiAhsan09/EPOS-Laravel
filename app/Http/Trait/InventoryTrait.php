@@ -29,10 +29,10 @@ trait InventoryTrait
         //Check Inventory Available 
         public function checkAvaialableInventory($item, $is_base_unit = 0)
         {
-            $findProduct = Products::find($item);
-            if($findProduct->check_inv){
-                return true;
-            }
+            // $findProduct = Products::find($item);
+            // if(!$findProduct->check_inv){
+            //     return true;
+            // }
 
             $product = Inventory::where('item_id', $item)->where( 'is_opnening_stock', 0)->first();
             if($product){

@@ -893,7 +893,7 @@ class AccountController extends Controller
                 $head_credit_debit = $this->get_credit_debit_sum(["account_id" => $head->id]);
                 $item = [];
                 $item["account_id"] = $head->id;
-                $item["parent_account"] = $head->parent->title;
+                $item["parent_account"] = $head->parent->title ?? '';
                 $item["title"] = $head->title;
                 $item["type"] = $head->type;
                 $item["parent"] = true;

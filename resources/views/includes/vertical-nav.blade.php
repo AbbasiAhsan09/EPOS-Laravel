@@ -29,8 +29,20 @@
                 <li class="submenu-item"><a href="/account">Accounts</a></li>
                 <li class="submenu-item"><a href="/account/journal">New Transactions</a></li>
                 <li class="submenu-item"><a href="/account/transactions">Transaction</a></li>
-                <li class="submenu-item"><a href="/account/report/trial-balance">Balance Sheet</a></li>
-                <li class="submenu-item"><a href="/account/report/general-ledger">Ledger</a></li>
+                <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
+                <li class="submenu-item"><a href="/account/report/general-ledger">Ledger Report</a></li>
+            </ul>
+        </li>
+
+        <li class="menu-item">Reporting
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/reports/inventory-report">Inventory Balance Report</a></li>
+                <li class="submenu-item"><a href="/reports/sales-report">Sale Report</a></li>
+                <li class="submenu-item"><a href="/reports/sales-detail-report">Sale Detail Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
+                <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
+                <li class="submenu-item"><a href="/account/report/general-ledger">Ledger Report</a></li>
             </ul>
         </li>
 
@@ -39,17 +51,17 @@
             <a href="/parties">Parties</a>
         </li>
 
-        <li class="menu-item">Products
+        <li class="menu-item"> <a href="/products">Products</a>
             <ul class="submenu">
-                <li class="submenu-item"><a href="/uom">UOM</a></li>
-                <li class="submenu-item"><a href="/fields">Fields</a></li>
-                <li class="submenu-item"><a href="/product-category">Categories</a></li>
                 <li class="submenu-item"><a href="/products">Products</a></li>
+                <li class="submenu-item"><a href="/fields">Categories</a></li>
+                <li class="submenu-item"><a href="/product-category">Sub Categories</a></li>
+                <li class="submenu-item"><a href="/uom">UOM</a></li>
             </ul>
         </li>
 
         <li class="menu-item"><a href="/system/configurations">Settings</a></li>
-        <li class="menu-item"><a href="{{route('auth.logout')}}">Logout</a></li>
+        <li class="menu-item bg-logout"><a href="{{route('auth.logout')}}">Logout</a></li>
         <li class="menu-item">
             <a class="" target="_blank" href="https://wa.me/03200681969?text=Hello,%20%0AName:%20{{Auth::check() ? Auth::user()->name : ''}}%0AStore:%20{{Auth::check() && isset(Auth::user()->store)? Auth::user()->store->store_name : ''}}%0AUser%20Role:%20{{Auth::check() && isset(Auth::user()->userroles->role_name) ? Auth::user()->userroles->role_name : ''}}%0AI%20need%20help%20regarding...."  type="button">Need Help?</a>
         </li>
@@ -104,10 +116,10 @@
     color: #9ec200
 }
 
-.menu-item:hover {
+/* .menu-item:hover {
     background-color: #d0d0d0;
     border-color: #8b8b8b;
-}
+} */
 
 .menu-item:active {
     background-color: #c0c0c0;
@@ -140,5 +152,29 @@
 .menu-item:hover .submenu {
     display: block; /* Show submenu on hover */
 }
+
+.menu-item:hover, .menu-active{
+    background: #9ec200;
+    color: white;
+    box-shadow:  0px 0px 20px #8b8b8b
+}
+
+.menu-item:hover > a{
+    color: white
+}
+
+
+.bg-logout{
+    background: red;
+    color: white
+}
+
+.bg-logout >a {
+    color: white
+}
+.bg-logout:hover{
+    background: rgb(216, 44, 44)
+}
+
 
 </style>

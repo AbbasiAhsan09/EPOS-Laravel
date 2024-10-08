@@ -274,15 +274,18 @@ class SalesController extends Controller
                     if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
                         $party = Parties::find($order->customer_id);
                         if($party){
+                        $group_validation = PartiesController::is_customer_group($party->id);
+                        $is_customer = $group_validation["is_customer"];
+                        $is_vendor = $group_validation["is_vendor"];
                            $party_account = Account::firstOrCreate(
                                 [ 
                                     'store_id' => Auth::user()->store_id, // and store_id,
-                                    'reference_type' => 'customer',
+                                    'reference_type' => $is_customer ? 'customer' : 'vendor',
                                     'reference_id' => $party->id,
                                 ],
                                 [
                                     'title' => $party->party_name,
-                                    'type' => 'assets',
+                                    'type' => $is_customer ? 'assets' : 'liabilities',
                                     'description' => 'This account is created by system on creating sale order '.$order->tran_no, // Added description key
                                     'opening_balance' => 0,
                                 ]
@@ -483,7 +486,9 @@ class SalesController extends Controller
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
                 
                 if ($group) {
-                    $customers = Parties::where('group_id', $group->id)->byUser()->get();
+                    $customers = Parties::filterByStore()->with("groups")->get()->groupBy(function ($customer) {
+                        return optional($customer->groups)->group_name;
+                    });
                 } else {
                     $customers = [];
                 }
@@ -711,15 +716,19 @@ class SalesController extends Controller
                         if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
                             $party = Parties::find($order->customer_id);
                             if($party){
-                               $party_account = Account::firstOrCreate(
+                                $group_validation = PartiesController::is_customer_group($party->id);
+                                $is_customer = $group_validation["is_customer"];
+                                $is_vendor = $group_validation["is_vendor"];
+                              
+                                $party_account = Account::firstOrCreate(
                                     [ 
                                         'store_id' => Auth::user()->store_id, // and store_id,
-                                        'reference_type' => 'customer',
+                                        'reference_type' => $is_customer ? 'customer' : 'vendor',
                                         'reference_id' => $party->id,
                                     ],
                                     [
                                         'title' => $party->party_name,
-                                        'type' => 'assets',
+                                        'type' => $is_customer ? 'assets' : 'liabilities',
                                         'description' => 'This account is created by system on creating sale order '.$order->tran_no, // Added description key
                                         'opening_balance' => 0,
                                     ]
@@ -856,7 +865,11 @@ class SalesController extends Controller
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
             $config = Configuration::filterByStore()->first();
             if ($group) {
-                $customers = Parties::where('group_id', $group->id)->filterByStore()->get();
+                // $customers = Parties::filterByStore()->with("groups")->get();
+                $customers = Parties::filterByStore()->with("groups")->get()->groupBy(function ($customer) {
+                    return optional($customer->groups)->group_name;
+                });
+                // dd($customers);
             } else {
                 $customers = [];
             }

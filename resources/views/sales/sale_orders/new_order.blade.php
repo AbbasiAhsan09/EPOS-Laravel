@@ -8,7 +8,6 @@
 @endphp
 @include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/eNhzTjJ2rIE'])
 @include("includes.spinner")
-
     <div class="page-wrapper">
           {{-- Form start --}}
           @if ($isEditMode)
@@ -81,8 +80,15 @@
                                                 <div class="input-group input-group-outline">
                                                     <select name="party_id" class="form-control" id="customer_select" >
                                                         <option value="">Select Customer</option>
-                                                        @foreach ($customers as $party)
-                                                            <option value="{{$party->id}}" {{ $isEditMode  && $order->customer_id ? ($order->customer_id === $party->id ? 'selected' : '') : '' }}>{{$party->party_name}}</option>
+                                                        @foreach ($customers as $group => $parties)
+                                                            <optgroup label="{{ ucfirst($group ?? '') }}">
+                                                                @foreach ($parties as $party)
+                                                                    <option value="{{ $party->id }}" 
+                                                                        {{ $isEditMode && $order->customer_id == $party->id ? 'selected' : '' }}>
+                                                                        {{ $party->party_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </optgroup>
                                                         @endforeach
                                                     </select>
                                                   </div> 

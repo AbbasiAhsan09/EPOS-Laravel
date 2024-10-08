@@ -203,7 +203,7 @@ class PartiesController extends Controller
 
 
 
-    public function is_customer_group(int $group_id) {
+    static function is_customer_group(int $group_id) {
         try {
             $party_group = PartyGroups::find($group_id);
 
