@@ -98,7 +98,7 @@ class AccountController extends Controller
           // Handle opening balance transaction
         if ($account->opening_balance !== null) {
             // Determine whether to debit or credit the opening balance
-             $is_debit =  in_array($account->type, ['expenses', 'assets']);
+             $is_debit =  in_array($account->type, ['expenses', 'assets','drawings']);
              $is_credit =in_array($account->type, ['income', 'equity', 'liabilities']);
             
             $opening_balance_equity_head = $this->get_head_account(['account_number' => 3000]);
@@ -279,9 +279,10 @@ class AccountController extends Controller
 
     function journal() {
 
-        $accounts =  Account::orderBy('title', 'ASC')->where('title','!=','Cash Sales')
+        $accounts =  Account::orderBy('type','ASC')->orderBy('title', 'ASC')->where('title','!=','Cash Sales')
         ->byUser()->filterByStore()->where('coa',false)->get();
-
+        $accounts = $accounts->groupBy("type");
+        // dd($accounts);
         return view('accounts.journal',compact('accounts'));
     }
 
@@ -293,7 +294,7 @@ class AccountController extends Controller
         session()->forget("j_entry_account_id");
 
     $entries = AccountTransaction::where("store_id", Auth::user()->store_id)
-    ->with('account')
+    ->with('account.parent')
     ->orderBy('id', 'ASC');
 
         // Filter by date range
@@ -325,9 +326,10 @@ class AccountController extends Controller
         $entries = $entries->paginate(20);
 
 
-        $accounts =  Account::orderBy('title', 'ASC')
+        $accounts =  Account::orderBy('type','ASC')->orderBy('title', 'ASC')
         ->byUser()->filterByStore()->get();
 
+        $accounts = $accounts->groupBy("type");
         return view('accounts.journal-entries', compact('entries','accounts'));
     }
 
@@ -665,6 +667,9 @@ class AccountController extends Controller
                 'Other Expenses'
             ];
 
+            $drawings_chat_of_accounts = [
+                "Owner's Drawings/Withdrawals"
+            ];
             
 
             // generate asset accounts 
@@ -690,6 +695,11 @@ class AccountController extends Controller
              // generate income accounts 
              foreach ($expenses_chat_of_accounts as $key => $expenses_coa) {
                 AccountController::first_or_create_coa(['title' => $expenses_coa, 'type' => 'expenses']);
+            }
+
+            // generate drawings accounts 
+            foreach ($drawings_chat_of_accounts as $key => $drawings_coa) {
+                AccountController::first_or_create_coa(['title' => $drawings_coa, 'type' => 'drawings']);
             }
 
             $this->generate_heads();
@@ -736,10 +746,14 @@ class AccountController extends Controller
                     'Mortgage Payable',
                 ]
             ],
+            'drawings' => [
+                "Owner's Drawings/Withdrawals" => [
+                    "Owner's Withdrawal",
+                ],
+            ],
             'equity' => [
                 "Owner's Equity"=> [
                     "Owner's Capital",
-                    "Owner's Drawings/Withdrawals"
                 ],
                 'Retained Earnings'=> [
                     'Retained Earnings'
@@ -790,7 +804,7 @@ class AccountController extends Controller
             "Long-Term Loans" => "2500",
             "Mortgage Payable" => "2510",
             "Owner's Capital" => "3000",
-            "Owner's Drawings/Withdrawals" => "3010",
+            "Owner's Withdrawal" => "3010",
             "Retained Earnings" => "3100",
             "Sales Revenue" => "4000",
             "Service Revenue" => "4010",
@@ -869,7 +883,7 @@ class AccountController extends Controller
             
             $pdf = $request->has("pdf");
             $data = [];
-            $heads = Account::where('head_account',true)->with('parent')->orderBy('type','ASC')
+            $heads = Account::where('head_account',true)->with('parent')->orderBy('type','ASC')->orderBy('title', 'ASC')
             // ->with("children.transactions",'parent','transactions')
             ->filterByStore()->get();
 
@@ -921,7 +935,7 @@ class AccountController extends Controller
             
             if($pdf){
                 $data = ["data" => $data->toArray()];
-                $pdf = Pdf::loadView('accounts.reports.pdf.trial-balance', $data)->setPaper('a4', 'landscape');
+                $pdf = Pdf::loadView('accounts.reports.pdf.trial-balance', $data)->setPaper('a4', 'portrait');
                 return $pdf->stream();
             }
             

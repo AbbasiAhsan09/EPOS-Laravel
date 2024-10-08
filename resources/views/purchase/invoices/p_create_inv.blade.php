@@ -279,8 +279,8 @@
                             
                            
                             <hr>
-                            <button class="btn btn-block btn-primary btn-lg" id="saveOrderBtn" style="width: 100%" disabled>Proccedd</button>
-                      
+                            <button class="btn btn-block btn-primary btn-lg" id="saveOrderBtn" style="width: 100%" disabled>Proceed</button>
+                        </form>
                         </div>
                      </div>
  

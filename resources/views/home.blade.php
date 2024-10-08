@@ -53,9 +53,16 @@
       <div class="col-lg-2">
         <a href="/purchase/invoice/0/create" class="btn btn-info w-100 btn-large btn-dashboard">Create Purchase</a>
       </div>
+      
+      @if (ConfigHelper::getStoreConfig()["use_accounting_module"])
       <div class="col-lg-2">
         <a href="/account/journal" class="btn btn-secondary w-100 btn-large btn-dashboard">Transactions</a>
       </div>
+      @else
+      <div class="col-lg-2">
+        <a href="/parties" class="btn btn-secondary w-100 btn-large btn-dashboard">Parties</a>
+      </div>
+      @endif
 
       <div class="col-lg-2">
         <a href="/reports/inventory-report" class="btn btn-warning w-100 btn-large btn-dashboard">Inventory Balance</a>

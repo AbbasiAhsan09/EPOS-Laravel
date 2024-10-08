@@ -43,10 +43,11 @@
             <th>Title</th>
             <th>Description</th>
             <th>Type</th>
-            <th>Opening Balance</th>
-            <th>Balance</th>
-           
+            <th>Opening Balance</th>   
+            @if (!request()->has('head_accounts'))
+                
             <th>Actions</th>
+            @endif  
         </thead>
         <tbody>
            @foreach ($items as $key => $item)
@@ -54,30 +55,18 @@
            <tr>
             <td>{{$item->id}}</td>
             <td>{{$item->title}}</td>
-            <td>{{$item->description}}</td>
+            <td>{{$item->description ?? '-'}}</td>
             <td>{{ucfirst($item->type ?? "")}}</td>
-            <td>{{ $item->opening_balance}}</td>
-            <td>N/A</td>
-            
+            <td>{{ ConfigHelper::getStoreConfig()["symbol"].$item->opening_balance}}</td>
             <td>
               {{-- @if (!$item->reference_type && !$item->reference_id && $item->title !== 'Cash Sales') --}}
+              @if (!request()->has('head_accounts'))
               <div class="s-btn-grp">
                 <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#accountModal{{$item->id}}">
-                    <i class="fa fa-edit"></i>
+                  <i class="fa fa-edit"></i>
                 </button>
-                {{-- <button class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
-                    <i class="fa fa-trash"></i>
-                </button> --}}
-             
               </div>  
-              {{-- @else
-              @if ($item->title === 'Cash Sales')
-              System Defined
-              @else
-              {{ucfirst($item->reference_type)}}
-                  
-              @endif
-              @endif --}}
+                @endif
             </td>
         </tr>
 

@@ -5,7 +5,7 @@
     $generatorPNG = new Picqer\Barcode\BarcodeGeneratorPNG();
 
 @endphp
-<img src="data:image/png;base64,{{ base64_encode($generatorPNG->getBarcode($code, $generatorPNG::TYPE_CODE_128)) }}" width="300px" height="50px">
+<img src="data:image/png;base64,{{ base64_encode($generatorPNG->getBarcode($code, $generatorPNG::TYPE_CODE_128)) }}" width="200px" height="30px">
 {{-- {!! $generator->getBarcode($code, $generator::TYPE_CODE_128) !!} --}}
 <p><small>{{$code}}</small></p>
 @endisset

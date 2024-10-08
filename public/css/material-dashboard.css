@@ -27759,6 +27759,19 @@ pre[class*="language-"] {
     .mid-order-selection{
       min-height: 60vh;
     }
+.custom-box{
+border : solid 1px gray;
+margin : 5px 0;
+background: #fbfbfb;
+padding : 10px ;
+}
+.custom-box > h2, .custom-box > h3, .custom-box > h4, .custom-box > h5{
+  text-align: center;
+  text-transform: capitalize;
+  background: rgb(55, 55, 55);
+  color: white;
+  margin:0  
+}
 /*# sourceMappingURL=dashboard-free.css.map */
 
 

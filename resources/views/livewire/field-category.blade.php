@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col">
         <div class="">
-            <label for="">Field {{$required ? '*' : ''}}</label>
+            <label for="">Category </label>
             <div class="input-group input-group-outline">
                 <select name="field" id="" class="form-control" wire:change="changeField()" wire:model="selectedField">
                 <option value="">Select Field</option>
@@ -14,7 +14,7 @@
     </div>
     <div class="col">
             <div class="">
-                <label for="">Category {{$required ? '*' : ''}}</label>
+                <label for="">Sub Category </label>
                 <div class="input-group input-group-outline">
                     <select name="category" id="" class="form-control">
                     <option value="">Select Category</option>
