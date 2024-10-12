@@ -58,7 +58,7 @@
     </div>
     {{-- <div class="p-5"> --}}
         @foreach ($data as $item)
-        <h5> {{$item->parent->title ? '('.$item->parent->title.') - ' : '' }}  {{ $item->title ?? "" }} ({{ ucfirst($item->type) ?? "" }}) {{$item->reference_type ? ' ('.ucfirst($item->reference_type).')' : ''}}</h5>
+        <h5> {{isset($item->parent->title) && $item->parent->title ? '('.$item->parent->title ?? "".') - ' : '' }}  {{ $item->title ?? "" }} ({{ ucfirst($item->type ?? "") ?? "" }}) {{$item->reference_type ? ' ('.ucfirst($item->reference_type).')' : ''}}</h5>
 
         <table class="table table-bordered table-responsive-sm" style="border: solid 2px">
             <thead style="background: rgb(197, 197, 197); color : black">

@@ -11,11 +11,11 @@
     <div class="page-wrapper">
           {{-- Form start --}}
           @if ($isEditMode)
-          <form action="{{route('update.return' , $order->id)}}" method="POST" id="sale_form">
+          <form action="{{route('update.purchase_return' , $order->id)}}" method="POST" id="sale_form">
               @csrf
               @method('put')
           @else
-          <form action="{{route('add.return')}}" method="POST" id="sale_form">
+          <form action="{{route('add.purchase_return')}}" method="POST" id="sale_form">
               @csrf
               @method('post')
           @endif
@@ -26,7 +26,7 @@
                     <div class="mid-section">
                         <div class="row align-items-center">
                             <div class="col-lg-2">
-                                <h1 class="page-title">{{$isEditMode ? 'Edit' : 'Create'}} Sale Return {{$isEditMode ? (' : '.$order->tran_no ?? '') : '' }}</h1>
+                                <h1 class="page-title">{{$isEditMode ? 'Edit' : 'Create'}} Purchase Return {{$isEditMode ? (' : '.$order->tran_no ?? '') : '' }}</h1>
                                 @if ($isEditMode)
                                     <b>{{$order->doc_no ?? ""}}</b>
                                 @endif
@@ -38,7 +38,7 @@
                                         <div class="col-lg-2">
                                             <div class="bill-date-wrapper">
                                              <h3 class="order_section_sub_title">
-                                                 Sale No.
+                                                 Purchase Inv.
                                              </h3>
                                              <div class="input-group input-group-outline d-flex align-items-center justify-content-center">
                                              <input type="text" placeholder="18/SA/23/07/1" name="invoice_no" class="form-control" id="invoice_no" value="{{$isEditMode ? $order->invoice_no : ''}}">
@@ -71,17 +71,17 @@
                                             <div class="order_type_wrapper">
                                                 <div class="order_type">
                                                     <h3 class="order_section_sub_title">
-                                                        Order Type
+                                                        Type
                                                     </h3>
                                                     <div class="order_type_items" style="display: flex; align-items: center; justify-content: space-between">   
-                                                                <label for="posOrder" class="order-type-item" style="width: 49%">
+                                                                {{-- <label for="posOrder" class="order-type-item" style="width: 49%">
                                                                 <input type="radio" name="order_type" id="posOrder" value="pos" class="form-check-input order_type_val" checked>
                                                                     POS ORDER
-                                                                </label>
+                                                                </label> --}}
                                                       
-                                                                <label for="normalOrder" class="order-type-item" style="width: 49%">
-                                                                <input type="radio" name="order_type" id="normalOrder" value="normal" class="form-check-input order_type_val" {{ $isEditMode && $order->party_id ? 'checked'  : '' }}>
-                                                                    CREDIT ORDER
+                                                                <label for="normalOrder" class="order-type-item" style="width: 49%"  >
+                                                                <input type="radio" name="order_type" id="normalOrder" value="normal" checked class="form-check-input order_type_val" {{ $isEditMode && $order->party_id ? 'checked'  : '' }}>
+                                                                    Purchase Return
                                                                 </label>
                                                     </div>
                                                 </div>
@@ -91,7 +91,7 @@
                                         <div class="col-lg-3" id="select_party_wrapper">
                                         <div class="select_party_wrapper">
                                             <h4 class="order_section_sub_title">
-                                                Select Customer
+                                                Select Party
                                             </h4>
                                             <div class="select_party">
                                                 
@@ -379,7 +379,7 @@ function search_invoice() {
     if (tran_no) {
         showSpinner();
         $.ajax({
-            url: '/api/sales/order', // API endpoint
+            url: '/api/purchase/invoice', // API endpoint
             type: 'POST',
             data: JSON.stringify({
                 tran_no: tran_no, // Correctly passing the transaction number
@@ -397,7 +397,7 @@ function search_invoice() {
                     auto_define_invoice_data(data);
                     console.log(data); // Log the returned data to the console for inspection
                 }else{
-                    swal('Not Found '+tran_no,"Sale not found for document no: " + tran_no,'error')
+                    swal('Not Found '+tran_no,"Purchase not found for document no: " + tran_no,'error')
                     emptyInvoiceField()
                    
                 }
@@ -405,13 +405,13 @@ function search_invoice() {
             error: function (xhr, status, error) {
                 // Error handling
                 hideSpinner();
-                swal('Not Found '+tran_no,"Sale not found for document no: " + tran_no,'error');
+                swal('Not Found '+tran_no,"Purchase not found for document no: " + tran_no,'error');
                 emptyInvoiceField()
                 console.log('Error details:', xhr.responseText);
             }
         });
     } else {
-        swal('Empty Invoice No', 'Please provide the invoice number.', 'error');
+        swal('Empty Purchase Invoice No', 'Please provide the invoice number.', 'error');
     }
 
     
@@ -425,7 +425,7 @@ function emptyInvoiceField(){
 
 function auto_define_invoice_data(data){
    
-    const party_id = +data?.customer_id;
+    const party_id = +data?.party_id;
     $("#invoice_no").prop("readonly",true);
     $("#search_invoice_button").css("display","none");
     var parent_div = $("#invoice_pre_data");
@@ -433,14 +433,14 @@ function auto_define_invoice_data(data){
     let partyName = 'Cash';
 
     if(+party_id){
-        partyName = data?.customer?.party_name;
+        partyName = data?.party?.party_name;
     }
 
     const billDate = data?.bill_date && moment(data?.bill_date).isValid() ? moment(data?.bill_date).format('MM-D-Y') : moment(data?.created_at).format('MM-DD-Y')
     const billDateDiv = `<div id="selected_inv_bill_date" class="col-lg-6"><strong>Bill Date: ${billDate ?? ''}</strong></div>`
-    const invNoDiv = `<div id="selected_inv_no" class="col-lg-6"><strong>Sale No: ${data?.tran_no ?? ''}</strong></div>`
+    const invNoDiv = `<div id="selected_inv_no" class="col-lg-6"><strong>Purchase No: ${data?.doc_num ?? ''}</strong></div>`
     const customerDiv = `<div id="selected_inv_customer" class="col-lg-6"><strong>Party: ${partyName ?? ''}</strong></div>`;
-    const netTotal = `<div id="selected_inv_net_total" class="col-lg-6"><strong style="color:red">Original Net: {{ConfigHelper::getStoreConfig()["symbol"]}}${data?.net_total ?? ''}</strong></div>`;
+    const netTotal = `<div id="selected_inv_net_total" class="col-lg-6"><strong style="color:red">Original Net: {{ConfigHelper::getStoreConfig()["symbol"]}}${data?.net_amount ?? ''}</strong></div>`;
     const subDiv = `<div class="row g-2" style="font-size:18px">${billDateDiv+invNoDiv+customerDiv+netTotal}</div>`
     parent_div.append(subDiv);
     

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('sale_return_details', function (Blueprint $table) {
            $table->id();
-           $table->foreignId('sale_id')->constrained('sales');
+           $table->foreignId('sale_id')->constrained('sale_returns');
            $table->foreignId('item_id')->constrained('products');
            $table->decimal('original_qty');
            $table->boolean('is_base_unit')->default(0);

@@ -9,15 +9,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SaleReturn extends Model
-{   
+class PurchaseReturn extends Model
+{
     //table
-    protected $table = 'sale_returns';
+    protected $table = 'purchase_returns';
     protected  $fillable = [
         'store_id',
         'doc_no',
         'user_id',
-        'sale_id',
+        'purchase_id',
         'party_id',
         'return_date',
         'reason',
@@ -38,7 +38,7 @@ class SaleReturn extends Model
      */
     public function order_details(): HasMany
     {
-        return $this->hasMany(SaleReturnDetail::class, 'sale_id', 'id');
+        return $this->hasMany(PurchaseReturnDetail::class, 'purchase_return_id', 'id');
     }
 
 
@@ -51,5 +51,17 @@ class SaleReturn extends Model
     {
         return $this->belongsTo(Parties::class, 'party_id', 'id');
     }
+
+
+    /**
+     * Get the purchase that owns the PurchaseReturn
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function purchase(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseInvoice::class, 'purchase_id', 'id');
+    }
+
     use HasFactory , SoftDeletes, UniversalScopeTrait;
 }

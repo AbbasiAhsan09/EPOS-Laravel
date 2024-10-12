@@ -8,19 +8,18 @@ use App\Models\Account;
 use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PartyGroups;
-use App\Models\SaleReturn;
-use App\Models\SaleReturnDetail;
-use App\Models\Sales;
-use App\Models\Stores;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseReturn;
+use App\Models\PurchaseReturnDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class SaleReturnController extends Controller
+class PurchaseReturnController extends Controller
 {
     use InventoryTrait; 
     
-    public function create_update_sales_return(int $orderid = null) {
+    public function create_update_purchase_return(int $orderid = null) {
         try {
             
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
@@ -36,7 +35,7 @@ class SaleReturnController extends Controller
             }
 
             if($orderid && !empty($orderid)){
-                $order = SaleReturn::where("id",$orderid)->with('order_details.item_details')->filterByStore()->first();
+                $order = PurchaseReturn::where("id",$orderid)->with('order_details.item_details')->filterByStore()->first();
                 // dd($order);
                 if(!$order){
 
@@ -44,12 +43,12 @@ class SaleReturnController extends Controller
                     return redirect()->back();
                 }
 
-                return view('sales.sale_orders.return.create_sale_return', compact('customers','config','orderid','order'));
+                return view('purchase.invoices.return.create_purchase_return', compact('customers','config','orderid','order'));
             }
 
             $order = null;
             
-            return view('sales.sale_orders.return.create_sale_return', compact('customers','config','orderid','order'));
+            return view('purchase.invoices.return.create_purchase_return', compact('customers','config','orderid','order'));
 
         } catch (\Throwable $th) {
             throw $th;
@@ -65,28 +64,30 @@ class SaleReturnController extends Controller
                 'total' => "required",
             ]);
 
+            // dd($request->all());
+
             $item_selected = $request->has('item_id') && count($request->item_id);
             if(!$item_selected){
                 toast('Please select any item ', 'error');
                 return redirect()->back();
             }
 
-            $store_prefix = "SR";
-            // Check if existed sale order
+            $store_prefix = "PR";
+            // Check if existed purchase order
             $existedInvoice = $request->has("invoice_no") && $request->invoice_no && !$request->has("party_id");
             $data = [];
             $data["store_id"] = Auth::user()->store_id;
-            $data["doc_no"] = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(SaleReturn::latest()->first()->id) ? (SaleReturn::max("id") + 1) : 1);
+            $data["doc_no"] = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(PurchaseReturn::latest()->first()->id) ? (PurchaseReturn::max("id") + 1) : 1);
             $data["user_id"] = Auth::user()->id;
             $data["return_date"] = $request->has("return_date") ? $request->return_date : date('Y-m-d',time());
             if($existedInvoice){
-                $sale = Sales::where("tran_no", $request->input("invoice_no"))->filterByStore()->first()->toArray();
-                if(!$sale){
-                    toast("Invalid Sale No.",'error');
+                $purchase = PurchaseInvoice::where("doc_num", $request->input("invoice_no"))->filterByStore()->first()->toArray();
+                if(!$purchase){
+                    toast("Invalid Purchase No.",'error');
                     return redirect()->back();
                 }
-                $data["sale_id"] = $sale["id"];
-                $data["party_id"] = $sale["customer_id"];
+                $data["purchase_id"] = $purchase["id"];
+                $data["party_id"] = $purchase["party_id"];
                 
             }else{
                 $data["party_id"] = $request->has("party_id") ? (int)($request->input("party_id")) : null ;
@@ -111,7 +112,7 @@ class SaleReturnController extends Controller
             DB::beginTransaction();
             $this->configInventoryChecks();
 
-            $return = SaleReturn::create($data);
+            $return = PurchaseReturn::create($data);
 
             
             if($return){
@@ -119,7 +120,7 @@ class SaleReturnController extends Controller
                     $return_detail = [];
                     $return_detail["item_id"] = $request->item_id[$i];
                     $return_detail["is_base_unit"] = ($request->uom[$i] > 1 ? true : false);
-                    $return_detail["sale_id"] = $return->id;
+                    $return_detail["purchase_return_id"] = $return->id;
                     if(isset($request->bags)){
                         $return_detail["bags"] = $request->bags[$i];
                     }
@@ -137,72 +138,18 @@ class SaleReturnController extends Controller
                         $return_detail["returned_total"] = (($request->qty[$i] * $request->rate[$i]) + ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->tax[$i]));
                     }
 
-                    $detail = SaleReturnDetail::create($return_detail);
+                    $detail = PurchaseReturnDetail::create($return_detail);
 
                     if($detail && ConfigHelper::getStoreConfig()["inventory_tracking"]){
-                        $this->returnQtyInventory($detail->is_base_unit,$detail->returned_qty,$detail->item_id);
+                        $this->returnQtyInventory($detail->is_base_unit,-(int)$detail->returned_qty,$detail->item_id);
                     }
 
                 }
 
                 if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                
-                    $revenue_coa = AccountController::get_coa_account(['title' => 'Revenue']);
-    
-    
-                    $revenue_account = Account::firstOrCreate(
-                        [
-                            'title' => 'Sales Revenue', // Search by title
-                            'pre_defined' => 1,      // and pre_defined
-                            'store_id' => Auth::user()->store_id, // and store_id
-                            'account_number' => 4000,
-                            'parent_id' => $revenue_coa->id ?? null,
-                            'head_account' => true
-                        ],
-                        [
-                            'type' => 'income',
-                            'description' => 'This account handles the Sales Revenue transactions', // Added description key
-                            'opening_balance' => 0,
-                        ]
-                    );
-                    // dd($revenue_account);
-                    if((!$return->party_id) || $return->party_id === 0){
-                        $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
-                        $cash_account = Account::firstOrCreate(
-                            [
-                                'title' => 'Cash', // Search by title
-                                'pre_defined' => 1,      // and pre_defined
-                                'store_id' => Auth::user()->store_id, // and store_id
-                                'account_number' => 1000,
-                                'parent_id' => $current_asset_coa->id,
-                                'head_account' => true// and store_id
-    
-                            ],
-                            [
-                                'type' => 'assets',
-                                'description' => 'This account is created by system on cash sales', // Added description key
-                                'opening_balance' => 0,
-                            ]
-                        );
-    
-                        if($revenue_account && $cash_account){
-    
-                            AccountController::record_journal_entry([
-                                'store_id' => Auth::user()->store_id,
-                                'account_id' => $cash_account->id,
-                                'reference_type' => 'sales_return',
-                                'reference_id' => $return->id,
-                                'credit' => $return->net_total,
-                                'debit' => 0,
-                                'transaction_date' => $return->return_date ?? date('Y-m-d',time()),
-                                'note' => 'This transaction is made by '.Auth::user()->name.' for sale return '. $return->doc_no .'',
-                                'source_account' => $revenue_account->id
-                            
-                            ]);
-                         
-                        }
-                    }
-    
+                    $inventory_head= AccountController::get_head_account(['account_number' => 1030]);
+
                     if($return->party_id && $return->party_id !== 0){
 
                         $party = Parties::find($return->party_id);
@@ -218,24 +165,24 @@ class SaleReturnController extends Controller
                                 [
                                     'title' => $party->party_name,
                                     'type' => $is_customer ? 'assets' : 'liabilities',
-                                    'description' => 'This account is created by system on creating sale order '.$return->doc_no, // Added description key
+                                    'description' => 'This account is created by system on creating purchase return '.$return->doc_no, // Added description key
                                     'opening_balance' => 0,
                                 ]
                             );
 
     
-                            if($party_account){
+                            if($party_account && $inventory_head){
     
                                 AccountController::record_journal_entry([
                                     'store_id' => Auth::user()->store_id,
-                                    'account_id' => $party_account->id,
-                                    'reference_type' => 'sales_return',
+                                    'account_id' => $inventory_head->id,
+                                    'reference_type' => 'purchase_return',
                                     'reference_id' => $return->id,
                                     'credit' => $return->net_total,
                                     'debit' => 0,
                                     'transaction_date' => $return->return_date ?? date('Y-m-d',time()),
-                                    'note' => 'This transaction is made by '.Auth::user()->name.' for sale return '. $return->doc_no .'',
-                                    'source_account' => $revenue_account->id
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Return '. $return->doc_no .'',
+                                    'source_account' => $party_account->id
                                 
                                 ]);
                             }
@@ -248,7 +195,7 @@ class SaleReturnController extends Controller
 
             DB::commit();
 
-            toast('Sale return created', 'success');
+            toast('Purchase Return created', 'success');
             return redirect()->back();
 
 
@@ -272,27 +219,27 @@ class SaleReturnController extends Controller
                 return redirect()->back();
             }
 
-            $return = SaleReturn::where('id',$id)->filterByStore()->first();
+            $return = PurchaseReturn::where('id',$id)->filterByStore()->first();
 
             if(!$return){
                 toast('Not found any return against ID : '.$id, 'error');
                 return redirect()->back();
             }
 
-            // Check if existed sale order
+            // Check if existed purchase invoice
             $existedInvoice = $request->has("invoice_no") && $request->invoice_no && !$request->has("party_id");
             $data = [];
             $data["store_id"] = Auth::user()->store_id;
             $data["user_id"] = Auth::user()->id;
             $data["return_date"] = $request->has("return_date") ? $request->return_date : date('Y-m-d',time());
             if($existedInvoice){
-                $sale = Sales::where("tran_no", $request->input("invoice_no"))->filterByStore()->first()->toArray();
-                if(!$sale){
-                    toast("Invalid Sale No.",'error');
+                $purchase = PurchaseInvoice::where("doc_num", $request->input("invoice_no"))->filterByStore()->first()->toArray();
+                if(!$purchase){
+                    toast("Invalid Purchase No.",'error');
                     return redirect()->back();
                 }
-                $data["sale_id"] = $sale["id"];
-                $data["party_id"] = $sale["customer_id"];
+                $data["purchase_id"] = $purchase["id"];
+                $data["party_id"] = $purchase["party_id"];
                 
             }else{
                 $data["party_id"] = $request->has("party_id") ? (int)($request->input("party_id")) : null ;
@@ -323,21 +270,21 @@ class SaleReturnController extends Controller
             if($return){
                 for ($i=0; $i < count($request->item_id) ; $i++) {
                     
-                    $deleteItems = SaleReturnDetail::where('sale_id' , $return->id)->whereNotIn('item_id' , $request->item_id);
+                    $deleteItems = PurchaseReturnDetail::where('purchase_return_id' , $return->id)->whereNotIn('item_id' , $request->item_id);
                     foreach ($deleteItems->get() as $deleteItem) {
                         if($deleteItem && ConfigHelper::getStoreConfig()["inventory_tracking"]){
-                            $this->UpdateReturnQtyInventory(0,$deleteItem->is_base_unit,$deleteItem->returned_qty,0,$deleteItem->item_id);
+                            $this->UpdateReturnQtyInventory(0,$deleteItem->is_base_unit,-$deleteItem->returned_qty,0,$deleteItem->item_id);
                         }
                     }
                     $deleteItems->delete();
 
-                    $detail = SaleReturnDetail::where(["item_id" => $request->item_id[$i], 'sale_id' => $return->id])->first();
+                    $detail = PurchaseReturnDetail::where(["item_id" => $request->item_id[$i], 'purchase_return_id' => $return->id])->first();
                     $oldQty = $detail->returned_qty ?? 0;
                     $was_base_unit = $detail->is_base_unit ?? false;
                     $return_detail = [];
                     $return_detail["item_id"] = $request->item_id[$i];
                     $return_detail["is_base_unit"] = ($request->uom[$i] > 1 ? true : false);
-                    $return_detail["sale_id"] = $return->id;
+                    $return_detail["purchase_return_id"] = $return->id;
                     if(isset($request->bags)){
                         $return_detail["bags"] = $request->bags[$i];
                     }
@@ -357,7 +304,7 @@ class SaleReturnController extends Controller
 
                     $detail->update($return_detail);
                     if($detail && ConfigHelper::getStoreConfig()["inventory_tracking"]){
-                        $this->UpdateReturnQtyInventory($detail->is_base_unit,$was_base_unit,$oldQty,$detail->returned_qty,$detail->item_id);
+                        $this->UpdateReturnQtyInventory($detail->is_base_unit,$was_base_unit,-$oldQty,-$detail->returned_qty,$detail->item_id);
                     }
                     // dd($oldQty,$detail);
 
@@ -368,70 +315,16 @@ class SaleReturnController extends Controller
                
                      // Reverse transactions
                      AccountController::reverse_transaction([
-                        'reference_type' => 'sales_return',
+                        'reference_type' => 'purchase_return',
                         'reference_id' => $return->id,
                         'date' => (isset($return->return_date) && $return->return_date) ? $return->return_date : null,
-                        'description' => 'This transaction is reversed transaction because sale return'.$return->doc_no.'   is update by '. Auth::user()->name.'',
+                        'description' => 'This transaction is reversed transaction because Purchase Return'.$return->doc_no.'   is update by '. Auth::user()->name.'',
                         'transaction_count' => 2,
                         'order_by' => 'DESC',
                         'order_column' => 'id'
                     ]);
 
-                    $revenue_coa = AccountController::get_coa_account(['title' => 'Revenue']);
-    
-    
-                    $revenue_account = Account::firstOrCreate(
-                        [
-                            'title' => 'Sales Revenue', // Search by title
-                            'pre_defined' => 1,      // and pre_defined
-                            'store_id' => Auth::user()->store_id, // and store_id
-                            'account_number' => 4000,
-                            'parent_id' => $revenue_coa->id ?? null,
-                            'head_account' => true
-                        ],
-                        [
-                            'type' => 'income',
-                            'description' => 'This account handles the Sales Revenue transactions', // Added description key
-                            'opening_balance' => 0,
-                        ]
-                    );
-                    // dd($revenue_account);
-                    if((!$return->party_id) || $return->party_id === 0){
-                        $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
-                        $cash_account = Account::firstOrCreate(
-                            [
-                                'title' => 'Cash', // Search by title
-                                'pre_defined' => 1,      // and pre_defined
-                                'store_id' => Auth::user()->store_id, // and store_id
-                                'account_number' => 1000,
-                                'parent_id' => $current_asset_coa->id,
-                                'head_account' => true// and store_id
-    
-                            ],
-                            [
-                                'type' => 'assets',
-                                'description' => 'This account is created by system on cash sales', // Added description key
-                                'opening_balance' => 0,
-                            ]
-                        );
-    
-                        if($revenue_account && $cash_account){
-    
-                            AccountController::record_journal_entry([
-                                'store_id' => Auth::user()->store_id,
-                                'account_id' => $cash_account->id,
-                                'reference_type' => 'sales_return',
-                                'reference_id' => $return->id,
-                                'credit' => $return->net_total,
-                                'debit' => 0,
-                                'transaction_date' => $return->return_date ?? date('Y-m-d',time()),
-                                'note' => 'This transaction is made by '.Auth::user()->name.' for sale return '. $return->doc_no .'',
-                                'source_account' => $revenue_account->id
-                            
-                            ]);
-                         
-                        }
-                    }
+                    $inventory_head= AccountController::get_head_account(['account_number' => 1030]);
     
                     if($return->party_id && $return->party_id !== 0){
 
@@ -448,24 +341,24 @@ class SaleReturnController extends Controller
                                 [
                                     'title' => $party->party_name,
                                     'type' => $is_customer ? 'assets' : 'liabilities',
-                                    'description' => 'This account is created by system on creating sale order '.$return->doc_no, // Added description key
+                                    'description' => 'This account is created by system on creating purchase return '.$return->doc_no, // Added description key
                                     'opening_balance' => 0,
                                 ]
                             );
 
     
-                            if($party_account){
+                            if($party_account  && $inventory_head){
     
                                 AccountController::record_journal_entry([
                                     'store_id' => Auth::user()->store_id,
-                                    'account_id' => $party_account->id,
-                                    'reference_type' => 'sales_return',
+                                    'account_id' => $inventory_head->id,
+                                    'reference_type' => 'purchase_return',
                                     'reference_id' => $return->id,
                                     'credit' => $return->net_total,
                                     'debit' => 0,
                                     'transaction_date' => $return->return_date ?? date('Y-m-d',time()),
-                                    'note' => 'This transaction is made by '.Auth::user()->name.' for sale return '. $return->doc_no .'',
-                                    'source_account' => $revenue_account->id
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for Purchase Return '. $return->doc_no .'',
+                                    'source_account' => $party_account->id
                                 
                                 ]);
                             }
@@ -478,7 +371,7 @@ class SaleReturnController extends Controller
 
             DB::commit();
 
-            toast('Sale return created', 'success');
+            toast('Purchase Return created', 'success');
             return redirect()->back();
 
 
@@ -492,7 +385,7 @@ class SaleReturnController extends Controller
     public function invoice(int $id){
         try {
 
-            $order = SaleReturn::where("id",$id)->filterByStore()->first();
+            $order = PurchaseReturn::where("id",$id)->filterByStore()->first();
             $config = Configuration::filterByStore()->first();
             if(!$order){
                 toast("Invalid invoice no",'error');
@@ -504,6 +397,5 @@ class SaleReturnController extends Controller
             throw $th;
         }
     }
-
 
 }

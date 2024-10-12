@@ -5,7 +5,12 @@
         </li>
         <li class="menu-item"> <a href="/sales">Sales</a>
             <ul class="submenu">
-                <li class="submenu-item"><a href="/sales/add">New</a></li>
+                <li class="submenu-item">Create
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/sales/add">Sale Invoice</a></li>
+                        <li class="childmenu-item"><a href="/sales/return">Sale Return</a></li>
+                    </ul>
+                </li>
                 <li class="submenu-item"><a href="/sales">List</a></li>
                 <li class="submenu-item"><a href="/sales/return">Return</a></li>
                 <li class="submenu-item"><a href="/reports/sales-report">Report</a></li>
@@ -16,7 +21,12 @@
         </li>
         <li class="menu-item"><a href="/purchase">Purchase</a> 
             <ul class="submenu">
-                <li class="submenu-item"><a href="/purchase/invoice/0/create">New</a></li>
+                <li class="submenu-item">Create
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/purchase/invoice/0/create">Purchase Invoice</a></li>
+                        <li class="childmenu-item"><a href="/purchase/return">Purchase Return </a></li>
+                    </ul>
+                </li>
                 <li class="submenu-item"><a href="/purchase/invoice">List</a></li>
                 <li class="submenu-item"><a href="/reports/purchase-report">Report</a></li>
                 <li class="submenu-item"><a href="/reports/purchase-detail-report">Detail Report</a></li>
@@ -137,6 +147,7 @@
     padding: 0;
     list-style: none;
     z-index: 1000;
+    transition: .2s
 }
 
 .submenu-item {
@@ -175,6 +186,45 @@
 }
 .bg-logout:hover{
     background: rgb(216, 44, 44)
+}
+
+
+/* Refactoring */
+
+
+ul.childmenu{
+    list-style: none;
+    display: none;
+    position: absolute;
+    top: 20%;
+    left: 100%;
+    padding: 0;
+    min-width: 150px;
+    background: #cecece;
+    border: solid 1px #9ec200;
+    transition: 0.5s;
+
+}
+
+.submenu-item{
+    color: #344767
+}
+
+.childmenu-item{
+    background: #cecece;
+    padding:5px 10px;
+}
+.childmenu-item:hover{
+    background: #ececec;
+}
+
+.submenu-item{
+    position: relative;
+}
+
+.submenu-item:hover > .childmenu{
+    display: inline;
+    /* height: fit-content; */
 }
 
 

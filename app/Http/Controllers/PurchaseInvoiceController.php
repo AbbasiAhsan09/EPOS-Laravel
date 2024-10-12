@@ -573,5 +573,30 @@ class PurchaseInvoiceController extends Controller
         }
     }
 
+    public function get_invoice_details(Request $request) {
+        try {
+            
+            $request->validate([
+                'store_id' => 'required',
+                'tran_no' => 'required'
+            ]);
+
+            $tran_no = $request->input('tran_no');
+            $store_id = $request->input('store_id');
+
+            $order = PurchaseInvoice::where("store_id", $store_id)->where("doc_num",$tran_no)
+            ->with("details","party")
+            ->first();
+
+            if($order){
+                return response()->json($order);
+            }
+
+            return false;
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 
 }

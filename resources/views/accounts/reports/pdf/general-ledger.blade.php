@@ -23,7 +23,7 @@
         </table>
         @foreach ($data as $item)
         <div class="custom-box">
-        <h5>{{$item->parent->title ? '('.$item->parent->title.') - ' : '' }}  
+        <h5>{{$item->parent->title ? '('.$item->parent->title ?? "".') - ' : '' }}  
             {{ $item->title ?? "" }} ({{ ucfirst($item->type) ?? "" }}) 
             {{$item->reference_type ? '- ('.ucfirst($item->reference_type).')' : ''}}
         </h5>

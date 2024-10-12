@@ -10,6 +10,7 @@ use App\Http\Controllers\InventoryReportController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseReportController;
+use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\RegisterStoreController;
 use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SalesController;
@@ -168,6 +169,10 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::get("order/print/{id}",'App\Http\Controllers\PurchaseOrderController@print_invoice');
         Route::get("invoice/print/{id}",'App\Http\Controllers\PurchaseInvoiceController@print_invoice');
         Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
+        // Purchase return routes
+        Route::get('return/{id?}',[PurchaseReturnController::class, 'create_update_purchase_return']);
+        Route::post('return',[PurchaseReturnController::class, 'store'])->name("add.purchase_return");
+        Route::put('return/{id}',[PurchaseReturnController::class, 'update'])->name("update.purchase_return");
 });
 
 Route::middleware('manager.role')->prefix('reports')->group(function(){
@@ -185,6 +190,7 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
 });
 Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
+    Route::get("/return/{id}",[SaleReturnController::class,'invoice'])->name("return.print");
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });
 Route::prefix('challan')->group(function(){
