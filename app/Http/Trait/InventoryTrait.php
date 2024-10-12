@@ -5,6 +5,7 @@ use App\Helpers\ConfigHelper;
 use App\Models\Configuration;
 use App\Models\Inventory;
 use App\Models\Products;
+use Illuminate\Support\Facades\DB;
 
 trait InventoryTrait
 {
@@ -138,6 +139,34 @@ trait InventoryTrait
                 return false;
 
             } catch (\Throwable $th) {
+                throw $th;
+            }
+        }
+
+        static function returnQtyInventory($is_base_unit = false, $qty, $item_id){
+            try {
+                DB::beginTransaction();
+                $item = Products::find($item_id);
+                            
+                $newQty = ($is_base_unit ? ($qty) : ((isset($item->uoms->base_unit_value ) ? $item->uoms->base_unit_value : 1 ) * $qty));
+                
+
+                $inventory = Inventory::where('item_id', $item_id)->where('is_opnening_stock', 0)->first();
+
+                if(!$inventory){
+                    $inventory = new Inventory();
+                    $inventory->item_id = $item_id;
+                    $inventory->is_opnening_stock = 0;
+                    $inventory->stock_qty = $newQty;
+                }else{
+                    $inventory->stock_qty = ($inventory->stock_qty + $newQty);
+                }
+
+                $inventory->save();
+                
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollBack();
                 throw $th;
             }
         }

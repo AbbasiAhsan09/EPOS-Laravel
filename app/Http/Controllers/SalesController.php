@@ -950,4 +950,34 @@ class SalesController extends Controller
             throw $th;
         }
     }
+
+
+    public function get_order_details(Request $request) {
+        try {
+            
+            $request->validate([
+                'store_id' => 'required',
+                'tran_no' => 'required'
+            ]);
+
+            $tran_no = $request->input('tran_no');
+            $store_id = $request->input('store_id');
+
+            $order = Sales::where("store_id", $store_id)->where("tran_no",$tran_no)
+            ->with("order_details","customer")
+            ->first();
+
+            if($order){
+                return response()->json($order);
+            }
+
+            return false;
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    
 }

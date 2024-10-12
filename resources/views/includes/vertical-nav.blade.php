@@ -7,6 +7,7 @@
             <ul class="submenu">
                 <li class="submenu-item"><a href="/sales/add">New</a></li>
                 <li class="submenu-item"><a href="/sales">List</a></li>
+                <li class="submenu-item"><a href="/sales/return">Return</a></li>
                 <li class="submenu-item"><a href="/reports/sales-report">Report</a></li>
                 <li class="submenu-item"><a href="/reports/sales-detail-report">Detail Report </a></li>
                 <li class="submenu-item"><a href="/reports/sales-summary-report">Summary Report </a></li>

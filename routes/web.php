@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\RegisterStoreController;
+use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SendBackupToMailController;
@@ -151,6 +152,8 @@ Route::prefix('sales')->group(function () {
     Route::post('/add','App\Http\Controllers\SalesController@store')->name('add.sale');
     Route::put('/edit/{id?}','App\Http\Controllers\SalesController@update')->name('edit.sale');
     Route::middleware('manager.role')->delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
+    Route::get('return/{id?}',[SaleReturnController::class, 'create_update_sales_return']);
+    Route::post('return',[SaleReturnController::class, 'store'])->name("add.return");
     
 });
 
