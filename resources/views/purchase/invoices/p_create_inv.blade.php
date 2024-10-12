@@ -47,8 +47,14 @@
                                     <div class="input-group input-group-outline">
                                         <select name="party_id" class="select2Style form-control" id="vendor_select" style="width: 100%">
                                             
-                                            @foreach ($vendors as $vendor)
+                                            @foreach ($vendors as $group => $vendorGroups)
+                                            <optgroup label="{{ucfirst($group)}}">
+                                                @foreach ($vendorGroups as $vendor)
+                                                    
+                                                
                                                 <option value="{{$vendor->id}}"  {{isset($order) &&  $order->party_id == $vendor->id  ? 'selected' : ''}}>{{$vendor->party_name}}</option>
+                                            </optgroup>
+                                                @endforeach
                                             @endforeach
                                         </select>
                                         <input type="hidden" name="q_num" class="form-control" value="{{isset($order) ? $order->doc_num : ''}}" readonly>

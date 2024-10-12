@@ -56,7 +56,10 @@ class PurchaseInvoiceController extends Controller
         }
 
         $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
-        $vendors = Parties::where('group_id' , 2)->byUser()->get();
+        $vendors = Parties::filterByStore()->with("groups")->get()->groupBy(function ($vendor) {
+            return optional($vendor->groups)->group_name;
+        });
+
         $dynamicFields = AppForms::where("name",'purchase_invoice')
         ->with("fields")->whereHas("fields", function($query){
             return $query->where('show_in_table', 1)->filterByStore();
@@ -215,17 +218,17 @@ class PurchaseInvoiceController extends Controller
                 if($invoice->party_id){
                     $party = Parties::find($invoice->party_id);
                     if($party){
-                       $party_head = AccountController::get_head_account(['account_number' => 2000]);
+                       $group_validation = PartiesController::is_customer_group($party->group_id);
+                       $is_customer = $group_validation["is_customer"];
                        $party_account = Account::firstOrCreate(
                             [ 
                                 'store_id' => Auth::user()->store_id, // and store_id,
-                                'reference_type' => 'vendor',
+                                'reference_type' => $is_customer ? "customer" : 'vendor',
                                 'reference_id' => $party->id,
-                                'parent_id' => $party_head->id,
                             ],
                             [
                                 'title' => $party->party_name,
-                                'type' => 'assets',
+                                'type' => $is_customer ? 'assets' : 'liabilities',
                                 'description' => 'This account is created by system on creating Purchase Invoice '.$invoice->doc_num, // Added description key
                                 'opening_balance' => 0,
                             ]
@@ -281,7 +284,9 @@ class PurchaseInvoiceController extends Controller
         try {
         $invoice = PurchaseInvoice::where('id',$id)->with('dynamicFeildsData')->filterByStore()->first();
             if($invoice){
-                $vendors = Parties::where('group_id' , 2)->filterByStore()->get();
+                $vendors = Parties::filterByStore()->with("groups")->get()->groupBy(function ($vendor) {
+                    return optional($vendor->groups)->group_name;
+                });
                 $config = Configuration::filterByStore()->first();
                     
                 $dynamicFields = AppForms::where("name",'purchase_invoice')
@@ -463,16 +468,16 @@ class PurchaseInvoiceController extends Controller
                     
                     if($invoice->party_id){
                         $party = Parties::find($invoice->party_id);
+                        $group_validation  = PartiesController::is_customer_group($party->group_id);
+                        $is_customer = $group_validation["is_customer"];
                         if($party){
-                           $party_head = AccountController::get_head_account(['account_number' => 2000]);
-                    
+
                            $party_account = Account::firstOrCreate(
                                 [ 
                                     'store_id' => Auth::user()->store_id, // and store_id,
-                                    'reference_type' => 'vendor',
+                                    'reference_type' => $is_customer ? 'customer' : 'vendor',
                                     'reference_id' => $party->id,
-                                    'type' => 'liabilities',
-                                    'parent_id' => $party_head->id,
+                                    'type' => $is_customer ? 'assets' : 'liabilities',
                                 ],
                                 [
                                     'title' => $party->party_name,
