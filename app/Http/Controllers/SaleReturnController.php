@@ -256,4 +256,233 @@ class SaleReturnController extends Controller
             throw $th;
         }
     }
+
+    public function update(int $id, Request $request){
+        try {
+            dd($request->all());
+            $request->validate([
+                'return_date' => "required",
+                'total' => "required",
+            ]);
+
+            $item_selected = $request->has('item_id') && count($request->item_id);
+            if(!$item_selected){
+                toast('Please select any item ', 'error');
+                return redirect()->back();
+            }
+
+            $return = SaleReturn::where('id',$id)->filterByStore()->first();
+
+            if(!$return){
+                toast('Not found any return against ID : '.$id, 'error');
+                return redirect()->back();
+            }
+
+            // Check if existed sale order
+            $existedInvoice = $request->has("invoice_no") && $request->invoice_no && !$request->has("party_id");
+            $data = [];
+            $data["store_id"] = Auth::user()->store_id;
+            $data["user_id"] = Auth::user()->id;
+            $data["return_date"] = $request->has("return_date") ? $request->return_date : date('Y-m-d',time());
+            if($existedInvoice){
+                $sale = Sales::where("tran_no", $request->input("invoice_no"))->filterByStore()->first()->toArray();
+                if(!$sale){
+                    toast("Invalid Sale No.",'error');
+                    return redirect()->back();
+                }
+                $data["sale_id"] = $sale["id"];
+                $data["party_id"] = $sale["customer_id"];
+                
+            }else{
+                $data["party_id"] = $request->has("party_id") ? (int)($request->input("party_id")) : null ;
+            }
+
+            $data["invoice_no"] = $request->has("invoice_no") ? $request->input("invoice_no") : null;
+            $data["reason"] = $request->has("reason") && $request->input('reason') ? $request->input('reason') : null;
+            $data["total"] = $request->has('total') ? $request->input('total') : 0;
+            $data["other_charges"] = $request->has('other_charges') ? $request->input('other_charges') : 0;
+            $discount = 0;
+            if ($request->has('discount') && (substr($request->discount, 0, 1) == '%')) {
+                $data["discount_type"] = 'PERCENT';
+                $data["discount"] = ((int)ltrim($request->discount, '%'));
+                $discount = (($request->total / 100) *  ((int)ltrim($request->discount, '%')));
+            } else if ($request->has('discount') && $request->discount > 0) {
+                $data["discount_type"] = 'FLAT';
+                $data["discount"]= $request->discount;
+                $discount =  $request->discount;
+            }
+            $data["net_total"] = $request->total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
+
+            DB::beginTransaction();
+            $this->configInventoryChecks();
+
+            $return->update($data);
+
+            
+            if($return){
+                for ($i=0; $i < count($request->item_id) ; $i++) {
+                    
+                    $deleteItems = SaleReturnDetail::where('sale_id' , $invoice->id)->whereNotIn('item_id' , $request->item_id);
+                    foreach ($deleteItems->get() as $deleteItem) {
+                        if($deleteItem && ConfigHelper::getStoreConfig()["inventory_tracking"]){
+                            $this->UpdateReturnQtyInventory(0,$deleteItem->is_base_unit,$deleteItem->returned_qty,0,$deleteItem->item_id);
+                        }
+                    }
+                    $deleteItems->delete();
+
+                    $detail = SaleReturnDetail::where(["item_id" => $request->item_id[$i], 'sale_id' => $return->id])->first();
+                    $oldQty = $detail->returned_qty ?? 0;
+                    $was_base_unit = $detail->is_base_unit ?? false;
+                    $return_detail = [];
+                    $return_detail["item_id"] = $request->item_id[$i];
+                    $return_detail["is_base_unit"] = ($request->uom[$i] > 1 ? true : false);
+                    $return_detail["sale_id"] = $return->id;
+                    if(isset($request->bags)){
+                        $return_detail["bags"] = $request->bags[$i];
+                    }
+
+                    if(isset($request->bag_size)){
+                        $return_detail["bag_size"] = $request->bag_size[$i];
+                    }
+
+                    $return_detail["returned_rate"] = $request->rate[$i];
+                    $return_detail["returned_tax"] = $request->tax[$i];
+                    $return_detail["returned_qty"] = $request->qty[$i];
+                    if ($request->has('item_disc')) {
+                        $return_detail["returned_total"] = (($request->qty[$i] * $request->rate[$i]) + ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->tax[$i]) - ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->item_disc[$i]));
+                    } else {
+                        $return_detail["returned_total"] = (($request->qty[$i] * $request->rate[$i]) + ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->tax[$i]));
+                    }
+
+                    $detail->update($return_detail);
+
+                    if($detail && ConfigHelper::getStoreConfig()["inventory_tracking"]){
+                        $this->UpdateReturnQtyInventory($detail->is_base_unit,$was_base_unit,$oldQty,$detail->returned_qty,$detail->item_id);
+                    }
+
+                }
+
+                if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+               
+                     // Reverse transactions
+                     AccountController::reverse_transaction([
+                        'reference_type' => 'sale_return',
+                        'reference_id' => $return->id,
+                        'date' => (isset($return->return_date) && $return->return_date) ? $return->return_date : null,
+                        'description' => 'This transaction is reversed transaction because sale return'.$return->doc_no.'   is update by '. Auth::user()->name.'',
+                        'transaction_count' => 2,
+                        'order_by' => 'DESC',
+                        'order_column' => 'id'
+                    ]);
+
+                    $revenue_coa = AccountController::get_coa_account(['title' => 'Revenue']);
+    
+    
+                    $revenue_account = Account::firstOrCreate(
+                        [
+                            'title' => 'Sales Revenue', // Search by title
+                            'pre_defined' => 1,      // and pre_defined
+                            'store_id' => Auth::user()->store_id, // and store_id
+                            'account_number' => 4000,
+                            'parent_id' => $revenue_coa->id ?? null,
+                            'head_account' => true
+                        ],
+                        [
+                            'type' => 'income',
+                            'description' => 'This account handles the Sales Revenue transactions', // Added description key
+                            'opening_balance' => 0,
+                        ]
+                    );
+                    // dd($revenue_account);
+                    if((!$return->party_id) || $return->party_id === 0){
+                        $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
+                        $cash_account = Account::firstOrCreate(
+                            [
+                                'title' => 'Cash', // Search by title
+                                'pre_defined' => 1,      // and pre_defined
+                                'store_id' => Auth::user()->store_id, // and store_id
+                                'account_number' => 1000,
+                                'parent_id' => $current_asset_coa->id,
+                                'head_account' => true// and store_id
+    
+                            ],
+                            [
+                                'type' => 'assets',
+                                'description' => 'This account is created by system on cash sales', // Added description key
+                                'opening_balance' => 0,
+                            ]
+                        );
+    
+                        if($revenue_account && $cash_account){
+    
+                            AccountController::record_journal_entry([
+                                'store_id' => Auth::user()->store_id,
+                                'account_id' => $cash_account->id,
+                                'reference_type' => 'sales_return',
+                                'reference_id' => $return->id,
+                                'credit' => $return->net_total,
+                                'debit' => 0,
+                                'transaction_date' => $return->return_date ?? date('Y-m-d',time()),
+                                'note' => 'This transaction is made by '.Auth::user()->name.' for sale return '. $return->doc_no .'',
+                                'source_account' => $revenue_account->id
+                            
+                            ]);
+                         
+                        }
+                    }
+    
+                    if($return->party_id && $return->party_id !== 0){
+
+                        $party = Parties::find($return->party_id);
+                        if($party){
+                        $group_validation = PartiesController::is_customer_group($party->id);
+                        $is_customer = $group_validation["is_customer"];
+                           $party_account = Account::firstOrCreate(
+                                [ 
+                                    'store_id' => Auth::user()->store_id, // and store_id,
+                                    'reference_type' => $is_customer ? 'customer' : 'vendor',
+                                    'reference_id' => $party->id,
+                                ],
+                                [
+                                    'title' => $party->party_name,
+                                    'type' => $is_customer ? 'assets' : 'liabilities',
+                                    'description' => 'This account is created by system on creating sale order '.$return->doc_no, // Added description key
+                                    'opening_balance' => 0,
+                                ]
+                            );
+
+    
+                            if($party_account){
+    
+                                AccountController::record_journal_entry([
+                                    'store_id' => Auth::user()->store_id,
+                                    'account_id' => $party_account->id,
+                                    'reference_type' => 'sales_return',
+                                    'reference_id' => $return->id,
+                                    'credit' => $return->net_total,
+                                    'debit' => 0,
+                                    'transaction_date' => $return->return_date ?? date('Y-m-d',time()),
+                                    'note' => 'This transaction is made by '.Auth::user()->name.' for sale return '. $return->doc_no .'',
+                                    'source_account' => $revenue_account->id
+                                
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+
+            DB::commit();
+
+            toast('Sale return created', 'success');
+            return redirect()->back();
+
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
+    }
 }

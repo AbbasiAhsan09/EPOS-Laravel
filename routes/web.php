@@ -154,6 +154,7 @@ Route::prefix('sales')->group(function () {
     Route::middleware('manager.role')->delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
     Route::get('return/{id?}',[SaleReturnController::class, 'create_update_sales_return']);
     Route::post('return',[SaleReturnController::class, 'store'])->name("add.return");
+    Route::put('return/{id}',[SaleReturnController::class, 'update'])->name("update.return");
     
 });
 

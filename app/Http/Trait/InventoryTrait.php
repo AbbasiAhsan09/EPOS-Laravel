@@ -6,6 +6,7 @@ use App\Models\Configuration;
 use App\Models\Inventory;
 use App\Models\Products;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 trait InventoryTrait
 {
@@ -170,6 +171,54 @@ trait InventoryTrait
                 throw $th;
             }
         }
+
+
+        static function UpdateReturnQtyInventory($is_base_unit = false, $was_base_unit = false, $subQty, $qty, $item_id) {
+            try {
+                DB::beginTransaction();
+        
+                // Retrieve the product
+                $item = Products::find($item_id);
+                if (!$item) {
+                    throw new \Exception('Product not found');
+                }
+        
+                // Check if UOM exists
+                $baseUnitValue = isset($item->uoms->base_unit_value) ? $item->uoms->base_unit_value : 1;
+        
+                // Calculate new and subtracted quantities based on base unit conversion
+                $newQty = $is_base_unit ? $qty : $baseUnitValue * $qty;
+                $subtractQty = $was_base_unit ? $subQty : $baseUnitValue * $subQty;
+        
+                // Find or create inventory record
+                $inventory = Inventory::where('item_id', $item_id)->where('is_opening_stock', 0)->first();
+        
+                if (!$inventory) {
+                    // Create new inventory record
+                    $inventory = new Inventory();
+                    $inventory->item_id = $item_id;
+                    $inventory->is_opening_stock = 0;
+                    $inventory->stock_qty = $newQty;
+                    Log::info("New inventory created for item: {$item_id}, stock_qty: {$newQty}");
+                } else {
+                    // Update existing inventory stock
+                    $inventory->stock_qty = ($inventory->stock_qty - $subtractQty) + $newQty;
+                    Log::info("Inventory updated for item: {$item_id}, new stock_qty: {$inventory->stock_qty}");
+                }
+        
+                // Save inventory
+                $inventory->save();
+                
+                DB::commit();
+                return ['status' => 'success', 'message' => 'Inventory updated successfully'];
+                
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                Log::error('Error updating inventory: ' . $th->getMessage());
+                return ['status' => 'error', 'message' => 'Error updating inventory: ' . $th->getMessage()];
+            }
+        }
+        
 
 
 }

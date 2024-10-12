@@ -11,7 +11,7 @@
     <div class="page-wrapper">
           {{-- Form start --}}
           @if ($isEditMode)
-          <form action="{{route('edit.sale' , $order->id)}}" method="POST" id="sale_form">
+          <form action="{{route('update.return' , $order->id)}}" method="POST" id="sale_form">
               @csrf
               @method('put')
           @else
@@ -27,6 +27,9 @@
                         <div class="row align-items-center">
                             <div class="col-lg-2">
                                 <h1 class="page-title">{{$isEditMode ? 'Edit' : 'Create'}} Sale Return {{$isEditMode ? (' : '.$order->tran_no ?? '') : '' }}</h1>
+                                @if ($isEditMode)
+                                    <b>{{$order->doc_no ?? ""}}</b>
+                                @endif
                             </div>
                     
                             <div class="col-lg-10">
@@ -38,7 +41,7 @@
                                                  Sale No.
                                              </h3>
                                              <div class="input-group input-group-outline d-flex align-items-center justify-content-center">
-                                             <input type="text" placeholder="18/SA/23/07/1" name="invoice_no" class="form-control" id="invoice_no" value="{{$isEditMode ? $order->tran_no : ''}}">
+                                             <input type="text" placeholder="18/SA/23/07/1" name="invoice_no" class="form-control" id="invoice_no" value="{{$isEditMode ? $order->invoice_no : ''}}">
                                              <button  type="button" class="btn btn-small btn-primary" style="margin: 0"  id="search_invoice_button"><i class="fa fa-search"></i></button>
                                              <button  type="button" class="btn btn-small btn-danger" style="margin: 0;display: none"  id="clear_invoice_selected" ><i class="fa fa-close"></i></button>
                                             </div>
@@ -479,6 +482,11 @@ function disabledFields(data = {enabled : false}){
     }
 
 }
+
+@if($isEditMode && $order->invoice_no)
+search_invoice();
+@endif
+
 
 </script>
 <script>
