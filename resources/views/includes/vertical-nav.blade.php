@@ -70,6 +70,7 @@
                 <li class="submenu-item"><a href="/sales/returns">Sale Return Report</a></li>
                 <li class="submenu-item"><a href="/reports/sales-detail-report">Sale Detail Report</a></li>
                 <li class="submenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
+                <li class="submenu-item"><a href="/purchase/returns">Purchase Return Report</a></li>
                 <li class="submenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
                 <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
                 <li class="submenu-item"><a href="/account/report/general-ledger">Ledger Report</a></li>
