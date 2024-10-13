@@ -27775,6 +27775,10 @@ padding : 10px ;
 table {
   line-height: 1 !important;
 }
+
+.itemsInCart  textarea {
+  width: 400px;
+}
 /*# sourceMappingURL=dashboard-free.css.map */
 
 
