@@ -12,6 +12,7 @@ use App\Models\SaleReturn;
 use App\Models\SaleReturnDetail;
 use App\Models\Sales;
 use App\Models\Stores;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,50 @@ class SaleReturnController extends Controller
 {
     use InventoryTrait; 
     
+
+    public function index(Request $request) {
+        try {
+            
+            $items = SaleReturn::filterByStore()->orderBy('return_date','DESC');
+            
+            session()->forget("sreturn_start_date");
+            session()->forget("sreturn_end_date");
+            session()->forget("sreturn_party_id");
+            session()->forget("sreturn_type");
+
+
+            if(!empty($request->input("start_date")) && !empty($request->input("end_date"))){
+                $range = [$request->input("start_date"), $request->input("end_date")];
+                $items = $items->whereBetween("return_date", $range);
+                session()->put('sreturn_start_date',$request->input("start_date"));
+                session()->put('sreturn_end_date',$request->input("end_date"));
+            }
+           
+            if(!empty($request->input("party_id"))){
+                session()->put('sreturn_party_id',$request->input("party_id"));
+                $items = $items->where("party_id", $request->input('party_id'));
+            }
+
+            if($request->input("type") === 'pdf'){
+                $data = ["records" => $items->get()];
+                $pdf = Pdf::loadView('reports.sales-report.return.report', $data)->setPaper('a4', 'portrait');
+                return $pdf->stream();
+            }
+
+            $items = $items->paginate(20);
+
+            $parties = Parties::filterByStore()->with("groups")->get()->groupBy(function ($customer) {
+                return optional($customer->groups)->group_name;
+            });
+
+            return view('sales.sale_orders.return.listing', compact('items','parties'));
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
     public function create_update_sales_return(int $orderid = null) {
         try {
             
@@ -505,5 +550,50 @@ class SaleReturnController extends Controller
         }
     }
 
+
+
+    public function destroy(int $id){
+        try {
+            $return= SaleReturn::where("id",$id)->filterByStore()->first();
+
+            if(!$return){
+                toast("Invalid Request", 'error');
+            }
+
+            DB::beginTransaction();
+
+            $details = SaleReturnDetail::where("sale_id", $return->id);
+
+            foreach ($details->get() as $key => $detail) {
+                $this->UpdateReturnQtyInventory(0,$detail->is_base_unit,$detail->returned_qty,0,$detail->item_id);
+            }
+            $details->delete();
+
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                AccountController::reverse_transaction([
+                    'reference_type' => 'sale_return',
+                    'reference_id' => $return->id,
+                    'description' => 'This transaction is reversed because sale return '.$return->doc_no.'   is deleted by '. Auth::user()->name.'',
+                    'transaction_count' => 0,
+                    'order_by' => 'DESC',
+                    'order_column' => 'id',
+                ]);
+               }
+
+
+            $return->delete();
+
+
+            DB::commit();
+
+            toast('Sale return deleted','success');
+
+            return redirect()->back();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+
+        }
+    }
 
 }

@@ -42,6 +42,17 @@ class SaleReturn extends Model
     }
 
 
+
+    /**
+     * Get the user that owns the SaleReturn
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
     /**
      * Get the party that owns the SaleReturn
      *

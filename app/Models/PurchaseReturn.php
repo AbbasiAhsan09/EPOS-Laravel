@@ -63,5 +63,11 @@ class PurchaseReturn extends Model
         return $this->belongsTo(PurchaseInvoice::class, 'purchase_id', 'id');
     }
 
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
     use HasFactory , SoftDeletes, UniversalScopeTrait;
 }

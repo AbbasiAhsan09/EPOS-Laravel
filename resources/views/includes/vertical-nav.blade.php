@@ -5,18 +5,28 @@
         </li>
         <li class="menu-item"> <a href="/sales">Sales</a>
             <ul class="submenu">
-                <li class="submenu-item">Create
+                <li class="submenu-item"><a href="/sales/add">Create</a>
                     <ul class="childmenu">
                         <li class="childmenu-item"><a href="/sales/add">Sale Invoice</a></li>
                         <li class="childmenu-item"><a href="/sales/return">Sale Return</a></li>
                     </ul>
                 </li>
-                <li class="submenu-item"><a href="/sales">List</a></li>
-                <li class="submenu-item"><a href="/sales/return">Return</a></li>
-                <li class="submenu-item"><a href="/reports/sales-report">Report</a></li>
-                <li class="submenu-item"><a href="/reports/sales-detail-report">Detail Report </a></li>
-                <li class="submenu-item"><a href="/reports/sales-summary-report">Summary Report </a></li>
-                <li class="submenu-item"><a href="/reports/sales-report?filter_deleted=true">Report (Deleted) </a></li>
+                <li class="submenu-item"><a href="/sales">List</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/sales/">Sale Invoices</a></li>
+                        <li class="childmenu-item"><a href="/sales/returns">Sale Returns</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"><a href="/reports/sales-report">Report</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/reports/sales-report">Sale Report</a></li>
+                        <li class="childmenu-item"><a href="/sales/returns">Sale Returns</a></li>
+                        <li class="childmenu-item"><a href="/reports/sales-detail-report">Detail Report </a></li>
+                        <li class="childmenu-item"><a href="/reports/sales-report?filter_deleted=true">Report (Deleted) </a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"></li>
+                {{-- <li class="submenu-item"><a href="/reports/sales-summary-report">Summary Report </a></li> --}}
             </ul>
         </li>
         <li class="menu-item"><a href="/purchase">Purchase</a> 
@@ -27,11 +37,19 @@
                         <li class="childmenu-item"><a href="/purchase/return">Purchase Return </a></li>
                     </ul>
                 </li>
-                <li class="submenu-item"><a href="/purchase/invoice">List</a></li>
-                <li class="submenu-item"><a href="/reports/purchase-report">Report</a></li>
-                <li class="submenu-item"><a href="/reports/purchase-detail-report">Detail Report</a></li>
-                <li class="submenu-item"><a href="/reports/purchase-summary-report">Summary Report</a></li>
-                
+                <li class="submenu-item"><a href="/purchase/invoice">List</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/purchase/invoice/">Purchase Invoices</a></li>
+                        <li class="childmenu-item"><a href="/purchase/returns">Purchase Returns</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"><a href="/reports/purchase-report">Report</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
+                        <li class="childmenu-item"><a href="/purchase/returns">Purchase Returns</a></li>
+                        <li class="childmenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
+                    </ul>
+                </li>
             </ul>
         </li>
 
@@ -49,6 +67,7 @@
             <ul class="submenu">
                 <li class="submenu-item"><a href="/reports/inventory-report">Inventory Balance Report</a></li>
                 <li class="submenu-item"><a href="/reports/sales-report">Sale Report</a></li>
+                <li class="submenu-item"><a href="/sales/returns">Sale Return Report</a></li>
                 <li class="submenu-item"><a href="/reports/sales-detail-report">Sale Detail Report</a></li>
                 <li class="submenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
                 <li class="submenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>

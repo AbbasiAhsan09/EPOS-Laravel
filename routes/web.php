@@ -156,6 +156,8 @@ Route::prefix('sales')->group(function () {
     Route::get('return/{id?}',[SaleReturnController::class, 'create_update_sales_return']);
     Route::post('return',[SaleReturnController::class, 'store'])->name("add.return");
     Route::put('return/{id}',[SaleReturnController::class, 'update'])->name("update.return");
+    Route::delete('return/{id}',[SaleReturnController::class, 'destroy'])->name("delete.return");
+    Route::get('returns',[SaleReturnController::class, 'index'])->name("index.return");
     
 });
 
@@ -171,8 +173,10 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
         // Purchase return routes
         Route::get('return/{id?}',[PurchaseReturnController::class, 'create_update_purchase_return']);
+        Route::get('returns',[PurchaseReturnController::class, 'index'])->name('index.purchase_return');
         Route::post('return',[PurchaseReturnController::class, 'store'])->name("add.purchase_return");
         Route::put('return/{id}',[PurchaseReturnController::class, 'update'])->name("update.purchase_return");
+        Route::delete('return/{id}',[PurchaseReturnController::class, 'destroy'])->name("delete.purchase_return");
 });
 
 Route::middleware('manager.role')->prefix('reports')->group(function(){

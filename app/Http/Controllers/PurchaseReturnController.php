@@ -11,6 +11,7 @@ use App\Models\PartyGroups;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnDetail;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,49 @@ class PurchaseReturnController extends Controller
 {
     use InventoryTrait; 
     
+
+    public function index(Request $request) {
+        try {
+            
+            $items = PurchaseReturn::filterByStore()->orderBy('return_date','DESC');
+            
+            session()->forget("preturn_start_date");
+            session()->forget("preturn_end_date");
+            session()->forget("preturn_party_id");
+            session()->forget("preturn_type");
+
+
+            if(!empty($request->input("start_date")) && !empty($request->input("end_date"))){
+                $range = [$request->input("start_date"), $request->input("end_date")];
+                $items = $items->whereBetween("return_date", $range);
+                session()->put('preturn_start_date',$request->input("start_date"));
+                session()->put('preturn_end_date',$request->input("end_date"));
+            }
+           
+            if(!empty($request->input("party_id"))){
+                session()->put('preturn_party_id',$request->input("party_id"));
+                $items = $items->where("party_id", $request->input('party_id'));
+            }
+
+            if($request->input("type") === 'pdf'){
+                $data = ["records" => $items->get()];
+                $pdf = Pdf::loadView('reports.purchase-report.return.report', $data)->setPaper('a4', 'portrait');
+                return $pdf->stream();
+            }
+
+            $items = $items->paginate(20);
+
+            $parties = Parties::filterByStore()->with("groups")->get()->groupBy(function ($customer) {
+                return optional($customer->groups)->group_name;
+            });
+
+            return view('purchase.invoices.return.listing', compact('items','parties'));
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
     public function create_update_purchase_return(int $orderid = null) {
         try {
             
@@ -395,6 +439,51 @@ class PurchaseReturnController extends Controller
             return view("sales.invoices.web.credit-note", compact("order",'config'));
         } catch (\Throwable $th) {
             throw $th;
+        }
+    }
+
+
+    public function destroy(int $id){
+        try {
+            $return= PurchaseReturn::where("id",$id)->filterByStore()->first();
+
+            if(!$return){
+                toast("Invalid Request", 'error');
+            }
+
+            DB::beginTransaction();
+
+            $details = PurchaseReturnDetail::where("purchase_return_id", $return->id);
+
+            foreach ($details->get() as $key => $detail) {
+                $this->UpdateReturnQtyInventory($detail->is_base_unit,0,0,$detail->returned_qty,$detail->item_id);
+            }
+            $details->delete();
+
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                AccountController::reverse_transaction([
+                    'reference_type' => 'purchase_return',
+                    'reference_id' => $return->id,
+                    'description' => 'This transaction is reversed because purchase return '.$return->doc_no.'   is deleted by '. Auth::user()->name.'',
+                    'transaction_count' => 0,
+                    'order_by' => 'DESC',
+                    'order_column' => 'id',
+                ]);
+               }
+
+
+            $return->delete();
+
+
+            DB::commit();
+
+            toast('Purchase return deleted','success');
+
+            return redirect()->back();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+
         }
     }
 

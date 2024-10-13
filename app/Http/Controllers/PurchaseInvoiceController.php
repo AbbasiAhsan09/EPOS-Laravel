@@ -539,8 +539,8 @@ class PurchaseInvoiceController extends Controller
                 'reference_id' => $invoice->id,
                 'order_by' => 'DESC',
                 'order_column' => 'id',
-                'transaction_count' => 0,
-                'This transaction is reversed because Purchase Invoice'.$invoice->doc_num.'   is deleted by '. Auth::user()->name.'',
+                'transaction_count' => 2,
+                'description' => 'This transaction is reversed because Purchase Invoice'.$invoice->doc_num.'   is deleted by '. Auth::user()->name.'',
             ]);
            }
 
