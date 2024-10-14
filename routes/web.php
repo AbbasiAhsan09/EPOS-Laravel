@@ -7,6 +7,8 @@ use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\LabourController;
+use App\Http\Controllers\LabourWorkHistoryController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseReportController;
@@ -177,6 +179,15 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::post('return',[PurchaseReturnController::class, 'store'])->name("add.purchase_return");
         Route::put('return/{id}',[PurchaseReturnController::class, 'update'])->name("update.purchase_return");
         Route::delete('return/{id}',[PurchaseReturnController::class, 'destroy'])->name("delete.purchase_return");
+});
+
+
+Route::middleware('manager.role')->group(function(){
+    // Route::res('labour',LabourController::class);
+    Route::resources([
+        'labour' => LabourController::class,
+        'labour-work' => LabourWorkHistoryController::class
+    ]);
 });
 
 Route::middleware('manager.role')->prefix('reports')->group(function(){
