@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Labour;
 use App\Models\LabourWorkHistory;
+use App\Models\LabourWorkHistoryItems;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LabourWorkHistoryController extends Controller
 {
@@ -15,9 +19,51 @@ class LabourWorkHistoryController extends Controller
      */
     public function index(Request $request)
     {
-        $items = [];
 
-        return view("labour.work-history.index",compact('items'));
+        session()->forget('labour_from');
+        session()->forget('labour_to');
+        session()->forget('labour_id');
+        session()->forget('labour_status');
+
+        $items = LabourWorkHistory::filterByStore()->with("labour")
+        ->orderBy("end_date","ASC")->orderBy("end_date","DESC")->orderBy("start_date","DESC");
+
+        if($request->has("from") && $request->has("to") && $request->input("from") && $request->input("to")){
+            $range = [$request->from, $request->to];
+                session()->put("labour_from",$range[0]);
+                session()->put("labour_to",$range[1]);
+
+            if($request->has("status") && $request->input("status")){
+                session()->put("labour_status",$request->status);
+                if($request->status == "open"){
+                    $items = $items->whereBetween("start_date", $range)->where("end_date", null);
+                }
+
+                if($request->status == "close"){
+                    $items = $items->whereBetween("end_date", $range)->whereNot("end_date", null);
+                }
+            }else{
+                $items = $items->whereBetween("start_date", $range);
+            }
+        }
+
+        if($request->has("labour_id") && $request->input("labour_id") ){
+            session()->put("labour_id",$request->labour_id);
+            $items = $items->where("labour_id", $request->input("labour_id"));
+        }
+
+
+        if($request->has("type") && $request->input("type") == 'pdf'){
+            $data = ['items' => $items->get()];
+            $pdf = Pdf::loadView('labour.work-history.report.pdf-report', $data)->setPaper('a4', 'portrait');
+            return $pdf->stream();
+        }
+
+        $items = $items->paginate(20);
+
+        $labours = Labour::filterByStore()->orderBy("name","ASC")->get();
+
+        return view("labour.work-history.index",compact('items','labours'));
 
     }
 
@@ -42,7 +88,65 @@ class LabourWorkHistoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       try {
+    
+         $request->validate([
+            'labour_id' => "required",
+            "start_date" => "required",
+        ]);
+        $prefix = "LW";
+        $labour_work_history_data = [];
+        $labour_work_history_data["labour_id"] = $request->labour_id;
+        $labour_work_history_data["start_date"] = $request->start_date;
+        $labour_work_history_data["doc_no"] = date('d') . '/' . $prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(LabourWorkHistory::latest()->first()->id) ? (LabourWorkHistory::max("id") + 1) : 1);
+        $labour_work_history_data["is_ended"] = $request->has("is_ended") && $request->is_ended ? $request->is_ended: false;
+        $labour_work_history_data["is_paid"] = $request->has("is_paid") && $request->is_paid ? $request->is_paid: false;
+        $labour_work_history_data["end_date"] = $request->has("end_date") && $request->end_date ? $request->end_date: null;
+        $labour_work_history_data["paid_date"] = $request->has("paid_date") && $request->paid_date ? $request->paid_date: null;
+        $labour_work_history_data["other_charges"] = $request->other_charges ?? 0;
+        $labour_work_history_data["bonus"] = $request->bonus ?? 0;
+        $labour_work_history_data["total"] = $request->total ?? 0;
+        $labour_work_history_data["net_total"] = $request->net_total ?? 0;
+        $labour_work_history_data["store_id"] = Auth::user()->store_id;
+        $labour_work_history_data["notes"] = $request->notes ?? null;
+
+
+        DB::beginTransaction();
+        if(!$request->has("rate") || !count($request->rate)){
+            toast("List items cannot be empty",'error');
+            return redirect()->back();
+        }
+        
+        $history = LabourWorkHistory::create($labour_work_history_data);
+        
+        if($history){
+            $total = 0;
+            for ($i=0; $i < count($request->rate); $i++) { 
+                $item_data = ["labour_work_history_id" => $history->id];
+                $item_data["date"] = $request->date[$i];
+                $item_data["description"] = $request->description[$i];
+                $item_data["rate"] = $request->rate[$i];
+                $item_data["qty"] = $request->qty[$i];
+                $rate = $request->rate[$i];
+                $qty = $request->qty[$i];
+                $item_data["total"] = $rate * $qty;
+                $total += $rate * $qty;
+                LabourWorkHistoryItems::create($item_data);
+            }
+            $net_total = $total + $history->other_charges + $history->bonus;
+            $history->update(['total' => $total, "net_total" => $net_total]);
+        }
+
+        toast("Labour bill created successfully",'success');
+        DB::commit();
+
+        return redirect()->back();
+
+       } catch (\Throwable $th) {
+        DB::rollBack();
+        throw $th;
+       }
+
     }
 
     /**
@@ -62,9 +166,11 @@ class LabourWorkHistoryController extends Controller
      * @param  \App\Models\LabourWorkHistory  $labourWorkHistory
      * @return \Illuminate\Http\Response
      */
-    public function edit(LabourWorkHistory $labourWorkHistory)
+    public function edit(int $id)
     {
-        //
+        $labours = Labour::filterByStore()->orderBy('name','ASC')->get();
+        $history  = LabourWorkHistory::where("id",$id)->with("items")->filterByStore()->first() ?? null;
+        return view("labour.work-history.form",compact('labours','history')); 
     }
 
     /**
@@ -74,9 +180,71 @@ class LabourWorkHistoryController extends Controller
      * @param  \App\Models\LabourWorkHistory  $labourWorkHistory
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, LabourWorkHistory $labourWorkHistory)
+    public function update(int $id, Request $request )
     {
-        //
+        try {
+           
+            $request->validate([
+               'labour_id' => "required",
+               "start_date" => "required",
+           ]);
+           $history = LabourWorkHistory::where("id",$id)->filterByStore()->first();
+        //    dd($history);
+           if(!$history){
+            toast("Invalid Request",'error');
+            return redirect()->back();
+           }
+           $labour_work_history_data = [];
+           $labour_work_history_data["labour_id"] = $request->labour_id;
+           $labour_work_history_data["start_date"] = $request->start_date;
+           $labour_work_history_data["is_ended"] = $request->has("is_ended") && $request->is_ended ? $request->is_ended: false;
+           $labour_work_history_data["is_paid"] = $request->has("is_paid") && $request->is_paid ? $request->is_paid: false;
+           $labour_work_history_data["end_date"] = $request->has("end_date") && $request->end_date ? $request->end_date: null;
+           $labour_work_history_data["paid_date"] = $request->has("paid_date") && $request->paid_date ? $request->paid_date: null;
+           $labour_work_history_data["other_charges"] = $request->other_charges ?? 0;
+           $labour_work_history_data["bonus"] = $request->bonus ?? 0;
+           $labour_work_history_data["total"] = $request->total ?? 0;
+           $labour_work_history_data["notes"] = $request->notes ?? null;
+           $labour_work_history_data["net_total"] = $request->net_total ?? 0;
+           $labour_work_history_data["store_id"] = Auth::user()->store_id;
+   
+           DB::beginTransaction();
+           if(!$request->has("rate") || !count($request->rate)){
+               toast("List items cannot be empty",'error');
+               return redirect()->back();
+           }
+           
+           $history->update($labour_work_history_data);
+        //    dd($request->all());
+           if($history){
+            LabourWorkHistoryItems::where("labour_work_history_id",$history->id)->delete();
+               $total = 0;
+
+               for ($i=0; $i < count($request->rate); $i++) { 
+                   $item_data = ["labour_work_history_id" => $history->id];
+                   $item_data["date"] = $request->date[$i];
+                   $item_data["description"] = $request->description[$i];
+                   $item_data["rate"] = $request->rate[$i];
+                   $item_data["qty"] = $request->qty[$i];
+                   $rate = $request->rate[$i];
+                   $qty = $request->qty[$i];
+                   $item_data["total"] = $rate * $qty;
+                   $total += $rate * $qty;
+                   LabourWorkHistoryItems::create($item_data);
+               }
+               $net_total = $total + $history->other_charges + $history->bonus;
+               $history->update(['total' => $total, "net_total" => $net_total]);
+           }
+   
+           toast("Labour bill updated successfully",'success');
+           DB::commit();
+   
+           return redirect()->back();
+   
+          } catch (\Throwable $th) {
+           DB::rollBack();
+           throw $th;
+          }
     }
 
     /**

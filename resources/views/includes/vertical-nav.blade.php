@@ -90,7 +90,14 @@
                 <li class="submenu-item"><a href="/uom">UOM</a></li>
             </ul>
         </li>
-
+        <li class="menu-item"><a href="/labour">Labour</a>
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/labour">Labours</a></li>
+                <li class="submenu-item"><a href="/labour-work/create">Create Bill</a></li>
+                <li class="submenu-item"><a href="/labour-work/">Bills</a></li>
+                <li class="submenu-item"><a href="/product-category">Reports</a></li>
+            </ul>
+        </li>
         <li class="menu-item"><a href="/system/configurations">Settings</a></li>
         <li class="menu-item bg-logout"><a href="{{route('auth.logout')}}">Logout</a></li>
         <li class="menu-item">
