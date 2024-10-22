@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountingReportController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
 use App\Http\Controllers\FieldsController;
@@ -184,9 +185,12 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
     Route::resources([
         'sales-report' => SalesReportController::class,
         'purchase-report' => PurchaseReportController::class,
-        'inventory-report' => InventoryReportController::class
+        'inventory-report' => InventoryReportController::class,
     ]);
-
+    
+    Route::prefix('accounting')->group(function () {
+        Route::get("customer-payments",[AccountingReportController::class,'customer_payments']);
+    });
     Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
     Route::get('purchase-summary-report', [PurchaseReportController::class, 'summary'])->name('purchase-report.summary');
     Route::get('sales-summary-report', [SalesReportController::class, 'summary'])->name('sales-report.summary');
