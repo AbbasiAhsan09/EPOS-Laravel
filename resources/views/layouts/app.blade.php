@@ -415,6 +415,7 @@
 
  @yield('scripts')
  <script src="{{asset("externals/select2/select2.min.js")}}"></script>
+ <script src="{{asset("js/multiple-form-submit-prevent.js")}}"></script>
 
  <script>
    $(document).on('keydown', function(event) {

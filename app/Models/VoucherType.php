@@ -16,7 +16,11 @@ class VoucherType extends Model
         "slug",
         "name",
         "description",
-        "type"
+        "type",
+        "show_head",
+        "show_coa",
+        "account_types",
+        "account_reference_types"
     ];
     use HasFactory, SoftDeletes, UniversalScopeTrait;
 }
