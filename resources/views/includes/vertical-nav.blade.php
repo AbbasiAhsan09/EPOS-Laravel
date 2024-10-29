@@ -1,3 +1,10 @@
+
+
+@php
+    use App\Models\VoucherType;
+    $voucher_types = VoucherType::filterByStore()->orderBy("name","ASC")->get();
+@endphp
+
 <div class="xp-navbar">
     <ul class="menu">
         <li class="menu-item">
@@ -60,6 +67,20 @@
                 <li class="submenu-item"><a href="/account/transactions">Transaction</a></li>
                 <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
                 <li class="submenu-item"><a href="/account/report/general-ledger">Ledger Report</a></li>
+            </ul>
+        </li>
+
+        <li class="menu-item">
+            Vouchers
+            <ul class="submenu">
+                @foreach ($voucher_types as $voucher_type)
+                <li class="submenu-item"><a href="/voucher/create/{{$voucher_type->id}}">{{$voucher_type->name}}</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"> <a href="/voucher/create/{{$voucher_type->id}}">Create {{$voucher_type->name}}</a> </li>
+                        <li class="childmenu-item"> <a href="/voucher?voucher_type_id={{$voucher_type->id}}">{{$voucher_type->name}} List</a> </li>
+                    </ul>
+                </li>
+            @endforeach
             </ul>
         </li>
 

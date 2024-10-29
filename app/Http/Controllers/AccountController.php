@@ -446,7 +446,6 @@ class AccountController extends Controller
 
     static function reverse_transaction($reference = ['reference_type' => '', 'reference_id' => 0, 'date' => '','description' => '', 'transaction_count' => 0, 'order_by' => null, 'order_column' => 'id']){
         try {
-
             
             if(!isset($reference["date"]) || !$reference["date"] || empty($reference["date"])){
                 $reference["date"] = date('Y-m-d',time());
@@ -529,6 +528,7 @@ class AccountController extends Controller
     ]){
         try {
             
+            
             if (empty($entry["account_id"]) || (abs($entry["debit"]) == 0 && abs($entry["credit"]) == 0)) {
                 return false;
             }
@@ -558,7 +558,8 @@ class AccountController extends Controller
                         'recorded_by' => $debit_entry1->recorded_by,
                         'credit' => $debit_entry1->debit > 0 ? $debit_entry1->debit : 0, 
                         'debit' => $debit_entry1->credit > 0 ? $debit_entry1->credit : 0, 
-                    ]);
+                        'source_account' => $debit_entry1->account_id,
+                     ]);
 
                     $debit_entry1->update([
                         'reference_id' => $entry["reference_id"] ?? $debit_entry1->id,
@@ -581,11 +582,12 @@ class AccountController extends Controller
                     $entry["reference_type"] = $entry["reference_type"] ?? "journal_entry";
                     $entry["reference_id"] = $entry["reference_id"] ?? $debit_entry_2->id;
 
-                    AccountTransaction::create($entry);
+                    $creditEntry = AccountTransaction::create($entry);
 
                     $debit_entry_2->update([
                         'reference_id' => $entry["reference_id"] ?? $debit_entry_2->id,
                         'reference_type' => $entry["reference_type"] ?? "journal_entry",
+                        'source_account' => $creditEntry->account_id
                     ]);
                 }
 

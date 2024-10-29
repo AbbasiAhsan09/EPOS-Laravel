@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountingReportController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
 use App\Http\Controllers\FieldsController;
@@ -19,6 +20,8 @@ use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SendBackupToMailController;
 use App\Http\Controllers\VendorLedgerController;
+use App\Http\Controllers\VoucherController;
+use App\Models\Voucher;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -147,6 +150,8 @@ Route::middleware('manager.role')->prefix('parties')->group(function () {
 });
 
 
+
+
 Route::prefix('sales')->group(function () {
     Route::get('/','App\Http\Controllers\SalesController@index');
     Route::get('/add','App\Http\Controllers\SalesController@addNewOrder');
@@ -195,13 +200,30 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
     Route::resources([
         'sales-report' => SalesReportController::class,
         'purchase-report' => PurchaseReportController::class,
-        'inventory-report' => InventoryReportController::class
+        'inventory-report' => InventoryReportController::class,
     ]);
-
+    
+    Route::prefix('accounting')->group(function () {
+        Route::get("customer-payments",[AccountingReportController::class,'customer_payments']);
+    });
     Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
     Route::get('purchase-summary-report', [PurchaseReportController::class, 'summary'])->name('purchase-report.summary');
     Route::get('sales-summary-report', [SalesReportController::class, 'summary'])->name('sales-report.summary');
     Route::get('sales-detail-report', [SalesReportController::class, 'detail'])->name('sales-report.detail');
+});
+
+
+Route::middleware('admin.role')->prefix('voucher-type')->group(function(){
+    Route::get("generate",[VoucherController::class,'generate_voucher_types']);
+});
+
+
+Route::middleware("manager.role")->prefix("voucher")->group(function(){
+    Route::get("/",[VoucherController::class, 'index'])->name("voucher.index");
+    Route::get("/create/{voucher_type_id}/{id?}",[VoucherController::class,'create']);
+    Route::post("/store",[VoucherController::class, 'store'])->name("voucher.store");
+    Route::put("/update/{id}",[VoucherController::class, 'update'])->name("voucher.update");
+    Route::delete('/{id}',[VoucherController::class,'destroy'])->name("voucher.delete");
 });
 Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
