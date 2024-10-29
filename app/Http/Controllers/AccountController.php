@@ -446,7 +446,6 @@ class AccountController extends Controller
 
     static function reverse_transaction($reference = ['reference_type' => '', 'reference_id' => 0, 'date' => '','description' => '', 'transaction_count' => 0, 'order_by' => null, 'order_column' => 'id']){
         try {
-
             
             if(!isset($reference["date"]) || !$reference["date"] || empty($reference["date"])){
                 $reference["date"] = date('Y-m-d',time());

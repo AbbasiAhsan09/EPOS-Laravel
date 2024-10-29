@@ -11,7 +11,7 @@
             <form action="{{ route('voucher.store') }}" method="POST">
                 @method('post')
             @else
-                <form action="{{ route('voucher.store') }}" method="POST">
+                <form action="{{ route('voucher.update',$voucher->id) }}" method="POST">
                 @method('put')
         @endif
         @csrf
@@ -19,17 +19,21 @@
             <div class="row d-flex align-items-center mb-3">
                 <div class="col-lg-3">
                     <h4>{{ $isEditMode ? 'Edit' : 'Create' }} {{ $voucher_type->name }} </h4>
+                    @if ($isEditMode)
+                    <strong>{{$voucher->doc_no}}</strong>
+                    @endif
                 </div>
                 <div class="col-lg-2">
-                    <label class="form-label">{{ ucfirst($voucher_type->type) }} From Account</label>
-
+                    <label class="form-label">{{ ucfirst($voucher_type->type) }} Account</label>
                     <div class="input-group input-group-outline">
                         <select name="account_from_id" id="" class="form-control" required>
                             <option value="">Select Account</option>
                             @foreach ($from_accounts as $key => $from_accountList)
                                 <optgroup label="{{ ucfirst($key) }}">
                                     @foreach ($from_accountList as $from_account)
-                                        <option value="{{ $from_account->id }}">{{ $from_account->title }}</option>
+                                        <option value="{{ $from_account->id }}" {{$isEditMode && $voucher->account_from_id === $from_account->id ? 'selected' : ''}}>
+                                            {{ $from_account->title }}
+                                        </option>
                                     @endforeach
                                 </optgroup>
                             @endforeach
@@ -41,11 +45,11 @@
                     <label class="form-label">Voucher Date</label>
                     <div class="input-group input-group-outline">
                         <input type="date" class="form-control" name="date" required
-                            value="{{ date('Y-m-d', time()) }}">
+                        value="{{$isEditMode ? $voucher->date : date('Y-m-d', time())}}">
                     </div>
                 </div>
                 <div class="col-lg-2">
-                    <label class="form-label">{{ ucfirst($voucher_type->type) }} In Account</label>
+                    <label class="form-label">{{ ucfirst($voucher_type->type) }} Bank</label>
                     <div class="input-group input-group-outline">
                         <select name="account_id" id="" class="form-control" required>
                             <option value="">Select Account</option>
@@ -53,10 +57,13 @@
                                 <optgroup label="{{ ucfirst($key) }}">
                                     @foreach ($accountList as $account)
                                         <option value="{{ $account->id }}"
-                                            @if (!$isEditMode) {{ !$isEditMode && $voucher_type->account_id === $account->id ? 'selected' : '' }}
-                        @else
-                        {{ $voucher->account_id === $account->id ? 'selected' : '' }} @endif>
-                                            {{ $account->title }}</option>
+                                            @if (!$isEditMode) 
+                                            {{ !$isEditMode && $voucher_type->account_id === $account->id ? 'selected' : '' }}
+                                            @else
+                                            {{ $voucher->account_id === $account->id ? 'selected' : '' }} 
+                                            @endif>
+                                            {{ $account->title }}
+                                        </option>
                                     @endforeach
                                 </optgroup>
                             @endforeach
@@ -68,7 +75,7 @@
                     <label class="form-label">Reference No.</label>
                     <div class="input-group input-group-outline">
                         <input type="text" class="form-control" name="reference_no" 
-                            value="">
+                            value="{{$isEditMode ? $voucher->reference_no : ''}}">
                     </div>
                 </div>
                 <div class="col-lg-1">
@@ -95,6 +102,36 @@
                     <th>Action</th>
                 </thead>
                 <tbody id="voucher_entry_tbody">
+                    @if ($isEditMode)
+                        @foreach ($voucher->entries as $entry)
+                        <tr>
+                            <td style="width: 200px">
+                                <div class="input-group input-group-outline">
+                                    <input type="text" name="reference[]" value="{{$entry->reference}}" class="form-control">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group input-group-outline">
+                                    <input type="text" name="description[]" value="{{$entry->description}}" class="form-control">
+                                </div>
+                            </td>
+                            <td style="width: 200px">
+                                <div class="input-group input-group-outline">
+                                    <input type="number" name="amount[]" value="{{$entry->amount}}" min="0.1" step="0.01" required
+                                        class="form-control voucher_amount">
+                                </div>
+                            </td>
+                            <td style="width: 100px">
+                                <button type="button" class="btn btn-small btn-primary" onclick="appendRow()">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-small btn-danger" onclick="removeRow(this)" disabled>
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        @endforeach
+                    @else
                     <tr>
                         <td style="width: 200px">
                             <div class="input-group input-group-outline">
@@ -121,7 +158,14 @@
                             </button>
                         </td>
                     </tr>
+                    @endif
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2">Total</th>
+                        <th><span id="grandTotal">0.00</span></th>
+                    </tr>
+                </tfoot>
             </table>
             <div class="mb-5">
                 <label for="">Note</label>
@@ -213,8 +257,7 @@
                 totalAmount += amount;
             });
             const totalFormatted = `{{ ConfigHelper::getStoreConfig()['symbol'] }}${formatNumber(totalAmount)}`;
-            console.log('totalFormatted', totalFormatted)
-            console.log("Total Amount:", totalAmount);
+            $("#grandTotal").text(totalFormatted);
 
             // Optionally, display the total amount in an element
             // $("#totalAmountDisplay").text(totalAmount.toFixed(2));

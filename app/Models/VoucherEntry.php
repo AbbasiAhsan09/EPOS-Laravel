@@ -17,7 +17,9 @@ class VoucherEntry extends Model
         'reference_id',
         'sale_id',
         'purchase_invoice_id',
-        'description'
+        'description',
+        'store_id',
+        'amount'
     ];
     use HasFactory, SoftDeletes, UniversalScopeTrait;
 }

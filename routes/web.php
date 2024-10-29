@@ -208,9 +208,11 @@ Route::middleware('admin.role')->prefix('voucher-type')->group(function(){
 
 
 Route::middleware("manager.role")->prefix("voucher")->group(function(){
+    Route::get("/",[VoucherController::class, 'index'])->name("voucher.index");
     Route::get("/create/{voucher_type_id}/{id?}",[VoucherController::class,'create']);
     Route::post("/store",[VoucherController::class, 'store'])->name("voucher.store");
     Route::put("/update/{id}",[VoucherController::class, 'update'])->name("voucher.update");
+    Route::delete('/{id}',[VoucherController::class,'destroy'])->name("voucher.delete");
 });
 Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
