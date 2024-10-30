@@ -207,10 +207,14 @@ class VoucherController extends Controller
 
             // $account = Account::where("id",$voucher->account_id)->filterByStore()->first();
             $account_from = Account::where("id",$voucher->account_from_id)->filterByStore()->first();
+            $account = Account::where("id",$voucher->account_id)->filterByStore()->first();
             $is_account_debit_increase = true;
             
             if(in_array($account_from->type,['assets','expenses'])){
                 $is_account_debit_increase = true;
+                if(in_array($account->type,['assets','expenses'])){
+                    $is_account_debit_increase = false;
+                }
             }else{
                 $is_account_debit_increase = false;
             }
@@ -336,10 +340,14 @@ class VoucherController extends Controller
 
             // $account = Account::where("id",$voucher->account_id)->filterByStore()->first();
             $account_from = Account::where("id",$voucher->account_from_id)->filterByStore()->first();
+            $account = Account::where("id",$voucher->account_id)->filterByStore()->first();
             $is_account_debit_increase = true;
             
             if(in_array($account_from->type,['assets','expenses'])){
                 $is_account_debit_increase = true;
+                if(in_array($account->type,['assets','expenses'])){
+                    $is_account_debit_increase = false;
+                }
             }else{
                 $is_account_debit_increase = false;
             }
