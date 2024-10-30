@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use App\Models\Labour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -66,6 +67,18 @@ class LabourController extends Controller
                 return redirect()->back();
             }
 
+            $head = Account::where("account_number",5020)->filterByStore()->first();
+            Account::create([
+                'title' => $labour->name,
+                'description' => 'This account is created while adding the labour.',
+                'type' => 'expenses',
+                'parent_id' => $head->id,
+                'pre_defined' => false,
+                'store_id' => Auth::user()->store_id,
+                'reference_type' => 'labour',
+                'reference_id' => $labour->id
+            ]);
+
             DB::commit();
             toast('Labour : '.$labour->name." added successfully", 'success');
             return redirect()->back();
@@ -125,6 +138,12 @@ class LabourController extends Controller
             
             $labour->update($input);
 
+            $account = Account::where([
+                'reference_type' => 'labour',
+                'reference_id' => $labour->id
+            ])->filterByStore()->first();
+
+            $account->update(['title' => $labour->name]);
 
             toast("Labour updated successfully",'success');
             return redirect()->back();
