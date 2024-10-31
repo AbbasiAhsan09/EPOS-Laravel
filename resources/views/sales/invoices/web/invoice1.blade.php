@@ -10,8 +10,8 @@
   background: white !important;
   border: 1px solid #CDD3E2;
   box-shadow: 0px 0px 1px #CCC;
-  padding: 40px 40px 60px;
-  margin-top: 40px;
+  padding: 20px;
+  margin-top: 20px;
   border-radius: 4px; 
 }
 
@@ -108,7 +108,7 @@
   margin-top: 20px; } 
 }
 .receipt-content .invoice-wrapper .line-items {
-  margin-top: 40px; 
+  margin-top: 10px; 
 }
 .receipt-content .invoice-wrapper .line-items .headers {
   color: #000000;
@@ -208,8 +208,8 @@
 }
 
 .receipt-content .footer {
-  margin-top: 40px;
-  margin-bottom: 110px;
+  margin-top: 20px;
+  margin-bottom: 10px;
   text-align: center;
   font-size: 12px;
   color: #969CAD; 
@@ -228,6 +228,7 @@
     position: absolute;
     top: 0;
     right: 0;
+    opacity: 0.2;
     content:  "";
     background: url("{{asset('images/inv.png')}}");
     width: 100%;
@@ -242,6 +243,7 @@
     position: absolute;
     bottom: 0;
     left: 0;
+    opacity: 0.2;
     content:  "";
     background: url("{{asset('images/inv.png')}}");
     width: 100%;
@@ -260,31 +262,15 @@
 			<div class="col-md-12">
 				<div class="invoice-wrapper inv-main-bg">
 					<div class="intro">
-						@if (isset($config) && $config->logo)
+						@if (isset($config) && $config->logo && $config->invoice_logo)
 									<img src="{{asset("images/logo/$config->logo")}}"  alt="Not Available" style="margin-top : 20px" width="120px" class="inv_logo">
-									@else
+									@elseif(isset($config) && $config->invoice_name)
 										<h2 style="text-transform: uppercase">{{isset($config) ? $config->app_title : 'Demo'}}</h2>
 									@endif
-                  <br> <br>
+                  @if (isset($config) && $config->invoice_logo && $config->invoice_name)
+                      <br>
                   <strong style="text-transform: uppercase">{{isset($config) ? $config->app_title : 'Demo'}}</strong>
-					</div>
-
-					<div class="payment-info">
-						{{-- <div class="row">
-							<div class="col-sm-4">
-								<span>Order No.</span>
-								<strong>{{$order->tran_no ?? ""}}</strong>
-							</div>
-							<div class="col-sm-4 text-right">
-								<span>Order Date:</span>
-								<strong>{{$order->bill_date !== null ? date('D, d M Y',strtotime($order->bill_date )) :date('D, d M Y', strtotime($order->created_at))}}</strong>
-							</div>
-
-                            <div class="col-sm-4 text-right">
-								<span>Printed On:</span>
-								<strong>{{date('D, d M Y', time())}}</strong>
-							</div>
-						</div> --}}
+                  @endif
 					</div>
 
 					<div class="payment-details">

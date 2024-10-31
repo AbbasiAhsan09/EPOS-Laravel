@@ -788,6 +788,29 @@ class SalesController extends Controller
         }
     }
 
+
+    public function search_sale(Request $request){
+        try {
+            
+            $doc_no = $request->has("doc_no") && (int) $request->input("doc_no") ?  (int) $request->input("doc_no") : null;
+            if(!$doc_no){
+                toast("Invalid document no.",'error');
+                return redirect()->back();
+            }
+
+            $order = Sales::where("id",$doc_no)->filterByStore()->first();
+
+            if(!$order){
+                toast("Invalid document no.",'error');
+                return redirect()->back();
+            }
+
+            return redirect()->to('/sales/edit/' . $order->id);
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
     /**
      * Remove the specified resource from storage.
      *

@@ -9,6 +9,8 @@
 @include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/eNhzTjJ2rIE'])
 @include("includes.spinner")
     <div class="page-wrapper">
+      
+        
           {{-- Form start --}}
           @if ($isEditMode)
           <form action="{{route('edit.sale' , $order->id)}}" method="POST" id="sale_form">
@@ -28,13 +30,24 @@
                             <div class="col-lg-2">
                                 <h1 class="page-title">{{$isEditMode ? 'Edit' : 'Create'}} Order {{$isEditMode ? (' : '.$order->tran_no ?? '') : '' }}</h1>
                             </div>
+
+                           
                     
                             <div class="col-lg-10">
+                               
                                 <div class="order-meta">
                                     <div class="row">
-                                       
+                                        <div class="col-lg-2">
+                                            <h4 class="order_section_sub_title">
+                                                Doc #
+                                            </h4>
+                                            <div class="input-group input-group-outline w-100 d-flex align-items-center justify-content-center">
+                                                <input type="text" id="search_value" class="form-control" value="{{$isEditMode ? $order->tran_no : ''}}">
+                                                <button  type="button" class="btn btn-small btn-primary" style="margin: 0" id="search_order_button" ><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
                                         @if ($config->bill_date_changeable && Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                         <div class="bill-date-wrapper">
                                          <h3 class="order_section_sub_title">
                                              Bill Date
@@ -69,7 +82,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                             {{-- Customer  --}}
                                         <div class="select_party_wrapper">
                                             <h4 class="order_section_sub_title">
@@ -522,6 +535,18 @@ window.addEventListener('beforeunload', function (event) {
  }
 });
 
+
+ // Pass the base URL from Laravel to JavaScript
+    const baseUrl = `{{ url("sales/search") }}`;
+
+    $("#search_order_button").click(function(){
+        const docNo = $("#search_value").val();
+        const lastNumber = docNo.split('/').pop();
+        if (lastNumber) {
+            // Construct the full URL with the parameter
+            window.location.href = `${baseUrl}?doc_no=${lastNumber}`;
+        }
+    });
 </script>
 
 <style>

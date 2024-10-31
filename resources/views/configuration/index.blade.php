@@ -171,6 +171,20 @@
                       <input type="checkbox" class="form-check-input" id="" name="allow_low_inventory" value="1" {{isset($currenConfig) ? ($currenConfig->allow_low_inventory ? 'checked' : '') : '' }}> 
                   </div>
               </div>
+
+              <div class="mt-3 d-flex">
+                <label for="" class="mb-0">Show Logo On Documents: </label>
+                <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                    <input type="checkbox" class="form-check-input" id="" name="invoice_logo" value="1" {{isset($currenConfig) ? ($currenConfig->invoice_logo ? 'checked' : '') : '' }}> 
+                </div>
+              </div>
+
+              <div class="mt-3 d-flex">
+                <label for="" class="mb-0">Show Business Name On Documents: </label>
+                <div class="form-check form-switch ps-0 ms-auto my-auto is-filled">
+                    <input type="checkbox" class="form-check-input" id="" name="invoice_name" value="1" {{isset($currenConfig) ? ($currenConfig->invoice_name ? 'checked' : '') : '' }}> 
+                </div>
+              </div>
                 
 
 
