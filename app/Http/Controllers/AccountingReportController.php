@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\AccountTransaction;
 use App\Models\Parties;
 use App\Models\PartyGroups;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,15 +35,29 @@ class AccountingReportController extends Controller
     public function generate_general_ledger_report(Request $request)
     {
         try {
-
+            // dd($request->all());
             $startDate = $request->has("from") && $request->input("from") ? Carbon::parse($request->input("from")) : Carbon::now()->startOfWeek();
             $endDate = $request->has("to") && $request->input("to") ? Carbon::parse($request->input("to")) : Carbon::now()->endOfWeek();
 
             // Fetch all accounts with their transactions within the date range
-            $accounts = Account::with(['transactions' => function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('transaction_date', [$startDate, $endDate])
-                    ->orderBy('transaction_date');
+            $accounts = Account::whereHas('transactions', function ($query) {
+                $query->where('credit', '>', 0)
+                      ->orWhere('debit', '>', 0);
+            });
+
+            if($request->has('accounts') && count($request->accounts) > 0){
+                $accounts = $accounts->whereIn("id",$request->accounts);
+            }
+
+            $accounts = $accounts->with(['transactions' => function ($query) use ($startDate, $endDate) {
+                $query
+                ->whereBetween('transaction_date', [$startDate, $endDate])
+                ->where(function($subQry){
+                    $subQry->where("credit", '>',0)->orWhere("debit", '>',0);
+                })
+                ->orderBy('transaction_date');
             }])->get();
+            // dd($accounts);
 
             // Initialize ledger data array
             $ledgerData = [];
@@ -50,6 +65,9 @@ class AccountingReportController extends Controller
             foreach ($accounts as $account) {
                 // Calculate starting balance (all transactions before the start date)
                 $startingBalance = AccountTransaction::where('account_id', $account->id)
+                    ->where(function($subQry){
+                        $subQry->where("credit", '>',0)->orWhere("debit", '>',0);
+                    })
                     ->where('transaction_date', '<', $startDate)
                     ->sum(DB::raw('debit - credit'));
 
@@ -64,8 +82,8 @@ class AccountingReportController extends Controller
 
                     // Prepare transaction data with running balance
                     $transactionsData[] = [
-                        'date' => $transaction->date,
-                        'description' => $transaction->description,
+                        'transaction_date' => $transaction->transaction_date,
+                        'description' => $transaction->note,
                         'debit' => $transaction->debit,
                         'credit' => $transaction->credit,
                         'running_balance' => $runningBalance,
@@ -76,14 +94,26 @@ class AccountingReportController extends Controller
                 $ledgerData[] = [
                     'account' => $account->title,
                     'account_type' => $account->type,
-                    'description' => $account->description,
+                    'description' => $account->note,
                     'starting_balance' => $startingBalance,
                     'transactions' => $transactionsData,
                     'ending_balance' => $runningBalance,
                 ];
             }
 
-            return view("reports.accounts.general-ledger",compact("ledgerData"));
+            if($request->has("type") && $request->type === 'pdf'){
+                $data = ["ledgerData" => $ledgerData];
+                $pdf = Pdf::loadView('reports.accounts.pdfs.general-ledger', $data)->setPaper('a4', 'portrait');
+                return $pdf->stream();
+            }
+
+            $all_accounts = Account::whereHas('transactions', function ($query) {
+                $query->where('credit', '>', 0)
+                      ->orWhere('debit', '>', 0);
+            })->get();
+            $accounts = $all_accounts->groupBy("type");
+            // dd($accounts);
+            return view("reports.accounts.general-ledger",compact("ledgerData","accounts"));
         } catch (\Throwable $th) {
             throw $th;
         }
