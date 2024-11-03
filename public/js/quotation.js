@@ -86,17 +86,18 @@ $(document).ready(function(){
                 success : function(e){
                         $('#cartList').append(
                             '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
-                            '<td>'+e.categories.field.name+' '+e.categories.category+' '+e.name+'</td>'+
-                            '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
-                            '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
-                            '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
-                            '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
-                            '</select>'+
+                            '<td>'+e.categories.field.name+' '+e.categories.category+' '+e.name+''+
+                            '<input type="hidden" name="item_id[]" value="'+e.id+'">'+
+                            '<input type="hidden" name="uom[]" value="1"></td>'+
+                            // '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
+                            // '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
+                            // '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
+                            // '</select>'+
                             '</td>'+
-                            '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>'+
-                            '<td><input name="bags[]" type="number" step="0.001" placeholder="Bags" min="0" class="form-control bags" value="0"></td>'+
+                            // '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>'+
+                            // '<td><input name="bags[]" type="number" step="0.001" placeholder="Bags" min="0" class="form-control bags" value="0"></td>'+
                             '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+e.tp+'"></td>'+
-                            '<td><input name="mrp[]" type="number" step="0.01" placeholder="MRP" min="1" class="form-control mrp" value="'+e.mrp+'"></td>'+
+                            // '<td><input name="mrp[]" type="number" step="0.01" placeholder="MRP" min="1" class="form-control mrp" value="'+e.mrp+'"></td>'+
                             '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+
                             '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
                             '<td class="total">'+(e.mrp * 1)+'</td>'+

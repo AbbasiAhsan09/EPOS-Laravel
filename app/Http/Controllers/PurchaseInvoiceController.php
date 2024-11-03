@@ -166,12 +166,12 @@ class PurchaseInvoiceController extends Controller
             if($invoice && count($request->item_id)){
                 
                     for ($i=0; $i < count($request->item_id) ; $i++) { 
-                        
+                        $item = Products::where("id",$request->item_id[$i])->filterByStore()->first();
                         $detail = new PurchaseInvoiceDetails();
                         $detail->inv_id = $invoice->id;
                         $detail->item_id = $request->item_id[$i];
                         $detail->rate = $request->rate[$i];
-                        $detail->mrp = $request->mrp[$i];
+                        $detail->mrp = isset($request->mrp[$i]) ? $request->mrp[$i] : $item->tp ?? 0 ;
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];
                         $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : 0;
@@ -438,7 +438,7 @@ class PurchaseInvoiceController extends Controller
                             $detail->inv_id = $invoice->id;
                             $detail->item_id = $request->item_id[$i];
                             $detail->rate = $request->rate[$i];
-                            $detail->mrp = $request->mrp[$i];
+                            $detail->mrp = isset($request->mrp[$i]) ? $request->mrp[$i] : $item->tp ?? 0 ;
                             $detail->qty = $request->qty[$i];
                             $detail->tax = $request->tax[$i];
                             $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : 0;

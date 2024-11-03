@@ -95,6 +95,7 @@
                 <li class="submenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
                 <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
                 <li class="submenu-item"><a href="/reports/accounting/general-ledger">Ledger Report</a></li>
+                <li class="submenu-item"><a href="/labour-work/">Labour Bills Report</a></li>
             </ul>
         </li>
 
@@ -116,7 +117,7 @@
                 <li class="submenu-item"><a href="/labour">Labours</a></li>
                 <li class="submenu-item"><a href="/labour-work/create">Create Bill</a></li>
                 <li class="submenu-item"><a href="/labour-work/">Bills</a></li>
-                <li class="submenu-item"><a href="/product-category">Reports</a></li>
+                {{-- <li class="submenu-item"><a href="/product-category">Reports</a></li> --}}
             </ul>
         </li>
         <li class="menu-item"><a href="/system/configurations">Settings</a></li>

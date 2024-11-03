@@ -266,7 +266,7 @@
                             </div>
                             <div class="col-lg-1">
                                 <h4 class="order_section_sub_title">
-                                    Bardan Charges:
+                                    Other Charges:
                                 </h4>
                                 <div class="input-group input-group-outline">
                                     <input type="number" name="other_charges" id="otherCharges" class="form-control" required value="{{$isEditMode ? $order->other_charges : 0}}" min="0" onkeypress="validationForSubmit()" >

@@ -395,7 +395,7 @@
 							</div>
                             @if ( $order->other_charges > 0)
 							<div class="field">
-								Bardana Charges <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</span>
+								OtherCharges <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</span>
 							</div>
                             @endif
                             @if ($order->discount > 0)

@@ -33,12 +33,12 @@
                               <table class="table table-sm table-responsive-sm table-striped table-bordered ">
                                 <thead>
                                     <th>Description</th>
-                                    <th>UOM</th>
-                                    <th>Bag Size</th>
-                                    <th>Bags</th>
-                                    <th>TP</th>
-                                    <th>MRP</th>
-                                    <th>Weight</th>
+                                    {{-- <th>UOM</th> --}}
+                                    {{-- <th>Bag Size</th>
+                                    <th>Bags</th> --}}
+                                    <th>Rate</th>
+                                    {{-- <th>MRP</th> --}}
+                                    <th>Qty</th>
                                     <th>Tax</th>
                                     <th>Total</th>
                                 </thead>
@@ -47,10 +47,13 @@
                                        @if (isset($invoice) && count($invoice->details))
                                        @foreach ($invoice->details as $item)
                                        <tr data-id="{{$item->items->barcode}}" class="itemsInCart">
-                                           <td>{{$item->items->name}}</td>
-                                           <td> 
+                                           <td>{{$item->items->name}}
+                                          
                                             <input type="hidden" name="item_id[]" value="{{$item->item_id}}">
-                                            @if ($item->items->uom != 0)
+                                            <input type="hidden" name="uom[]" value="1">
+                                        </td>
+                                         {{-- <td>  --}}
+                                            {{-- @if ($item->items->uom != 0)
                                             <select name="uom[]" class="form-control uom" data-id="{{$item->items->uoms->base_unit_value}}">
                                                 <option value="1">{{$item->items->uoms->uom}}</option>
                                                 <option value="{{$item->items->uoms->base_unit_value}}" {{$item->is_base_unit ? 'selected' : ''}}>{{$item->items->uoms->base_unit}}</option>
@@ -59,16 +62,16 @@
                                             <select name="uom[]" class="form-control uom" data-id="1" >
                                                 <option value="1">Default</option>
                                             </select>
-                                            @endif
-                                            </td>
-                                            <td><input name="bag_size[]" type="number" step="0.01" placeholder="Size"
+                                            @endif --}}
+                                            {{-- </td> --}}
+                                            {{-- <td><input name="bag_size[]" type="number" step="0.01" placeholder="Size"
                                                 min="0" class="form-control bag_size" value="{{$item->bag_size}}"></td>
                                             <td><input name="bags[]" type="number" step="0.01" placeholder="Bags"
-                                                min="0" class="form-control bags" value="{{$item->bags}}"></td>
+                                                min="0" class="form-control bags" value="{{$item->bags}}"></td> --}}
                                             <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                 min="1" class="form-control rate" value="{{$item->rate}}"></td>
-                                                <td><input name="mrp[]" type="number" step="0.01" placeholder="Rate"
-                                                    min="1" class="form-control mrp" value="{{$item->mrp}}" required></td>
+                                                {{-- <td><input name="mrp[]" type="number" step="0.01" placeholder="Rate"
+                                                    min="1" class="form-control mrp" value="{{$item->mrp}}" required></td> --}}
                                            <td><input name="qty[]" type="number" step="0.01" placeholder="Qty"
                                                    min="1" class="form-control pr_qty" value="{{$item->qty}}"></td>
                                            <td><input name="tax[]" type="number" step="0.01" placeholder="Tax"
@@ -287,7 +290,7 @@
                             </div>
                             <hr>
                             <h4 class="order_section_sub_title">
-                                Bardana Charges: 
+                                OtherCharges: 
                             </h4>
                             <div class="input-group input-group-outline">
                                 <input type="number" name="other_charges" id="otherCharges" class="form-control" required min="0" onkeypress="validationForSubmit()"  value="{{$invoice->others  ?? 0}}">
