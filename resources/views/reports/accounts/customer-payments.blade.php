@@ -25,7 +25,7 @@
         <tbody>
             @foreach ($data as $item)
             <tr>
-                <td>{{$item->transaction_date ? date("m-d-Y",strtotime($item->transaction_date)) : 'N/A'}}</td>
+                <td>{{$item->transaction_date ? date("d/m/Y",strtotime($item->transaction_date)) : 'N/A'}}</td>
                 <td>
                     {{$item->account->title ?? "N/A"}}
                 </td>

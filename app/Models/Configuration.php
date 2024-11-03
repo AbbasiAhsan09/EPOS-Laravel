@@ -12,6 +12,7 @@ class Configuration extends Model
     protected $fillable = ['app_title', 'logo','address','phone','ntn','ptn','show_ntn','show_ptn','inventory_tracking',
     'mutltiple_sales_order','start_date','contract_duration','store_id','order_processing','order_processing_template',
     'invoice_message','allow_inventory_check','allow_low_inventory','added_by','show_tp_in_order_form',
-    'use_accounting_module','ui'];
+    'use_accounting_module','ui',
+    'invoice_logo','invoice_name'];
     use UniversalScopeTrait, HasFactory;
 }

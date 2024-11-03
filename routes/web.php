@@ -156,6 +156,7 @@ Route::prefix('sales')->group(function () {
     Route::get('/','App\Http\Controllers\SalesController@index');
     Route::get('/add','App\Http\Controllers\SalesController@addNewOrder');
     Route::get('change-status','App\Http\Controllers\SalesController@changeOrderStatus');
+    Route::get("/search",[SalesController::class, 'search_sale'])->name('sale.search');
     Route::middleware('manager.role')->get('/edit/{id}','App\Http\Controllers\SalesController@edit');
     Route::post('/add','App\Http\Controllers\SalesController@store')->name('add.sale');
     Route::put('/edit/{id?}','App\Http\Controllers\SalesController@update')->name('edit.sale');

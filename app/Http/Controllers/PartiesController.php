@@ -378,7 +378,7 @@ class PartiesController extends Controller
                     'title' => $party->party_name,
                     'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0, 
                     'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
-                    'type' => $is_customer ? 'income' : 'liabilities',
+                    'type' => $is_customer ? 'assets' : 'liabilities',
                     'parent_id' => $head_account->id,
                 ]);
                 }else{
@@ -391,7 +391,7 @@ class PartiesController extends Controller
                         ],
                         [
                             'title' => $party->party_name,
-                            'type' => $is_customer ? 'income' : 'liabilities',
+                            'type' => $is_customer ? 'assets' : 'liabilities',
                             'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
                         ]
                     );

@@ -63,6 +63,8 @@ class ConfigurationController extends Controller
                 }
                 $config->phone  =  $request->phone;
                 $config->address = $request->address;
+                $config->invoice_logo = $request->invoice_logo ?? false;
+                $config->invoice_name = $request->invoice_name ?? false;
                 $config->invoice_message = $request->inv_message;
                 $config->ntn = $request->ntn;
                 $config->ptn = $request->ptn;

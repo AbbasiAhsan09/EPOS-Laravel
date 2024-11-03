@@ -38,7 +38,7 @@
                                         <div class="col-lg-2">
                                             <div class="bill-date-wrapper">
                                              <h3 class="order_section_sub_title">
-                                                 Sale No.
+                                                 Doc #
                                              </h3>
                                              <div class="input-group input-group-outline d-flex align-items-center justify-content-center">
                                              <input type="text" placeholder="18/SA/23/07/1" name="invoice_no" class="form-control" id="invoice_no" value="{{$isEditMode ? $order->invoice_no : ''}}">
