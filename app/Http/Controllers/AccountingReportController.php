@@ -36,8 +36,8 @@ class AccountingReportController extends Controller
     {
         try {
             // dd($request->all());
-            $startDate = $request->has("from") && $request->input("from") ? Carbon::parse($request->input("from")) : Carbon::now()->startOfWeek();
-            $endDate = $request->has("to") && $request->input("to") ? Carbon::parse($request->input("to")) : Carbon::now()->endOfWeek();
+            $startDate = $request->has("from") && $request->input("from") ? Carbon::parse($request->input("from")) : Carbon::now()->subDay(11);
+            $endDate = $request->has("to") && $request->input("to") ? Carbon::parse($request->input("to")) : Carbon::now();
 
             // Fetch all accounts with their transactions within the date range
             $accounts = Account::whereHas('transactions', function ($query) {

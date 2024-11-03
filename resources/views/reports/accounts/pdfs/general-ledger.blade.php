@@ -21,7 +21,12 @@
             @foreach ($account['transactions'] as $transaction)
                 <tr>
                     <td>{{ $transaction['transaction_date'] }}</td>
-                    <td>
+                    <td style="{{strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed') ? 'background : red; color : white' :''}}">
+                        @if (strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed'))
+                            <p>
+                                <strong>Reversed Entry</strong>
+                            </p>
+                        @endif
                         @include("reports.accounts.component.transaction_description",['data' => $transaction['data']])
                     </td>
                     <td>{{number_format($transaction['debit'], 2) }}</td>

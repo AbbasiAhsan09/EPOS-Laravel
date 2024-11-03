@@ -11,13 +11,13 @@
         <div class="col-lg-2">
             <label for="">From</label>
             <div class="input-group input-group-outline">
-                <input type="date" name="from" value="{{request()->from ?? ""}}" class="form-control">
+                <input type="date" name="from" value="{{request()->from ?? \Carbon\Carbon::now()->subDays(11)->toDateString()}}" class="form-control">
             </div>
         </div>
         <div class="col-lg-2">
             <label for="">To</label>
             <div class="input-group input-group-outline">
-                <input type="date" name="to" value="{{request()->to ?? ""}}" class="form-control">
+                <input type="date" name="to" value="{{request()->to ?? \Carbon\Carbon::now()->toDateString()}}" class="form-control">
             </div>
         </div>
 
@@ -73,7 +73,12 @@
             @foreach ($account['transactions'] as $transaction)
                 <tr>
                     <td>{{ $transaction['transaction_date'] }}</td>
-                    <td>
+                    <td style="{{strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed') ? 'background : red; color : white' :''}}">
+                        @if (strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed'))
+                            <p>
+                                <strong>Reversed Entry</strong>
+                            </p>
+                        @endif
                         @include("reports.accounts.component.transaction_description",['data' => $transaction['data']])
                     </td>
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['debit'], 2) }}</td>
