@@ -33,7 +33,7 @@ class SendBackupMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Daily Backup EPOS'.' - '. date("m-d-Y"),
+            subject: 'Daily Backup EPOS'.' - '. date("d/m/Y"),
         );
     }
 

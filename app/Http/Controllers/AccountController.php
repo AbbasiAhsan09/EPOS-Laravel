@@ -444,7 +444,7 @@ class AccountController extends Controller
         }
     }
 
-    static function reverse_transaction($reference = ['reference_type' => '', 'reference_id' => 0, 'date' => '','description' => '', 'transaction_count' => 0, 'order_by' => null, 'order_column' => 'id']){
+    static function reverse_transaction($reference = ['reference_type' => '', 'reference_id' => 0, 'date' => '','description' => '', 'transaction_count' => 0, 'order_by' => null, 'order_column' => 'id'], $delete = true){
         try {
             
             if(!isset($reference["date"]) || !$reference["date"] || empty($reference["date"])){
@@ -473,6 +473,13 @@ class AccountController extends Controller
                 DB::beginTransaction();
                 if($transactions && count($transactions)){
                     foreach ($transactions as  $transaction) {
+
+                        if($delete){
+                            dump("reversing....");
+                            $transaction->delete();
+                            continue;
+                        }
+
                         if(abs($transaction->credit)> 0){
                             AccountTransaction::create([
                                 'account_id' => $transaction->account_id,

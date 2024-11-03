@@ -68,20 +68,22 @@
         <tbody>
             <tr style="background: rgb(197, 250, 221)">
                 <td colspan="4" style="text-align: right"><strong>Opening Balance</strong></td>
-                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($account['starting_balance'], 2) }}</strong></td>
+                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format(abs($account['starting_balance']), 2) }} {{$account['starting_balance'] < 0 ? 'CR': "DR"}}</strong></td>
             </tr>
             @foreach ($account['transactions'] as $transaction)
                 <tr>
                     <td>{{ $transaction['transaction_date'] }}</td>
-                    <td>{{ $transaction['description'] }}</td>
+                    <td>
+                        @include("reports.accounts.component.transaction_description",['data' => $transaction['data']])
+                    </td>
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['debit'], 2) }}</td>
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['credit'], 2) }}</td>
-                    <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['running_balance'], 2) }}</td>
+                    <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format(abs($transaction['running_balance']), 2) }} {{$transaction['running_balance'] < 0 ? 'CR': "DR"}}</td>
                 </tr>
             @endforeach
             <tr style="background: rgb(250, 197, 208)">
                 <td colspan="4" style="text-align: right"><strong>Closing Balance</strong></td>
-                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($account['ending_balance'], 2) }}</strong></td>
+                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format(abs($account['ending_balance']), 2) }} {{$account['ending_balance'] < 0 ? 'CR': "DR"}}</strong></td>
             </tr>
         </tbody>
     </table>

@@ -43,7 +43,7 @@
                     
                 @endphp
                 <tr>
-                    <td width="80px">{{ date("m-d-Y",strtotime($transaction->transaction_date)) }}</td>
+                    <td width="80px">{{ date("d/m/Y",strtotime($transaction->transaction_date)) }}</td>
                     <td >{{ $transaction->note }}</td>
                     <td width="100px">{{ number_format($transaction->credit, 2) }}</td>
                     <td width="100px">{{ number_format($transaction->debit, 2) }}</td>
