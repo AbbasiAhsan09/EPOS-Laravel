@@ -336,11 +336,11 @@
                                     {{-- <th>Field</th>
                                     <th>Category</th> --}}
                                     <th>Description</th>
-                                    <th>Bag Pack.</th>
+                                    {{-- <th>Bag Pack.</th> --}}
                                     <th>Qty</th>
                                     {{-- <th>Tax</th> --}}
                                     {{-- <th>Disc.</th> --}}
-                                    <th>Weight.</th>
+                                    {{-- <th>Weight.</th> --}}
                                     <th>Rate</th>
                                     <th>Total</th>
                                 </tr>
@@ -352,8 +352,8 @@
                                 {{-- <td>{{$item->item_details->categories->field->name ?? ''}}</td>
                                 <td>{{$item->item_details->categories->category ?? ''}}</td> --}}
                                 <td>{{$item->item_details->name ?? ''}}</td>
-                                <td>{{$item->bag_size ?? '-'}}</td>
-                                <td>{{$item->bags ?? '-'}}</td>
+                                {{-- <td>{{$item->bag_size ?? '-'}}</td> --}}
+                                {{-- <td>{{$item->bags ?? '-'}}</td> --}}
                                 {{-- <td>{{$item->tax}}</td> --}}
                                 {{-- <td>{{$item->disc}}</td> --}}
                                 <td>{{$item->qty}}</td>

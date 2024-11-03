@@ -27,11 +27,11 @@
     <table class="table table-responsive table-bordered" id="journal-entry-table">
         <thead>
             <th style="width: 200px;">Date</th>
-            <th style="width: 300px;">Account</th>
+            <th style="width: 300px;">From Account</th>
             <th >Description</th>
             <th style="width: 200px;">Credit</th>
             <th style="width: 200px;">Debit</th>
-            <th>From Account</th>
+            <th>To Account</th>
             <th >Action</th>
         </thead>
         <tbody>
