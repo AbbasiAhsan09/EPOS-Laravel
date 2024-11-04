@@ -1,5 +1,7 @@
 
-@include("reports.header")
+@extends('reports.layout')
+@section("report_content")
+
     @foreach ($ledgerData as $account)
     <div class="custom-box">
     <h5 class="title">{{ $account['account'] }} ({{ $account['account_type'] }})</h5>
@@ -60,3 +62,5 @@
     margin:0  
 }
 </style>
+
+@endsection

@@ -102,7 +102,11 @@ class AccountingReportController extends Controller
             }
 
             if($request->has("type") && $request->type === 'pdf'){
-                $data = ["ledgerData" => $ledgerData];
+                $data = ["ledgerData" => $ledgerData,
+                        'report_title' => 'Ledger Report',
+                        'from' => $startDate,
+                        'to' => $endDate
+                    ];
                 $pdf = Pdf::loadView('reports.accounts.pdfs.general-ledger', $data)->setPaper('a4', 'portrait');
                 return $pdf->stream();
             }
