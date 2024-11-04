@@ -36,8 +36,8 @@ class AccountingReportController extends Controller
     {
         try {
             // dd($request->all());
-            $startDate = $request->has("from") && $request->input("from") ? Carbon::parse($request->input("from")) : Carbon::now()->startOfWeek();
-            $endDate = $request->has("to") && $request->input("to") ? Carbon::parse($request->input("to")) : Carbon::now()->endOfWeek();
+            $startDate = $request->has("from") && $request->input("from") ? Carbon::parse($request->input("from")) : Carbon::now()->subDay(11);
+            $endDate = $request->has("to") && $request->input("to") ? Carbon::parse($request->input("to")) : Carbon::now();
 
             // Fetch all accounts with their transactions within the date range
             $accounts = Account::whereHas('transactions', function ($query) {
@@ -55,6 +55,11 @@ class AccountingReportController extends Controller
                 ->where(function($subQry){
                     $subQry->where("credit", '>',0)->orWhere("debit", '>',0);
                 })
+                ->with("sale.order_details.item_details")
+                ->with("purchase.details.items")
+                ->with("sale_return.order_details.item_details")
+                ->with("purchase_return")
+                ->orderByRaw("CASE WHEN (reference_type = 'opening_balance_customer' OR  reference_type =  'opening_balance_vendor') THEN 0 ELSE 1 END")
                 ->orderBy('transaction_date');
             }])->get();
             // dd($accounts);
@@ -82,11 +87,12 @@ class AccountingReportController extends Controller
 
                     // Prepare transaction data with running balance
                     $transactionsData[] = [
-                        'transaction_date' => $transaction->transaction_date,
+                        'transaction_date' => date("d/m/Y",strtotime($transaction->transaction_date)),
                         'description' => $transaction->note,
                         'debit' => $transaction->debit,
                         'credit' => $transaction->credit,
                         'running_balance' => $runningBalance,
+                        'data' => $transaction
                     ];
                 }
 
@@ -98,8 +104,11 @@ class AccountingReportController extends Controller
                     'starting_balance' => $startingBalance,
                     'transactions' => $transactionsData,
                     'ending_balance' => $runningBalance,
+                    // 'data' => $account
                 ];
             }
+
+            // return ($ledgerData);
 
             if($request->has("type") && $request->type === 'pdf'){
                 $data = ["ledgerData" => $ledgerData,

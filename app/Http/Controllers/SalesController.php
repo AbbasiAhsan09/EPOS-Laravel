@@ -121,9 +121,9 @@ class SalesController extends Controller
             if ($validate) {
 
                 $config = Configuration::filterByStore()->first();
-                $store_prefix = 'SA';
+                $store_prefix = 'SI';
                 $order  = new Sales();
-                $order->tran_no = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(Sales::latest()->first()->id) ? (Sales::max("id") + 1) : 1);
+                $order->tran_no = $store_prefix . '/'  . (isset(Sales::latest()->first()->id) ? (Sales::max("id") + 1) : 1);
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
                 $order->gp_no = $request->gp_no;
@@ -274,7 +274,7 @@ class SalesController extends Controller
                     if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
                         $party = Parties::find($order->customer_id);
                         if($party){
-                        $group_validation = PartiesController::is_customer_group($party->id);
+                        $group_validation = PartiesController::is_customer_group($party->group_id);
                         $is_customer = $group_validation["is_customer"];
                         $is_vendor = $group_validation["is_vendor"];
                            $party_account = Account::firstOrCreate(
@@ -716,7 +716,7 @@ class SalesController extends Controller
                         if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
                             $party = Parties::find($order->customer_id);
                             if($party){
-                                $group_validation = PartiesController::is_customer_group($party->id);
+                                $group_validation = PartiesController::is_customer_group($party->group_id);
                                 $is_customer = $group_validation["is_customer"];
                                 $is_vendor = $group_validation["is_vendor"];
                               
@@ -831,39 +831,14 @@ class SalesController extends Controller
 
 
                      if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
-                        $reversible_transactions = AccountTransaction::where([
-                            'store_id' => Auth::user()->store_id,
+                        AccountController::reverse_transaction([
                             'reference_type' => 'sales_order',
-                            'reference_id' => $id,
-                        ])->orderBy("id","DESC")->take(2)->get();
-        
-                        if($reversible_transactions && count($reversible_transactions) > 0){
-                            foreach ($reversible_transactions as $key => $reversible_transaction) {
-                                if($reversible_transaction->credit && $reversible_transaction->credit > 0){
-                                    AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
-                                        'account_id' => $reversible_transaction->account_id,
-                                        'reference_type' => 'sales_order',
-                                        'reference_id' => $id,
-                                        'credit' => 0,
-                                        'debit' => $reversible_transaction->credit,
-                                        'transaction_date' => date('Y-m-d',time()),
-                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Order '.$id.'   is deleted by '. Auth::user()->name.'',
-                                    ]);
-                                }else{
-                                    AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
-                                        'account_id' => $reversible_transaction->account_id,
-                                        'reference_type' => 'sales_order',
-                                        'reference_id' => $id,
-                                        'credit' => $reversible_transaction->debit,
-                                        'debit' => 0,
-                                        'transaction_date' => date('Y-m-d',time()),
-                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.'  because Order '.$id.'   is deleted by  '. Auth::user()->name.'',
-                                    ]);
-                                }
-                            }
-                        }
+                            'reference_id' => $sale->id,
+                            'transaction_count'=> 2,
+                            'order_by' => 'DESC',
+                            'order_column' => 'id',
+                            'description' => 'Transaction reversed because Order '.$sale->tran_no.'   is updated by '. Auth::user()->name.''
+                        ]);
                     }
                     
                     Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
@@ -902,7 +877,8 @@ class SalesController extends Controller
                 $query->filterByStore();
             })->first();
 
-            return view('sales.sale_orders.new_order', compact('customers','config','orderid','dynamicFields'));
+            $last_id = Sales::max("id");
+            return view('sales.sale_orders.new_order', compact('customers','config','orderid','dynamicFields','last_id'));
         } catch (\Throwable $th) {
             throw $th;
         }

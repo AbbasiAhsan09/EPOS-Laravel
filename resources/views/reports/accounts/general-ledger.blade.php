@@ -11,13 +11,13 @@
         <div class="col-lg-2">
             <label for="">From</label>
             <div class="input-group input-group-outline">
-                <input type="date" name="from" value="{{request()->from ?? ""}}" class="form-control">
+                <input type="date" name="from" value="{{request()->from ?? \Carbon\Carbon::now()->subDays(11)->toDateString()}}" class="form-control">
             </div>
         </div>
         <div class="col-lg-2">
             <label for="">To</label>
             <div class="input-group input-group-outline">
-                <input type="date" name="to" value="{{request()->to ?? ""}}" class="form-control">
+                <input type="date" name="to" value="{{request()->to ?? \Carbon\Carbon::now()->toDateString()}}" class="form-control">
             </div>
         </div>
 
@@ -68,20 +68,27 @@
         <tbody>
             <tr style="background: rgb(197, 250, 221)">
                 <td colspan="4" style="text-align: right"><strong>Opening Balance</strong></td>
-                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($account['starting_balance'], 2) }}</strong></td>
+                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format(abs($account['starting_balance']), 2) }} {{$account['starting_balance'] < 0 ? 'CR': "DR"}}</strong></td>
             </tr>
             @foreach ($account['transactions'] as $transaction)
                 <tr>
                     <td>{{ $transaction['transaction_date'] }}</td>
-                    <td>{{ $transaction['description'] }}</td>
+                    <td style="{{strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed') ? 'background : red; color : white' :''}}">
+                        @if (strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed'))
+                            <p>
+                                <strong>Reversed Entry</strong>
+                            </p>
+                        @endif
+                        @include("reports.accounts.component.transaction_description",['data' => $transaction['data']])
+                    </td>
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['debit'], 2) }}</td>
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['credit'], 2) }}</td>
-                    <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['running_balance'], 2) }}</td>
+                    <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format(abs($transaction['running_balance']), 2) }} {{$transaction['running_balance'] < 0 ? 'CR': "DR"}}</td>
                 </tr>
             @endforeach
             <tr style="background: rgb(250, 197, 208)">
                 <td colspan="4" style="text-align: right"><strong>Closing Balance</strong></td>
-                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($account['ending_balance'], 2) }}</strong></td>
+                <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].number_format(abs($account['ending_balance']), 2) }} {{$account['ending_balance'] < 0 ? 'CR': "DR"}}</strong></td>
             </tr>
         </tbody>
     </table>

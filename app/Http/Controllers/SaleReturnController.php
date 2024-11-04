@@ -121,7 +121,7 @@ class SaleReturnController extends Controller
             $existedInvoice = $request->has("invoice_no") && $request->invoice_no && !$request->has("party_id");
             $data = [];
             $data["store_id"] = Auth::user()->store_id;
-            $data["doc_no"] = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(SaleReturn::latest()->first()->id) ? (SaleReturn::max("id") + 1) : 1);
+            $data["doc_no"] = $store_prefix . '/' . (isset(SaleReturn::latest()->first()->id) ? (SaleReturn::max("id") + 1) : 1);
             $data["user_id"] = Auth::user()->id;
             $data["return_date"] = $request->has("return_date") ? $request->return_date : date('Y-m-d',time());
             if($existedInvoice){
@@ -252,7 +252,7 @@ class SaleReturnController extends Controller
 
                         $party = Parties::find($return->party_id);
                         if($party){
-                        $group_validation = PartiesController::is_customer_group($party->id);
+                        $group_validation = PartiesController::is_customer_group($party->group_id);
                         $is_customer = $group_validation["is_customer"];
                            $party_account = Account::firstOrCreate(
                                 [ 
@@ -482,7 +482,7 @@ class SaleReturnController extends Controller
 
                         $party = Parties::find($return->party_id);
                         if($party){
-                        $group_validation = PartiesController::is_customer_group($party->id);
+                        $group_validation = PartiesController::is_customer_group($party->group_id);
                         $is_customer = $group_validation["is_customer"];
                            $party_account = Account::firstOrCreate(
                                 [ 

@@ -170,7 +170,7 @@ class VoucherController extends Controller
             $prefix = $this->getFirstLetters($voucher_type->name); 
             $last_voucher = Voucher::orderBy('id', 'desc')->first();
             $last_voucher_id = $last_voucher ? $last_voucher->id : 1;
-            $doc_no = date("d") .'/'.$prefix.'/'.date("y").'/'.date('m').'/'.$last_voucher_id;
+            $doc_no = $prefix.'/'.$last_voucher_id;
             $voucher_input_data= [
                 'doc_no' => $doc_no,
                 'store_id' => Auth::user()->store_id,

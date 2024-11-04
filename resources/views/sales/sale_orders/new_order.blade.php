@@ -29,6 +29,9 @@
                         <div class="row align-items-center">
                             <div class="col-lg-2">
                                 <h1 class="page-title">{{$isEditMode ? 'Edit' : 'Create'}} Order {{$isEditMode ? (' : '.$order->tran_no ?? '') : '' }}</h1>
+                                @if (isset($last_id) && $last_id)
+                                    SI/{{$last_id + 1}}
+                                @endif
                             </div>
 
                            

@@ -14,6 +14,9 @@
                     <div class="row">
                         <div class="col-lg-2">
                             <h1 class="page-title">{{isset($order) ? 'Create' : 'Create'}} Purchase Invoice  </h1>
+                            @if (isset($last_id) && $last_id)
+                                PI/{{$last_id+1}}
+                            @endif
                         </div>
                         <div class="col">
                               {{-- Customer  --}}
