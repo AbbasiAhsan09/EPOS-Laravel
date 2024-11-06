@@ -1,5 +1,7 @@
 
-@include("reports.header")
+@extends('reports.layout')
+@section("report_content")
+
     @foreach ($ledgerData as $account)
     <div class="custom-box">
     <h5 class="title" >{{ $account['account'] }} LEDGER  </h5>
@@ -74,3 +76,5 @@ p{
     line-height: 0.2
 }
 </style>
+
+@endsection
