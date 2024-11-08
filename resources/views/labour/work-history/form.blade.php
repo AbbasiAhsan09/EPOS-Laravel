@@ -21,7 +21,7 @@
         @method($isEditMode ? "put" : "post")
             <div class="general-form">
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <div class="select_party_wrapper">
                             <h4 class="order_section_sub_title">
                                 Select Labour
@@ -72,19 +72,29 @@
                     <div class="col-lg-1">
                         <div class="select_party_wrapper">
                             <h4 class="order_section_sub_title">
-                                Closed
+                                Paid
                             </h4>
                             <div class="select_party"> 
                                 <div class="input-group input-group-outline">
-                                    <select name="is_ended"  class="form-control">
+                                    <select id="is_paid_selection" name="is_paid"  
+                                    
+                                    class="form-control {{$isEditMode  && $history->is_paid ? 'readonly' : '' }}  ">
                                         <option value="0">No</option>
-                                        <option value="1" {{$isEditMode  && $history->is_ended ? 'selected' : '' }}>Yes</option>
+                                        <option value="1" {{$isEditMode  && $history->is_paid ? 'selected' : '' }}>Yes</option>
                                     </select>
                                   </div> 
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-2" id="paid_date">
+                        <h4 class="order_section_sub_title">
+                           Paid On
+                        </h4>
+                        <div class="input-group input-group-outline">
+                        <input type="date" name="paid_date" value="{{$isEditMode && $history->is_paid && $history->paid_date ? $history->paid_date : '' }}" {{$isEditMode && $history->is_paid && $history->paid_date ? 'readonly' : ''}} id="paid_date_input"  class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
                         <h4 class="order_section_sub_title">
                             Net. Total
                         </h4>
@@ -321,6 +331,7 @@
         }
     });
 
+
     // Event listener for recalculating total when rate or quantity changes
     $(document).on('input', 'input[name="rate[]"], input[name="qty[]"]', function () {
         let row = $(this).closest('tr');
@@ -330,6 +341,31 @@
     // Initial calculation for the first row
     calculateTotal($('table tbody tr').first());
 });
+
+
+$(document).ready(function() {
+    
+    $("#is_paid_selection").on("change", function() {
+        paid_selection();
+    });
+
+    function paid_selection() {
+        const paid = $("#is_paid_selection").val();
+
+        if (+paid) {
+            
+            $("#paid_date").show();
+            $("#paid_date_input").prop("disabled", false).prop("required",true)
+        } else {
+            $("#paid_date").hide();
+            $("#paid_date_input").prop("disabled", true).prop("required",false);
+        }
+    }
+
+
+    paid_selection();
+});
+
 
 </script>
 @endsection

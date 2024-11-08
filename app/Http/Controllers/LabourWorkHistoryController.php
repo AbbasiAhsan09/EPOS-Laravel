@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use App\Models\Labour;
 use App\Models\LabourWorkHistory;
 use App\Models\LabourWorkHistoryItems;
@@ -94,11 +95,11 @@ class LabourWorkHistoryController extends Controller
             'labour_id' => "required",
             "start_date" => "required",
         ]);
-        $prefix = "LW";
+        $prefix = "LB";
         $labour_work_history_data = [];
         $labour_work_history_data["labour_id"] = $request->labour_id;
         $labour_work_history_data["start_date"] = $request->start_date;
-        $labour_work_history_data["doc_no"] = date('d') . '/' . $prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(LabourWorkHistory::latest()->first()->id) ? (LabourWorkHistory::max("id") + 1) : 1);
+        $labour_work_history_data["doc_no"] = $prefix . '/' . (isset(LabourWorkHistory::latest()->first()->id) ? (LabourWorkHistory::max("id") + 1) : 1);
         $labour_work_history_data["is_ended"] = $request->has("is_ended") && $request->is_ended ? $request->is_ended: false;
         $labour_work_history_data["is_paid"] = $request->has("is_paid") && $request->is_paid ? $request->is_paid: false;
         $labour_work_history_data["end_date"] = $request->has("end_date") && $request->end_date ? $request->end_date: null;
@@ -135,6 +136,46 @@ class LabourWorkHistoryController extends Controller
             }
             $net_total = $total + $history->other_charges + $history->bonus;
             $history->update(['total' => $total, "net_total" => $net_total]);
+
+            $payable_head = Account::filterByStore()->where('account_number',2000)->first();
+            $labour_account = Account::filterByStore()
+            ->where([
+                "reference_id" => $history->labour_id,
+                "reference_type" => 'labour'
+            ])->first();
+
+            if( $labour_account){    
+                if($payable_head && !$labour_work_history_data["is_paid"]){
+                    AccountController::record_journal_entry([
+                        'account_id'  => $labour_account->id,
+                        'transaction_date' => !empty($labour_work_history_data["paid_date"]) ? $labour_work_history_data["paid_date"] : date("Y-m-d",time()),
+                        'note' => 'Labour bill #' . $history->doc_no . ' Account : ' . $labour_account->title,
+                        'credit' => 0,
+                        'debit' => $history->net_total,
+                        'reference_type' => 'labour_bill',
+                        'reference_id' => $history->id,
+                        'source_account' => $payable_head->id,
+                    ]);
+                }
+                if($labour_work_history_data["is_paid"]){
+                    $cash_account = Account::filterByStore()->where('account_number',1000)->first();
+                    if($cash_account){
+                        AccountController::record_journal_entry([
+                            'account_id'  => $labour_account->id,
+                            'transaction_date' => !empty($labour_work_history_data["paid_date"]) ? $labour_work_history_data["paid_date"] : date("Y-m-d",time()),
+                            'note' => 'Labour bill #' . $history->doc_no,
+                            'credit' => 0,
+                            'debit' => $history->net_total,
+                            'reference_type' => 'labour_bill',
+                            'reference_id' => $history->id,
+                            'source_account' => $cash_account->id,
+                        ]);
+                    }
+                }
+
+            }
+
+
         }
 
         toast("Labour bill created successfully",'success');
@@ -234,6 +275,54 @@ class LabourWorkHistoryController extends Controller
                }
                $net_total = $total + $history->other_charges + $history->bonus;
                $history->update(['total' => $total, "net_total" => $net_total]);
+               
+               $payable_head = Account::filterByStore()->where('account_number',2000)->first();
+               $labour_account = Account::filterByStore()
+               ->where([
+                   "reference_id" => $history->labour_id,
+                   "reference_type" => 'labour'
+               ])->first();
+
+               AccountController::reverse_transaction([
+                'reference_type' => 'labour_bill',
+                'reference_id' => $history->id,
+                'date' => null,
+                'description' => 'Revrsed transaction for labour bill# '.$history->doc_no,
+                'transaction_count' => 2,
+                'order_column' => 'id',
+                'order_by' => 'DESC',
+            ]);
+
+            if( $labour_account){    
+                if($payable_head && !$labour_work_history_data["is_paid"]){
+                    AccountController::record_journal_entry([
+                        'account_id'  => $labour_account->id,
+                        'transaction_date' => !empty($labour_work_history_data["paid_date"]) ? $labour_work_history_data["paid_date"] : date("Y-m-d",time()),
+                        'note' => 'Labour bill #' . $history->doc_no. ' Account : ' . $labour_account->title,
+                        'credit' => $history->net_total,
+                        'debit' => 0,
+                        'reference_type' => 'labour_bill',
+                        'reference_id' => $history->id,
+                        'source_account' => $payable_head->id,
+                    ]);
+                }
+                if($labour_work_history_data["is_paid"]){
+                    $cash_account = Account::filterByStore()->where('account_number',1000)->first();
+                    if($cash_account){
+                        AccountController::record_journal_entry([
+                            'account_id'  => $cash_account->id,
+                            'transaction_date' => !empty($labour_work_history_data["paid_date"]) ? $labour_work_history_data["paid_date"] : date("Y-m-d",time()),
+                            'note' => 'Labour bill #' . $history->doc_no,
+                            'credit' => $history->net_total,
+                            'debit' => 0,
+                            'reference_type' => 'labour_bill',
+                            'reference_id' => $history->id,
+                            'source_account' => $labour_account->id,
+                        ]);
+                    }
+                }
+
+            }
            }
    
            toast("Labour bill updated successfully",'success');

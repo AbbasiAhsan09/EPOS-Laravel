@@ -150,3 +150,8 @@ border-color: var(--bs-pink);
     .btn-dashboard{
     
     }
+
+    
+    .readonly{
+        pointer-events: none; background-color: #f0f0f0;
+    }

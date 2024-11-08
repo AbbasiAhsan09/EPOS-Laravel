@@ -92,12 +92,16 @@
         </thead>
         <tbody>
             @foreach ($items as $item)
-                <tr style="{{!empty($item->end_date) ? 'background: rgb(233, 187, 187); color : black' : ''}}">
+                <tr style="{{!empty($item->end_date) ? 'background: rgb(233, 187, 187); color : black;' : ''}} {{$item->is_paid ? 'background : #6ffc76; color : black !important;' : ''}}">
                     <td>
                         @if (!empty($item->end_date))
                         <span class="badge badge-sm bg-gradient-danger">Closed</span>
                         @else
                         <span class="badge badge-sm bg-gradient-success">Open</span>
+                        @endif
+
+                        @if($item->is_paid)
+                        <span class="badge badge-sm bg-gradient-success">(Paid)</span>
                         @endif
                     </td>
                     <td>{{$item->doc_no ?? ""}}</td>
