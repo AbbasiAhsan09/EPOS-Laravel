@@ -475,7 +475,6 @@ class AccountController extends Controller
                     foreach ($transactions as  $transaction) {
 
                         if($delete){
-                            dump("reversing....");
                             $transaction->delete();
                             continue;
                         }

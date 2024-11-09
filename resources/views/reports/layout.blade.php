@@ -118,7 +118,11 @@
                 <th style="text-align: left; width: 200px">
                     <div class="brand" >
             @if (ConfigHelper::getStoreConfig() && ConfigHelper::getStoreConfig()['logo'] && ConfigHelper::getStoreConfig()['invoice_logo'])
-            <img src="{{asset("images/logo/".ConfigHelper::getStoreConfig()['logo']."")}}"  alt="Not Available" style="margin-top : 20px" width="80px" class="inv_logo">
+            <img src="{{ 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(public_path('images/logo/' . ConfigHelper::getStoreConfig()['logo']))) }}" 
+            alt="Not Available" 
+            style="margin-top: 20px;" 
+            width="80px" 
+            class="inv_logo">
             @elseif(ConfigHelper::getStoreConfig() && ConfigHelper::getStoreConfig()['invoice_name'])
                 <h2 style="text-transform: uppercase">{{ConfigHelper::getStoreConfig() ? ConfigHelper::getStoreConfig()['app_title'] : 'Demo'}}</h2>
             @endif
@@ -160,5 +164,22 @@
     <footer>
         Powered by TradeWisePOS - PH : +92-320-0681969
     </footer>
+
+    <style>
+        table{
+            width: 100% ;
+        }
+        table, th, td {
+      border: 1px solid gray;
+      border-collapse: collapse;
+    }
+        .dates{
+            float: right
+        }
+
+        body table th{
+            font-size: 12px !important
+        }
+    </style>
 </body>
 </html>

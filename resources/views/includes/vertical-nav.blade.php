@@ -62,6 +62,12 @@
 
         <li class="menu-item">Accounting
             <ul class="submenu">
+                <li class="submenu-item"><a href="/journal-voucher/create">Journal Voucher</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"> <a href="/journal-voucher/create/">Create</a> </li>
+                        <li class="childmenu-item"> <a href="/journal-voucher"> List</a> </li>
+                    </ul>
+                </li>
                 <li class="submenu-item"><a href="/account">Accounts</a></li>
                 <li class="submenu-item"><a href="/account/journal">New Transactions</a></li>
                 <li class="submenu-item"><a href="/account/transactions">Transaction</a></li>
@@ -73,11 +79,17 @@
         <li class="menu-item">
             Vouchers
             <ul class="submenu">
+                <li class="submenu-item"><a href="/journal-voucher/create">Journal Voucher</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"> <a href="/journal-voucher/create/">Create</a> </li>
+                        <li class="childmenu-item"> <a href="/journal-voucher"> List</a> </li>
+                    </ul>
+                </li>
                 @foreach ($voucher_types as $voucher_type)
                 <li class="submenu-item"><a href="/voucher/create/{{$voucher_type->id}}">{{$voucher_type->name}}</a>
                     <ul class="childmenu">
-                        <li class="childmenu-item"> <a href="/voucher/create/{{$voucher_type->id}}">Create {{$voucher_type->name}}</a> </li>
-                        <li class="childmenu-item"> <a href="/voucher?voucher_type_id={{$voucher_type->id}}">{{$voucher_type->name}} List</a> </li>
+                        <li class="childmenu-item"> <a href="/voucher/create/{{$voucher_type->id}}">Create </a> </li>
+                        <li class="childmenu-item"> <a href="/voucher?voucher_type_id={{$voucher_type->id}}">List</a> </li>
                     </ul>
                 </li>
             @endforeach
@@ -86,15 +98,17 @@
 
         <li class="menu-item">Reporting
             <ul class="submenu">
-                <li class="submenu-item"><a href="/reports/inventory-report">Inventory Balance Report</a></li>
-                <li class="submenu-item"><a href="/reports/sales-report">Sale Report</a></li>
-                <li class="submenu-item"><a href="/sales/returns">Sale Return Report</a></li>
-                <li class="submenu-item"><a href="/reports/sales-detail-report">Sale Detail Report</a></li>
-                <li class="submenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
-                <li class="submenu-item"><a href="/purchase/returns">Purchase Return Report</a></li>
-                <li class="submenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
                 <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
+                <li class="submenu-item"><a href="/reports/inventory-report">Inventory Balance Report</a></li>
+                <li class="submenu-item"><a href="/journal-voucher">Journal Voucher Report</a></li>
                 <li class="submenu-item"><a href="/reports/accounting/general-ledger">Ledger Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
+                <li class="submenu-item"><a href="/purchase/returns">Purchase Return Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
+                <li class="submenu-item"><a href="/reports/sales-detail-report">Sale Detail Report</a></li>
+                <li class="submenu-item"><a href="/sales/returns">Sale Return Report</a></li>
+                <li class="submenu-item"><a href="/reports/sales-report">Sale Report</a></li>
+            
             </ul>
         </li>
 

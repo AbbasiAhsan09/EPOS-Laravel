@@ -123,7 +123,7 @@ class AccountingReportController extends Controller
             $all_accounts = Account::whereHas('transactions', function ($query) {
                 $query->where('credit', '>', 0)
                       ->orWhere('debit', '>', 0);
-            })->get();
+            })->filterByStore()->get();
             $accounts = $all_accounts->groupBy("type");
             // dd($accounts);
             return view("reports.accounts.general-ledger",compact("ledgerData","accounts"));

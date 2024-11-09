@@ -6,9 +6,11 @@ use App\Models\Configuration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class ConfigurationController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      *
@@ -54,12 +56,39 @@ class ConfigurationController extends Controller
                     $config = new Configuration();
                 }
                 $config->app_title  = $request->business;
-                if($request->file('logo')){
+                // if($request->file('logo')){
+                //     $file = $request->file('logo');
+                //     $ext = $file->getClientOriginalName();
+                //     $rename_file = time().''.$ext;
+                //     $file->move(public_path('images/logo/'),$rename_file);
+                //     $config->logo = $rename_file;
+                // }
+                if ($request->file('logo')) {
+                    // Get the uploaded file
                     $file = $request->file('logo');
-                    $ext = $file->getClientOriginalName();
-                    $rename_file = time().''.$ext;
-                    $file->move(public_path('images/logo/'),$rename_file);
+                    
+                    // Generate a unique file name
+                    $ext = $file->getClientOriginalExtension();
+                    $rename_file = time() . '.' . $ext;
+            
+                    // Define the upload path
+                    $uploadPath = public_path('images/logo/');
+                    
+                    // Move the file to the target directory
+                    $file->move($uploadPath, $rename_file);
+            
+                    // Full path of the uploaded file
+                    $filePath = $uploadPath . $rename_file;
+            
+                    // Optimize the image
+                    $optimizerChain = OptimizerChainFactory::create();
+                    // dump($filePath);
+                    $optimizerChain->optimize($filePath);
+                    // dd($optimizerChain);
+            
+                    // Save the file name in the configuration or database
                     $config->logo = $rename_file;
+        
                 }
                 $config->phone  =  $request->phone;
                 $config->address = $request->address;

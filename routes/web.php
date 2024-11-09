@@ -8,6 +8,7 @@ use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\JournalVoucherController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseReportController;
@@ -216,6 +217,18 @@ Route::middleware("manager.role")->prefix("voucher")->group(function(){
     Route::put("/update/{id}",[VoucherController::class, 'update'])->name("voucher.update");
     Route::delete('/{id}',[VoucherController::class,'destroy'])->name("voucher.delete");
 });
+
+
+Route::middleware("manager.role")->prefix("journal-voucher")->group(function(){
+    Route::get("/",[JournalVoucherController::class, 'index'])->name("journal-voucher.index");
+    Route::get("/create/{id?}",[JournalVoucherController::class,'create']);
+    Route::get("/detail/{id}",[JournalVoucherController::class,'show']);
+    Route::post("/store",[JournalVoucherController::class, 'store'])->name("journal-voucher.store");
+    Route::put("/update/{id}",[JournalVoucherController::class, 'update'])->name("journal-voucher.update");
+    Route::delete('/{id}',[JournalVoucherController::class,'destroy'])->name("journal-voucher.delete");
+});
+
+
 Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
     Route::get("/return/{id}",[SaleReturnController::class,'invoice'])->name("return.print");
