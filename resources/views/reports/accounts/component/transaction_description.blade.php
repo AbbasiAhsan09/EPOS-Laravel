@@ -35,7 +35,7 @@
        @endif
 
     @if ($data && isset($data->purchase) && $data->reference_type === 'purchase_invoice')
-        <p>Purchase#{{ $data->purchase->doc_num }} - {{$data->purchase->condition ? "On condition ".$data->purchase->condition : ''}} Dated {{date('d/m/Y',strtotime($data->purchase->bill_date))}} 
+        <p>Purchase#{{ $data->purchase->doc_num }} - {{$data->purchase->condition ? "On condition ".$data->purchase->condition : ''}} Dated {{date('d/m/Y',strtotime($data->purchase->bill_date ? $data->purchase->bill_date : $data->purchase->created_at))}} 
             {{ $data->purchase->gp_no ? ' - GP : '. $data->purchase->gp_no : "" }}</p>
         @if ($data->purchase && count($data->purchase->details))
             @foreach ($data->purchase->details as $detail)
