@@ -1,17 +1,9 @@
-<title>Sale Detail Report</title>
-@include('reports.header')
-<h2>
-    Sale Detail Report
-        @if ((isset($from) && isset($to)) && (!empty($from) && !empty($to)))
-        <span class="dates">
-        From: {{isset($from) ? date('d-m-y', strtotime($from)) : ''}} To: {{isset($to) ? date('d-m-y', strtotime($to)) : ''}}
-    </span>
-        @endif
-    
-</h2>
+@extends('reports.layout')
+@section("report_content")
+
 <table class="table table-sm table-responsive-sm table-striped ">
     <thead>
-        <th>Inv ID</th>
+        <th>SID</th>
         <th>Doc #</th>
         <th>Date</th>
         {{-- <th>Field</th> --}}
@@ -36,7 +28,7 @@
                 {{-- </a> --}}
                 </td>
                 {{-- <td>{{$item->item_details->categories->field->name ?? ""}}</td> --}}
-                <td>{{date('m-d-y', strtotime($item->created_at))}}</td>
+                <td>{{date('d/m/Y', strtotime($item->created_at))}}</td>
                 <td>{{$item->item_details->categories->category ?? ""}}</td>
                 <td>{{$item->item_details->name ?? ""}}</td>
                 <td>{{$item->bag_size ?? "-"}}</td>
@@ -57,15 +49,4 @@
     </tfoot>
     </tbody>
 </table>
-<style>
-    table{
-        width: 100% ;
-    }
-    table, th, td {
-  border: 1px solid gray;
-  border-collapse: collapse;
-}
-    .dates{
-        float: right
-    }
-</style>
+@endsection

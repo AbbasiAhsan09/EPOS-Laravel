@@ -45,7 +45,12 @@ class PurchaseReturnController extends Controller
             }
 
             if($request->input("type") === 'pdf'){
-                $data = ["records" => $items->get()];
+                $data = [
+                    "records" => $items->get(),
+                    "report_title" => "Purchase Return Report",
+                    "from" => $request->input("start_date") ?? null,
+                    "to" => $request->input("end_date") ?? null,
+            ];
                 $pdf = Pdf::loadView('reports.purchase-report.return.report', $data)->setPaper('a4', 'portrait');
                 return $pdf->stream();
             }

@@ -19,7 +19,8 @@
         "rachidlaasri/laravel-installer": "^4.1",
         "realrashid/sweet-alert": "^5.1",
         "spatie/dropbox-api": "^1.21",
-        "spatie/laravel-backup": "^8.2"
+        "spatie/laravel-backup": "^8.2",
+        "spatie/laravel-image-optimizer": "^1.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

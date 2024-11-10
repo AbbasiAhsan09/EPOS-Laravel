@@ -118,7 +118,11 @@
                 <th style="text-align: left; width: 200px">
                     <div class="brand" >
             @if (ConfigHelper::getStoreConfig() && ConfigHelper::getStoreConfig()['logo'] && ConfigHelper::getStoreConfig()['invoice_logo'])
-            <img src="{{asset("images/logo/".ConfigHelper::getStoreConfig()['logo']."")}}"  alt="Not Available" style="margin-top : 20px" width="80px" class="inv_logo">
+            <img src="{{ 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(public_path('images/logo/' . ConfigHelper::getStoreConfig()['logo']))) }}" 
+            alt="Not Available" 
+            style="margin-top: 20px;" 
+            width="80px" 
+            class="inv_logo">
             @elseif(ConfigHelper::getStoreConfig() && ConfigHelper::getStoreConfig()['invoice_name'])
                 <h2 style="text-transform: uppercase">{{ConfigHelper::getStoreConfig() ? ConfigHelper::getStoreConfig()['app_title'] : 'Demo'}}</h2>
             @endif
@@ -128,7 +132,7 @@
             @endif
         </div>
                 </th>
-                <th style="text-align: center; width: 200px">{{$report_title ?? "Report"}}</th>
+                <th style="text-align: center; width: 200px; text-decoration : underline">{{$report_title ?? "Report"}}</th>
                 <th style="text-align: right; width: 200px">
                      <div class="vendor">
                         <img src="{{asset("images/logo.png")}}" alt="Not Available" width="80px">
@@ -155,10 +159,31 @@
         </table>
         
     </div>
-    @yield('report_content')
+    <div class="report-content">
+        @yield('report_content')
+    </div>
    
     <footer>
         Powered by TradeWisePOS - PH : +92-320-0681969
     </footer>
+
+    <style>
+        table{
+            width: 100% ;
+        }
+        table, th, td {
+      border: 1px solid gray;
+      border-collapse: collapse;
+    }
+        .dates{
+            float: right
+        }
+
+        .report-content table th{
+            font-size: 12px !important;
+            background : black;
+            color: white
+        }
+    </style>
 </body>
 </html>
