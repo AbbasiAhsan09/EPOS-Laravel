@@ -1,15 +1,5 @@
-
-
-@php
-    $config = ConfigHelper::getStoreConfig();
-@endphp
-
-{{ (isset($config) && $config['app_title']) ? $config['app_title'] : 'Demo' }} <br>
-<small>{{date("d-m-Y", time())}}</small>
-<div class="custom-box" style="margin-bottom: 10px">
-    <h2>Financial Report </h2>
-   
-</div>
+@extends('reports.layout')
+@section('report_content')
 @foreach ($data as $key => $item)
 <div class="custom-box">
     {{-- <hr style="background: gray"> --}}
@@ -95,3 +85,4 @@ background: #fbfbfb;
     margin:0  
 }
 </style>
+@endsection

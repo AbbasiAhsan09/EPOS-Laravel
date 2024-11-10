@@ -942,7 +942,10 @@ class AccountController extends Controller
             $data = collect($data)->groupBy('parent_account');
             
             if($pdf){
-                $data = ["data" => $data->toArray()];
+                $data = [
+                    "data" => $data->toArray(),
+                    'report_title' => 'Financial Report'
+                ];
                 $pdf = Pdf::loadView('accounts.reports.pdf.trial-balance', $data)->setPaper('a4', 'portrait');
                 return $pdf->stream();
             }

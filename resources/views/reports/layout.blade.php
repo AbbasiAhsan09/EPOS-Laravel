@@ -132,7 +132,7 @@
             @endif
         </div>
                 </th>
-                <th style="text-align: center; width: 200px">{{$report_title ?? "Report"}}</th>
+                <th style="text-align: center; width: 200px; text-decoration : underline">{{$report_title ?? "Report"}}</th>
                 <th style="text-align: right; width: 200px">
                      <div class="vendor">
                         <img src="{{asset("images/logo.png")}}" alt="Not Available" width="80px">
@@ -159,7 +159,9 @@
         </table>
         
     </div>
-    @yield('report_content')
+    <div class="report-content">
+        @yield('report_content')
+    </div>
    
     <footer>
         Powered by TradeWisePOS - PH : +92-320-0681969
@@ -177,8 +179,10 @@
             float: right
         }
 
-        body table th{
-            font-size: 12px !important
+        .report-content table th{
+            font-size: 12px !important;
+            background : black;
+            color: white
         }
     </style>
 </body>

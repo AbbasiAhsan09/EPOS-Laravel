@@ -50,6 +50,7 @@ class SalesReportController extends Controller
                 'records' => $records,
                 'from' => $from,
                 'to' => $to,
+                'report_title' => "Sales Report"
             ];
             $pdf = Pdf::loadView('reports.sales-report.pdf-report1', $data)->setPaper('a4', 'landscape');
             return $pdf->stream();
@@ -110,6 +111,7 @@ class SalesReportController extends Controller
                     'records' => $records,
                     'from' => $from,
                     'to' => $to,
+                    'report_title' => 'Sales Detail Report'
                 ];
                 $pdf = PDF::loadView('reports.sales-report.pdf-report2', $data)->setPaper('a4', 'landscape');
                 return $pdf->stream();

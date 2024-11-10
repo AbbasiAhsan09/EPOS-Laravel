@@ -1,14 +1,7 @@
-<title>Inventory Report</title>
-@include('reports.header')
-<h2>
-    Inventory Report {{request()->filter_deleted == 'true' ? '(Deleted)' : ''}}
-    @if ((isset($from) && isset($to)) && (!empty($from) && !empty($to)))
-    <span class="dates">
-        From: {{isset($from) ? date('d-m-y', strtotime($from)) : ''}} To: {{isset($to) ? date('d-m-y', strtotime($to)) : ''}}
-    </span>
-    @endif
+@extends('reports.layout')
+@section('report_content')
+    
 
-</h2>
 <table border="1">
     <thead>
         <th>Field</th>
@@ -42,19 +35,12 @@
         </tr>
         @endforeach
     </tbody>
+    <tfoot>
+        <tr>
+        <th colspan="7">Total</th>
+        <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].$total ?? 0}}</th>
+        </tr>
+    </tfoot>
 </table>
-<h4>Total Cost : {{ConfigHelper::getStoreConfig()["symbol"].$total ?? 0}}</h4>
-<style>
-    table{
-        width: 100% ;
-    }
-    
-    table, th, td {
-  border: 1px solid gray;
-  border-collapse: collapse;
-}
 
-    .dates{
-        float: right
-    }
-</style>
+@endsection

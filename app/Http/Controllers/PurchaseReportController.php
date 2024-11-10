@@ -52,7 +52,8 @@ class PurchaseReportController extends Controller
                 $data = [
                     'records' => $records,
                     'from' => $from,
-                    'to' => $to
+                    'to' => $to,
+                    'report_title' => 'Purchase Report'
                 ];
                 $pdf = PDF::loadView('reports.purchase-report.pdf-report1', $data)->setPaper('a4', 'landscape');
                 return $pdf->stream();
@@ -139,6 +140,7 @@ class PurchaseReportController extends Controller
                     'records' => $records,
                     'from' => $from,
                     'to' => $to,
+                    'report_title' => "Purchase Detail Report"
                 ];
                 $pdf = PDF::loadView('reports.purchase-report.pdf-report2', $data)->setPaper('a4', 'landscape');
                 return $pdf->stream();

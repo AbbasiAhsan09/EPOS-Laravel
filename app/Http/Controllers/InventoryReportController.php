@@ -79,6 +79,7 @@ class InventoryReportController extends Controller
                     $records = $records->get();
                     $data = [
                         'records' => $records,
+                        'report_title' => 'Inventory Balance Report'
                     ];
                     $pdf = Pdf::loadView('reports.inventory-report.pdf-report1', $data)->setPaper('a4', 'landscape');
                     return $pdf->stream();
