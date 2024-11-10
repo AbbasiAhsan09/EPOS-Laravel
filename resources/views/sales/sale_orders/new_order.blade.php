@@ -88,14 +88,15 @@
                                         <div class="col-lg-2">
                                             {{-- Customer  --}}
                                         <div class="select_party_wrapper">
-                                            <h4 class="order_section_sub_title">
-                                                Select Customer
+                                            <h4 class="order_section_sub_title d-flex align-items-center justify-content-between">
+                                                <span>Select Party </span> <i style="cursor: pointer;" class="fa fa-plus" data-bs-toggle="modal" data-bs-target="#addPartyModal"></i>
                                             </h4>
                                             <div class="select_party">
                                                 
                                                 <div class="input-group input-group-outline">
-                                                    <select name="party_id" class="form-control" id="customer_select" >
-                                                        <option value="">Select Customer</option>
+                                                    @livewire('party-dropdown', ['name' => 'customer_select', 'selected_id' => ($isEditMode && $order->customer_id ? $order->customer_id : null)])
+                                                    {{-- <select name="party_id" class="form-control" id="customer_select" >
+                                                        <option value="">Select Party</option>
                                                         @foreach ($customers as $group => $parties)
                                                             <optgroup label="{{ ucfirst($group ?? '') }}">
                                                                 @foreach ($parties as $party)
@@ -106,7 +107,7 @@
                                                                 @endforeach
                                                             </optgroup>
                                                         @endforeach
-                                                    </select>
+                                                    </select> --}}
                                                   </div> 
                                             </div>
                                         </div>
@@ -450,6 +451,10 @@
         </div>
     </form>
     </div>
+
+    @livewire('party-live-wire')
+
+
     @if (session('openNewWindow'))
         <script>
             $(document).ready(function(){

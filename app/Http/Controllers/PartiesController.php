@@ -129,7 +129,7 @@ class PartiesController extends Controller
     }
 
 
-    public function create_party_account(int $party_id) {
+    static function create_party_account(int $party_id) {
         try {
 
             $party = Parties::find($party_id);
@@ -138,7 +138,7 @@ class PartiesController extends Controller
                 return false;
             }
 
-            $group_validation = $this->is_customer_group($party->group_id);
+            $group_validation = PartiesController::is_customer_group($party->group_id);
             $is_vendor = $group_validation['is_vendor'];
             $is_customer = $group_validation['is_customer'];
 

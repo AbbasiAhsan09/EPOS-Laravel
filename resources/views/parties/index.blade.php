@@ -285,20 +285,7 @@
                     <input type="text" class="form-control" name="business_name"  placeholder="Demo Trades">
                   </div>
                   </div>
-
-                    
-                    
-                   
-{{-- 
-                    <div class="col-lg-4">
-                        <label for="">Party  Website </label>
-                    <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" name="website"  placeholder="example.com">
-                    </div>
-                    </div> --}}
-                    
                     @livewire('location')
-                    
 
                     <div class="col-lg-12">
                         <label for="">Party  Address </label>

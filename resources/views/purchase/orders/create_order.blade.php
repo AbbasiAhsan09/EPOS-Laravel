@@ -324,7 +324,7 @@
             </div>
         </div>
     </div>
-    
+
 @section('scripts')
      {{-- Custom jS --}}
 <script src="{{asset('js/quotation.js')}}"></script>
