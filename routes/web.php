@@ -193,7 +193,7 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
         'purchase-report' => PurchaseReportController::class,
         'inventory-report' => InventoryReportController::class,
     ]);
-    
+    Route::get('inventory-balance',[InventoryReportController::class, 'real_inventory'])->name("inventory.balance");
     Route::prefix('accounting')->group(function () {
         Route::get("customer-payments",[AccountingReportController::class,'customer_payments']);
         Route::get("general-ledger",[AccountingReportController::class,'generate_general_ledger_report']);

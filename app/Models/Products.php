@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Products extends Model
 {
-    protected $fillable = ['mrp','tp','taxes','discount','check_inv'];
+    protected $fillable = ['mrp','tp','taxes','discount','check_inv','opening_stock_unit_cost'];
     protected $appends = ['fullProductName'];
      /**
      * Get the user that owns the ProductCategory
