@@ -65,7 +65,7 @@
       @endif
 
       <div class="col-lg-2">
-        <a href="/reports/inventory-report" class="btn btn-warning w-100 btn-large btn-dashboard">Inventory Balance</a>
+        <a href="/reports/inventory-balance" class="btn btn-warning w-100 btn-large btn-dashboard">Inventory Balance</a>
       </div>
       <div class="col-lg-2">
         <a href="/products" class="btn btn-success w-100 btn-large btn-dashboard">Items</a>
