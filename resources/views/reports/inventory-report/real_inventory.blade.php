@@ -60,7 +60,9 @@
         <th>Product</th>
         <th>Opening Stock</th>
         <th>Purchased Stock</th>
+        <th>P.Return Stock</th>
         <th>Sold Stock</th>
+        <th>S.Return Stock</th>
         <th>Available Stock</th>
         <th>Avg Cost</th>
         <th>Total Cost</th>
@@ -75,8 +77,35 @@
                     <td>{{$item->category}}</td>
                     <td>{{$item->name}}</td>
                     <td>{{number_format(($item->opening_qty ?? 0),2)}}</td>
-                    <td>{{number_format(($item->purchased_qty) - ($item->purchase_return_qty),2)}}</td>
-                    <td>{{number_format(($item->sold_qty) - ($item->sold_returned_qty),2)}}</td>
+                    <td>
+                        @if ($item->purchased_qty != 0)
+                        <a href="/reports/purchase-detail-report?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank">{{number_format(($item->purchased_qty),2)}}</a>
+                        @else
+                        {{number_format(($item->purchased_qty),2)}}
+                        @endif
+                    </td>
+                    <td>
+                        @if ($item->purchase_return_qty != 0)
+                        <a href="/purchase/returns/detail/?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank">{{number_format($item->purchase_return_qty,2)}}</a>
+                        @else
+                            {{number_format($item->purchase_return_qty,2)}}
+                        @endif
+                    </td>
+                    <td>
+                        @if ($item->sold_qty != 0)
+                            <a href="/reports/sales-detail-report?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank" >{{number_format(($item->sold_qty),2)}}</a>
+                        @else
+                        {{number_format(($item->sold_qty),2)}}
+                        @endif
+                    </td>
+                    
+                    <td>
+                        @if ($item->sold_returned_qty != 0)
+                        <a href="/sales/returns/detail?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank" >{{number_format(($item->sold_returned_qty),2)}}</a>
+                        @else
+                            {{number_format($item->sold_returned_qty,2)}}
+                        @endif
+                    </td>
                     <td>{{number_format(($item->avl_qty),2)}}</td>
                     <td>{{number_format(($item->avg_rate),2)}}</td>
                     <td>{{number_format(($item->avg_rate) * ($item->avl_qty) ,2)}}</td>

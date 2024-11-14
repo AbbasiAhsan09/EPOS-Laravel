@@ -100,6 +100,8 @@ class InventoryReportController extends Controller
                 ->selectRaw("
                     p.name,
                     p.id AS item_id,
+                    fields.id as field_id,
+                    product_categories.id as category_id,
                     fields.name as field,
                     p.low_stock as low_stock_indicator,
                     product_categories.category as category,

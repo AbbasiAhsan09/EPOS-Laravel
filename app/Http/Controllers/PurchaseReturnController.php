@@ -492,4 +492,66 @@ class PurchaseReturnController extends Controller
         }
     }
 
+
+    public function details(Request $request) {
+        try {
+
+            // dd($request->all());
+            
+            $records = PurchaseReturnDetail::with('return')
+            ->whereHas('return', function($query) {
+                $query->filterByStore();
+            });
+
+            if($request->has("from") && !empty($request->input("from"))){
+                $records = $records->whereHas("return",function($query) use($request){
+                    $query->where('return_date','>=', $request->from);
+                });
+            }
+
+            if($request->has("to") && !empty($request->input("to"))){
+                $records = $records->whereHas("return",function($query) use($request){
+                    $query->where('return_date','<=', $request->to);
+                });
+            }
+
+            if($request->has("category") && !empty($request->input("category"))){
+                $records = $records->whereHas("item_details",function($query) use($request){
+                    $query->where("category", $request->category);
+                });
+            }
+
+            if($request->has("field") && !empty($request->input("field"))){
+                $records = $records->whereHas('item_details.categories',  function($q) use($request){
+                    $q->where('parent_cat', $request->field);
+                });
+            }
+
+            if($request->has("product") && !empty($request->input("product"))){
+                $records = $records->where('item_id', $request->product);
+            }
+
+            if ($request->has('type') && $request->type === 'pdf') {
+
+                $records = $records->get();
+                $data = [
+                    'records' => $records,
+                    'from' => $request->from ?? null,
+                    'to' => $request->to ?? null,
+                    'report_title' => "Purchase Return Detail Report"
+                ];
+                $pdf = PDF::loadView('purchase.invoices.return.pdf-detail-report', $data)->setPaper('a4', 'landscape');
+                return $pdf->stream();
+            }
+
+
+            $records = $records->paginate(20);
+
+            return view("purchase.invoices.return.detail-report", compact("records"));
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
 }

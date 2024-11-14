@@ -165,6 +165,7 @@ Route::prefix('sales')->group(function () {
     Route::put('return/{id}',[SaleReturnController::class, 'update'])->name("update.return");
     Route::delete('return/{id}',[SaleReturnController::class, 'destroy'])->name("delete.return");
     Route::get('returns',[SaleReturnController::class, 'index'])->name("index.return");
+    Route::get('returns/detail',[SaleReturnController::class, 'details'])->name("detail.return");
     
 });
 
@@ -181,6 +182,7 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         // Purchase return routes
         Route::get('return/{id?}',[PurchaseReturnController::class, 'create_update_purchase_return']);
         Route::get('returns',[PurchaseReturnController::class, 'index'])->name('index.purchase_return');
+        Route::get('returns/detail',[PurchaseReturnController::class, 'details'])->name('detail.purchase_return');
         Route::post('return',[PurchaseReturnController::class, 'store'])->name("add.purchase_return");
         Route::put('return/{id}',[PurchaseReturnController::class, 'update'])->name("update.purchase_return");
         Route::delete('return/{id}',[PurchaseReturnController::class, 'destroy'])->name("delete.purchase_return");

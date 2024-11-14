@@ -34,6 +34,17 @@ class SaleReturnDetail extends Model
     {
         return $this->belongsTo(Products::class, 'item_id', 'id');
     }
+
+
+    /**
+     * Get the return that owns the SaleReturnDetail
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function return(): BelongsTo
+    {
+        return $this->belongsTo(SaleReturn::class, 'sale_id', 'id');
+    }
     
     use HasFactory , SoftDeletes, UniversalScopeTrait;
 }
