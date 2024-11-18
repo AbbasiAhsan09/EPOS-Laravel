@@ -217,6 +217,7 @@ Route::middleware("manager.role")->prefix("voucher")->group(function(){
     Route::get("/create/{voucher_type_id}/{id?}",[VoucherController::class,'create']);
     Route::post("/store",[VoucherController::class, 'store'])->name("voucher.store");
     Route::put("/update/{id}",[VoucherController::class, 'update'])->name("voucher.update");
+    Route::get("/detail/{voucher_id}",[VoucherController::class, 'show'])->name('voucher.show');
     Route::delete('/{id}',[VoucherController::class,'destroy'])->name("voucher.delete");
 });
 
