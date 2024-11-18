@@ -52,6 +52,10 @@
     </div>
   </form>
     @foreach ($ledgerData as $account)
+    @php
+        $total_credit = 0;
+        $total_debit = 0;
+    @endphp
     <div class="custom-box">
     <h5>{{ $account['account'] }} ({{ $account['account_type'] }})</h5>
     <p>{{ $account['description'] }}</p>
@@ -85,7 +89,17 @@
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].number_format($transaction['credit'], 2) }}</td>
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].($transaction['running_balance'] < 0 ? '(': "").number_format(abs($transaction['running_balance']), 2).($transaction['running_balance'] < 0 ? ')': "") }} {{$transaction['running_balance'] < 0 ? 'CR': "DR"}}</td>
                 </tr>
+                @php
+                    $total_credit += $transaction['credit'];
+                    $total_debit += $transaction["debit"];
+                @endphp
             @endforeach
+            <tr>
+                <td colspan="2"></td>
+                <td><strong>{{number_format($total_debit,2)}}</strong></td>
+                <td><strong>{{number_format($total_credit,2)}}</strong></td>
+                <td></td>
+            </tr>
             <tr style="background: rgb(250, 197, 208)">
                 <td colspan="4" style="text-align: right"><strong>Closing Balance</strong></td>
                 <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].($account['ending_balance'] < 0 ? '(': "").number_format(abs($account['ending_balance']), 2).($account['ending_balance'] < 0 ? ')': "") }} {{$account['ending_balance'] < 0 ? 'CR': "DR"}}</strong></td>

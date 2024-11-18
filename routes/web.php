@@ -167,6 +167,7 @@ Route::prefix('sales')->group(function () {
     Route::put('return/{id}',[SaleReturnController::class, 'update'])->name("update.return");
     Route::delete('return/{id}',[SaleReturnController::class, 'destroy'])->name("delete.return");
     Route::get('returns',[SaleReturnController::class, 'index'])->name("index.return");
+    Route::get('returns/detail',[SaleReturnController::class, 'details'])->name("detail.return");
     
 });
 
@@ -183,6 +184,7 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         // Purchase return routes
         Route::get('return/{id?}',[PurchaseReturnController::class, 'create_update_purchase_return']);
         Route::get('returns',[PurchaseReturnController::class, 'index'])->name('index.purchase_return');
+        Route::get('returns/detail',[PurchaseReturnController::class, 'details'])->name('detail.purchase_return');
         Route::post('return',[PurchaseReturnController::class, 'store'])->name("add.purchase_return");
         Route::put('return/{id}',[PurchaseReturnController::class, 'update'])->name("update.purchase_return");
         Route::delete('return/{id}',[PurchaseReturnController::class, 'destroy'])->name("delete.purchase_return");
@@ -204,7 +206,7 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
         'purchase-report' => PurchaseReportController::class,
         'inventory-report' => InventoryReportController::class,
     ]);
-    
+    Route::get('inventory-balance',[InventoryReportController::class, 'real_inventory'])->name("inventory.balance");
     Route::prefix('accounting')->group(function () {
         Route::get("customer-payments",[AccountingReportController::class,'customer_payments']);
         Route::get("general-ledger",[AccountingReportController::class,'generate_general_ledger_report']);
@@ -226,6 +228,7 @@ Route::middleware("manager.role")->prefix("voucher")->group(function(){
     Route::get("/create/{voucher_type_id}/{id?}",[VoucherController::class,'create']);
     Route::post("/store",[VoucherController::class, 'store'])->name("voucher.store");
     Route::put("/update/{id}",[VoucherController::class, 'update'])->name("voucher.update");
+    Route::get("/detail/{voucher_id}",[VoucherController::class, 'show'])->name('voucher.show');
     Route::delete('/{id}',[VoucherController::class,'destroy'])->name("voucher.delete");
 });
 

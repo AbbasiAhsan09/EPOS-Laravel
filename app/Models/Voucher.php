@@ -39,6 +39,16 @@ class Voucher extends Model
         return $this->hasMany(VoucherEntry::class, 'voucher_id', 'id');
     }
 
+
+    /**
+     * Get the voucher_type that owns the Voucher
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function voucher_type(): BelongsTo
+    {
+        return $this->belongsTo(VoucherType::class, 'voucher_type_id', 'id');
+    }
     /**
      * Get the account that owns the Voucher
      *

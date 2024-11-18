@@ -3,6 +3,10 @@
 @section("report_content")
 
     @foreach ($ledgerData as $account)
+    @php
+        $total_credit = 0;
+        $total_debit = 0;
+    @endphp
     <div class="custom-box">
     <h5 class="title" >{{ $account['account'] }} LEDGER  </h5>
     <table class="table table-bordered table-striped"  border="3">
@@ -23,7 +27,7 @@
             @foreach ($account['transactions'] as $transaction)
                 <tr>
                     <td>{{ $transaction['transaction_date'] }}</td>
-                    <td style="{{strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed') ? 'background : red; color : white' :''}}">
+                    <td style="{{strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed') ? 'background : red; color : white;' :''}} " width="150px">
                         @if (strpos($transaction["description"], 'reverse') !== false || strpos($transaction["description"], 'reversed'))
                             <p>
                                 <strong>Reversed Entry</strong>
@@ -35,7 +39,17 @@
                     <td>{{number_format($transaction['credit'], 2) }}</td>
                     <td>{{ ConfigHelper::getStoreConfig()["symbol"].($transaction['running_balance'] < 0 ? '(': "").number_format(abs($transaction['running_balance']), 2).($transaction['running_balance'] < 0 ? ')': "") }} {{$transaction['running_balance'] < 0 ? 'CR': "DR"}}</td>
                 </tr>
+                @php
+                $total_credit += $transaction['credit'];
+                $total_debit += $transaction["debit"];
+            @endphp
             @endforeach
+            <tr>
+                <td colspan="2"></td>
+                <td><strong>{{number_format($total_debit,2)}}</strong></td>
+                <td><strong>{{number_format($total_credit,2)}}</strong></td>
+                <td></td>
+            </tr>
             <tr style="background: rgb(250, 197, 208)">
                 <td colspan="4" style="text-align: right"><strong>Closing Balance</strong></td>
                 <td><strong>{{ ConfigHelper::getStoreConfig()["symbol"].($account['ending_balance'] < 0 ? '(': "").number_format(abs($account['ending_balance']), 2).($account['ending_balance'] < 0 ? ')': "") }} {{$account['ending_balance'] < 0 ? 'CR': "DR"}}</strong></td>

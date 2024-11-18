@@ -1,4 +1,8 @@
                       
+<script src="{{asset("js/jquery.min.js")}}"></script>
+
+<link rel="stylesheet" href="{{asset("css/bootstrap.min.css")}}" 
+integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
 <style>
     .receipt-content .logo a:hover {
@@ -228,7 +232,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    opacity: 0.2;
+    opacity: 1;
     content:  "";
     background: url("{{asset('images/inv.png')}}");
     width: 100%;
@@ -243,7 +247,7 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    opacity: 0.2;
+    opacity: 1;
     content:  "";
     background: url("{{asset('images/inv.png')}}");
     width: 100%;
@@ -252,6 +256,27 @@
     rotate: 0deg;
     background-repeat: no-repeat;
 
+}
+
+
+
+.totals .field {
+  border: solid 1px black !important;
+  margin: 0 !important;
+  padding: 5px;
+  border-bottom: none !important;
+  text-align: left;
+  padding: 0 24px;
+}
+
+/* Remove top border for the first field */
+.totals .field:first-child {
+  border-top: none !important;
+}
+
+/* Add bottom border to the last field */
+.totals .field:last-child {
+  border-bottom: solid 1px black !important;
 }
 </style>
 <div class="receipt-content">
@@ -329,7 +354,7 @@
 
 					<div class="line-items">
 						{{--Table --}}
-                        <table id="" class="table table-sm table-bordered">
+                        <table id="" class="table table-sm table-bordered" style="margin : 0 !important">
                             <thead>
                                 <tr>
                                     <th>S#</th>
@@ -370,7 +395,7 @@
                         @endphp
                         
 						{{--Table --}}
-						<div class="total text-right">
+						<div class="total text-right d-flex align-items-start justify-content-between " style="margin-top : 0 !important">
               
               <p class="extra-notes">
                 <strong>Amount in words :</strong>
@@ -436,10 +461,12 @@
 	</div>
 </div>                    
 
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<style>
+  table, th, td, tr, td{
+  border:  solid 3px black !important
+}
+@page { margin: 0; }
+</style>
 
 			<script>
 				$(document).ready(function() {

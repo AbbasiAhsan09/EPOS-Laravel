@@ -41,8 +41,8 @@ class AccountingReportController extends Controller
 
             // Fetch all accounts with their transactions within the date range
             $accounts = Account::whereHas('transactions', function ($query) {
-                $query->where('credit', '>', 0)
-                      ->orWhere('debit', '>', 0);
+                $query->where('credit', '!=', 0)
+                      ->orWhere('debit', '!=', 0);
             })->filterByStore();
 
             if($request->has('accounts') && count($request->accounts) > 0){
@@ -53,7 +53,7 @@ class AccountingReportController extends Controller
                 $query
                 ->whereBetween('transaction_date', [$startDate, $endDate])
                 ->where(function($subQry){
-                    $subQry->where("credit", '>',0)->orWhere("debit", '>',0);
+                    $subQry->where("credit", '!=',0)->orWhere("debit", '!=',0);
                 })
                 ->with("sale.order_details.item_details")
                 ->with("purchase.details.items")
