@@ -158,10 +158,10 @@ class PartiesController extends Controller
                 [
                     
                     'title' => $party->party_name,
-                    'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
+                    'opening_balance' => $party->opening_balance !== null && !empty($party->opening_balance) ? $party->opening_balance : 0,
                 ]
             );
-             $opening_balance_head = AccountController::get_head_account(["account_number" => 3000]);
+             $opening_balance_head = AccountController::get_head_account(["account_number" => 3000]);  
 
              $opening_balance_equity = Account::firstOrCreate(
                 [
@@ -314,7 +314,7 @@ class PartiesController extends Controller
             
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                 if($request->has('opening_balance')){
-                    $party->opening_balance = $request->opening_balance ?? 0;
+                    $party->opening_balance = $request->opening_balance !== null && !empty($request->opening_balance) ? $request->opening_balance : 0;
                 }
             }
 

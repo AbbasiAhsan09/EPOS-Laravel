@@ -549,7 +549,7 @@ class AccountController extends Controller
             DB::beginTransaction();
             if (!empty($entry["source_account"])) {
                    
-                if ($entry["debit"] > 0) {
+                if (abs($entry["debit"]) > 0) {
                     // Create debit entry first
                     $debit_entry1 = AccountTransaction::create($entry);
                     
@@ -562,8 +562,8 @@ class AccountController extends Controller
                         'note' => $debit_entry1->note,
                         'store_id' => $debit_entry1->store_id,
                         'recorded_by' => $debit_entry1->recorded_by,
-                        'credit' => $debit_entry1->debit > 0 ? $debit_entry1->debit : 0, 
-                        'debit' => $debit_entry1->credit > 0 ? $debit_entry1->credit : 0, 
+                        'credit' => $debit_entry1->debit !== null && !empty($debit_entry1->debit) ? $debit_entry1->debit : 0, 
+                        'debit' => $debit_entry1->credit !== null && !empty($debit_entry1->credit)  ? $debit_entry1->credit : 0, 
                         'source_account' => $debit_entry1->account_id,
                      ]);
 
@@ -572,7 +572,8 @@ class AccountController extends Controller
                         'reference_type' => $entry["reference_type"] ?? "journal_entry",
                     ]);
                 } 
-                if($entry["credit"] > 0){
+                if(abs($entry["credit"]) > 0){
+                  
                     // Handle the case where debit is not present
                    $debit_entry_2 = AccountTransaction::create([
                         'account_id' => $entry['source_account'],
@@ -580,9 +581,11 @@ class AccountController extends Controller
                         'note' => $entry['note'],
                         'store_id' => $entry['store_id'],
                         'recorded_by' => $entry["recorded_by"],
-                        'credit' => $entry["debit"] > 0 ? $entry["debit"] : 0, 
-                        'debit' => $entry["credit"] > 0 ? $entry["credit"] : 0, 
+                        'credit' =>  $entry["debit"] !== null && !empty($entry["debit"]) ? $entry["debit"] : 0, 
+                        'debit' => $entry["credit"] !== null && !empty($entry["credit"])  ? $entry["credit"] : 0, 
                     ]);
+                
+                    // dd($debit_entry_2);
 
                     // Create the credit entry as well
                     $entry["reference_type"] = $entry["reference_type"] ?? "journal_entry";
