@@ -177,11 +177,14 @@ class AccountController extends Controller
             // dd($request->all());
             $input = [
                 'title' => $request->title,
-                'parent_id' => $request->has('parent_id') ? $request->parent_id : null, 
                 'opening_balance' => $request->opening_balance !== null ? $request->opening_balance : 0,
                 'description' => $request->description ?? null,
                 'color_code' => $request->color_code ?? null
             ];
+
+            if($request->has('parent_id')){
+                $input['parent_id'] = $request->has('parent_id') ? $request->parent_id : null;
+            }
 
             $coa = Account::where(['coa' => true, 'id' => $request->coa_id, 'store_id' => Auth::user()->store_id])->first();
             
