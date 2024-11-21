@@ -74,6 +74,12 @@ class AccountController extends Controller
                 'color_code' => $request->color_code ?? null
             ];
 
+            if($request->has('parent_id')){
+                $input['parent_id'] = $request->has('parent_id') ? $request->parent_id : null;
+            }else{
+                $input["parent_id"] = $request->has("coa_id") ? $request->input("coa_id") : null; 
+            }
+            
             $coa = Account::where(['coa' => true, 'id' => $request->coa_id, 'store_id' => Auth::user()->store_id])->first();
             
             if(!$coa){
@@ -184,6 +190,8 @@ class AccountController extends Controller
 
             if($request->has('parent_id')){
                 $input['parent_id'] = $request->has('parent_id') ? $request->parent_id : null;
+            }else{
+                $input["parent_id"] = $request->has("coa_id") ? $request->input("coa_id") : null; 
             }
 
             $coa = Account::where(['coa' => true, 'id' => $request->coa_id, 'store_id' => Auth::user()->store_id])->first();
@@ -192,6 +200,7 @@ class AccountController extends Controller
                 toast('Bad Request Please Contact Support','error');
                 return redirect()->back();
             }
+
 
             $input["type"] = $coa->type;
             $input["head_account"] = $request->has('parent_id') ? false : true; 
