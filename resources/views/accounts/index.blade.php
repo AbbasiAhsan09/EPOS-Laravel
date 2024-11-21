@@ -60,13 +60,13 @@
             <td>{{ ConfigHelper::getStoreConfig()["symbol"].$item->opening_balance}}</td>
             <td>
               {{-- @if (!$item->reference_type && !$item->reference_id && $item->title !== 'Cash Sales') --}}
-              @if (!request()->has('head_accounts'))
+              {{-- @if (!request()->has('head_accounts')) --}}
               <div class="s-btn-grp">
                 <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#accountModal{{$item->id}}">
                   <i class="fa fa-edit"></i>
                 </button>
               </div>  
-                @endif
+                {{-- @endif --}}
             </td>
         </tr>
 

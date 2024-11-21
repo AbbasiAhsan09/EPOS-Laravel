@@ -248,9 +248,28 @@ class VoucherController extends Controller
      * @param  \App\Models\Voucher  $voucher
      * @return \Illuminate\Http\Response
      */
-    public function show(Voucher $voucher)
+    public function show(int $voucher_id)
     {
-        //
+        try {
+            $voucher = Voucher::filterByStore()->where("id",$voucher_id)->with('account','voucher_type','entries','account_from')->first();
+
+
+            if(!$voucher){
+                toast("Invalid Voucher ID",'error');
+                return redirect()->back();
+            }
+
+            $data = [
+                'voucher' => $voucher,
+                'report_title' => $voucher->voucher_type->name . '  ('.$voucher->doc_no.')',
+            ];
+            $pdf = Pdf::loadView('vouchers.pdf.detail', $data)->setPaper('a4', 'portrait');
+
+            return $pdf->stream();
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**

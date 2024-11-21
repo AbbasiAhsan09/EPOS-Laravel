@@ -122,6 +122,7 @@
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{$voucher->id}}">  
                                 <li><a class="dropdown-item" href="{{url('/voucher/create/'.$voucher->voucher_type_id.'/'.$voucher->id.'')}}"><i class="fa fa-edit"></i> Edit</a></li>
+                                <li><a class="dropdown-item" href="{{url('/voucher/detail/'.$voucher->id.'')}}" target="_blank"><i class="fa fa-file-pdf"></i> PDF</a></li>
                                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dltModal{{$voucher->id}}"><i class="fa fa-trash"></i> Delete</a></li>
                             </ul>
                             </div>
