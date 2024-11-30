@@ -130,7 +130,7 @@ class AccountController extends Controller
                 'reference_id' => $account->id,
                 'debit' => $is_debit  ? $account->opening_balance : 0, // Credit to Opening Balance Equity
                 'credit' => $is_credit ? $account->opening_balance : 0,
-                'transaction_date' => now(),
+                'transaction_date' => '2000-01-01',
                 'recorded_by' => Auth::user()->id,
                 'note' => 'Debit for new account opening balance',
                 'source_account' => $opening_balance_equity->id
@@ -255,7 +255,7 @@ class AccountController extends Controller
                 'reference_id' => $account->id,
                 'debit' => $is_debit  ? $account->opening_balance : 0, // Credit to Opening Balance Equity
                 'credit' => $is_credit ? $account->opening_balance : 0,
-                'transaction_date' => now(),
+                'transaction_date' => '2000-01-01',
                 'recorded_by' => Auth::user()->id,
                 'note' => ' New account opening balance Updated',
                 'source_account' => $opening_balance_equity->id

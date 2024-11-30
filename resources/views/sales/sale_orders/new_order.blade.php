@@ -94,8 +94,8 @@
                                             <div class="select_party">
                                                 
                                                 <div class="input-group input-group-outline">
-                                                    @livewire('party-dropdown', ['name' => 'customer_select', 'selected_id' => ($isEditMode && $order->customer_id ? $order->customer_id : null)])
-                                                    {{-- <select name="party_id" class="form-control" id="customer_select" >
+                                                    {{-- @livewire('party-dropdown', ['name' => 'customer_select', 'selected_id' => ($isEditMode && $order->customer_id ? $order->customer_id : null)]) --}}
+                                                    <select name="party_id" class="form-control" id="customer_select" >
                                                         <option value="">Select Party</option>
                                                         @foreach ($customers as $group => $parties)
                                                             <optgroup label="{{ ucfirst($group ?? '') }}">
@@ -107,7 +107,7 @@
                                                                 @endforeach
                                                             </optgroup>
                                                         @endforeach
-                                                    </select> --}}
+                                                    </select>
                                                   </div> 
                                             </div>
                                         </div>
