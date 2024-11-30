@@ -59,7 +59,7 @@ class AccountingReportController extends Controller
                 ->with("purchase.details.items")
                 ->with("sale_return.order_details.item_details")
                 ->with("purchase_return")
-                ->orderByRaw("CASE WHEN (reference_type = 'opening_balance_customer' OR  reference_type =  'opening_balance_vendor') THEN 0 ELSE 1 END")
+                ->orderByRaw("CASE WHEN (reference_type = 'opening_balance_customer' OR  reference_type =  'opening_balance_vendor'  OR  reference_type =  'opening_balance') THEN 0 ELSE 1 END")
                 ->orderBy('transaction_date');
             }])->get();
             // dd($accounts);
