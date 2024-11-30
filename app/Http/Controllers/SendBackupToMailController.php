@@ -45,7 +45,11 @@ class SendBackupToMailController extends Controller
     function DbBackup()
     {
         // Creating new backup
-        Artisan::call("backup:run");
+        try {
+            Artisan::call("backup:run");
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
 
         $this->removeAllBackupExceptRecent(2);
         $filename = $this->getRecentBackupFilename() ?? "";
