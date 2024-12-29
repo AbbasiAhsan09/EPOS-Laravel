@@ -27775,6 +27775,48 @@ padding : 10px ;
 table {
   line-height: 1 !important;
 }
+
+.itemsInCart  textarea {
+  width: 400px;
+}
+
+.general-form-wrapper{
+  width : 99%;
+  margin : auto;
+  border : solid 2px #a3a2a2;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 20px ;
+}
+
+.general-form-wrapper .form-title{
+
+}
+
+.work-history-table-wrapper{
+  height: 50vh;
+  overflow: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+.work-history-table-wrapper table thead{
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+
+}
+.text-left{
+  text-align: left;
+}
+
+.text-right{
+  text-align: right;
+}
+
+.text-center{
+  text-align: center;
+}
 /*# sourceMappingURL=dashboard-free.css.map */
 
 

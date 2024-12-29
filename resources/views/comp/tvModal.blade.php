@@ -1,4 +1,4 @@
-<!-- Button trigger modal -->
+{{-- <!-- Button trigger modal -->
 <button type="button" class="btn btn-outline-primary" id="tutorialBtn" data-bs-toggle="modal" data-bs-target="#exampleModal">
  Tutorial <i class="fa fa-play"></i>
 </button>
@@ -40,4 +40,4 @@
       z-index: 1
     }
   </style>
-
+ --}}

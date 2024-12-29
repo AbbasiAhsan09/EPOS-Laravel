@@ -43,7 +43,7 @@ class AccountingReportController extends Controller
             $accounts = Account::whereHas('transactions', function ($query) {
                 $query->where('credit', '!=', 0)
                       ->orWhere('debit', '!=', 0);
-            });
+            })->filterByStore();
 
             if($request->has('accounts') && count($request->accounts) > 0){
                 $accounts = $accounts->whereIn("id",$request->accounts);
@@ -71,7 +71,7 @@ class AccountingReportController extends Controller
 
             foreach ($accounts as $account) {
                 // Calculate starting balance (all transactions before the start date)
-                $startingBalance = AccountTransaction::where('account_id', $account->id)
+                $startingBalance = AccountTransaction::where('account_id', $account->id)->filterByStore()
                     ->where(function($subQry){
                         $subQry->where("credit", '!=',0)->orWhere("debit", '!=',0);
                     })
@@ -126,7 +126,7 @@ class AccountingReportController extends Controller
                 return $pdf->stream();
             }
 
-            $all_accounts = Account::whereHas('transactions', function ($query) {
+            $all_accounts = Account::filterByStore()->whereHas('transactions', function ($query) {
                 $query->where('credit', '>', 0)
                       ->orWhere('debit', '>', 0);
             })->filterByStore()->get();

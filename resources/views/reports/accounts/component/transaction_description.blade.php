@@ -2,7 +2,7 @@
 {{-- @dump($data->purchase ?? "")
 @dump($data->reference_type ?? "") --}}
     @if ($data && isset($data->sale) && $data->reference_type === 'sales_order')
-        <p>Sale# {{ $data->sale->tran_no }} - {{$data->sale->condition ? "On condition ".$data->sale->condition : ''}} Dated {{date('d/m/Y',strtotime($data->sale->bill_date))}} 
+        <p>Sale# {{ $data->sale->tran_no }} - {{$data->sale->condition ? "On condition ".$data->sale->condition : ''}}  
             {{ $data->sale->gp_no ? ' - GP : '. $data->sale->gp_no : "" }}</p>
         {{-- @if ($data->sale && count($data->sale->order_details))
             @foreach ($data->sale->order_details as $detail)

@@ -82,7 +82,7 @@
     color: white;
     margin:0  
 }
-td, p {
+td, p, th {
     font-size: 12px !important;
     
 }

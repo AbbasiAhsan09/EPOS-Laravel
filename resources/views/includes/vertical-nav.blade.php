@@ -113,6 +113,7 @@
                 <li class="submenu-item"><a href="/sales/returns">Sale Return Report</a></li>
                 <li class="submenu-item"><a href="/sales/returns/detail"> Sales Return Detail Report </a></li>
             
+                <li class="submenu-item"><a href="/labour-work/">Labour Bills Report</a></li>
             </ul>
         </li>
 
@@ -129,11 +130,20 @@
                 <li class="submenu-item"><a href="/uom">UOM</a></li>
             </ul>
         </li>
-
         <li class="menu-item"><a href="/system/configurations">Settings</a>
             <ul class="submenu">
                 <li class="submenu-item"><a href="/db-backup" target="_blank">DB Backup</a></li>
             </ul></li>
+
+        <li class="menu-item"><a href="/labour">Labour</a>
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/labour">Labours</a></li>
+                <li class="submenu-item"><a href="/labour-work/create">Create Bill</a></li>
+                <li class="submenu-item"><a href="/labour-work/">Bills</a></li>
+                {{-- <li class="submenu-item"><a href="/product-category">Reports</a></li> --}}
+            </ul>
+        </li>
+
         <li class="menu-item bg-logout"><a href="{{route('auth.logout')}}">Logout</a></li>
         <li class="menu-item">
             <a class="" target="_blank" href="https://wa.me/03200681969?text=Hello,%20%0AName:%20{{Auth::check() ? Auth::user()->name : ''}}%0AStore:%20{{Auth::check() && isset(Auth::user()->store)? Auth::user()->store->store_name : ''}}%0AUser%20Role:%20{{Auth::check() && isset(Auth::user()->userroles->role_name) ? Auth::user()->userroles->role_name : ''}}%0AI%20need%20help%20regarding...."  type="button">Need Help?</a>

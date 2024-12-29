@@ -336,11 +336,11 @@ color: #969CAD;
                                   {{-- <th>Field</th>
                                   <th>Category</th> --}}
                                   <th>Description</th>
-                                  <th>Bag Pack.</th>
+                                  {{-- <th>Bag Pack.</th> --}}
                                   <th>Qty</th>
                                   {{-- <th>Tax</th> --}}
                                   {{-- <th>Disc.</th> --}}
-                                  <th>Weight.</th>
+                                  {{-- <th>Weight.</th> --}}
                                   <th>Rate</th>
                                   <th>Total</th>
                               </tr>
@@ -352,8 +352,8 @@ color: #969CAD;
                               {{-- <td>{{$item->item_details->categories->field->name ?? ''}}</td>
                               <td>{{$item->item_details->categories->category ?? ''}}</td> --}}
                               <td>{{$item->item_details->name ?? ''}}</td>
-                              <td>{{$item->bag_size ?? '-'}}</td>
-                              <td>{{$item->bags ?? '-'}}</td>
+                              {{-- <td>{{$item->bag_size ?? '-'}}</td> --}}
+                              {{-- <td>{{$item->bags ?? '-'}}</td> --}}
                               {{-- <td>{{$item->tax}}</td> --}}
                               {{-- <td>{{$item->disc}}</td> --}}
                               <td>{{$item->qty}}</td>
@@ -395,7 +395,7 @@ color: #969CAD;
             </div>
                           @if ( $order->other_charges > 0)
             <div class="field">
-              Bardana Charges <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</span>
+              Other Charges <span>{{ConfigHelper::getStoreConfig()["symbol"].round($order->other_charges)}}</span>
             </div>
                           @endif
                           @if ($order->discount > 0)

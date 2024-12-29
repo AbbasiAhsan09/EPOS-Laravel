@@ -152,6 +152,11 @@ border-color: var(--bs-pink);
     }
 
     
+    .readonly{
+        pointer-events: none; background-color: #f0f0f0;
+    }
+
+    
 .login-main-container{
     display: flex;
     width: 100%;
