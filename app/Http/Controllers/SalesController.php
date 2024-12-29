@@ -220,7 +220,6 @@ class SalesController extends Controller
 
                     $revenue_account = Account::firstOrCreate(
                         [
-                            'title' => 'Sales Revenue', // Search by title
                             'pre_defined' => 1,      // and pre_defined
                             'store_id' => Auth::user()->store_id, // and store_id
                             'account_number' => 4000,
@@ -228,6 +227,7 @@ class SalesController extends Controller
                             'head_account' => true
                         ],
                         [
+                            'title' => 'Sales Revenue', // Search by title
                             'type' => 'income',
                             'description' => 'This account handles the Sales Revenue transactions', // Added description key
                             'opening_balance' => 0,
@@ -238,15 +238,15 @@ class SalesController extends Controller
                         $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                         $cash_account = Account::firstOrCreate(
                             [
-                                'title' => 'Cash', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
                                 'account_number' => 1000,
                                 'parent_id' => $current_asset_coa->id,
                                 'head_account' => true// and store_id
-
+                                
                             ],
                             [
+                                'title' => 'Cash', // Search by title
                                 'type' => 'assets',
                                 'description' => 'This account is created by system on cash sales', // Added description key
                                 'opening_balance' => 0,
@@ -404,11 +404,11 @@ class SalesController extends Controller
         // Get or create the COGS and Inventory accounts
         $cogsAccount = Account::firstOrCreate(
             [
-                'title' => 'Cost of Goods Sold',
                 'store_id' => Auth::user()->store_id,
                 'account_number' => 5000,
             ],
             [
+                'title' => 'Cost of Goods Sold',
                 'type' => 'expense',
                 'description' => 'COGS for sales orders',
                 'opening_balance' => 0,
@@ -417,11 +417,11 @@ class SalesController extends Controller
 
         $inventoryAccount = Account::firstOrCreate(
             [
-                'title' => 'Inventory',
                 'store_id' => Auth::user()->store_id,
                 'account_number' => 1500,
             ],
             [
+                'title' => 'Inventory',
                 'type' => 'assets',
                 'description' => 'Tracks store’s inventory',
                 'opening_balance' => 0,
@@ -652,7 +652,6 @@ class SalesController extends Controller
 
                         $revenue_account = Account::firstOrCreate(
                             [
-                                'title' => 'Sales Revenue', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
                                 'account_number' => 4000,
@@ -661,6 +660,7 @@ class SalesController extends Controller
                                 'head_account' => true    
                             ],  
                             [
+                                'title' => 'Sales Revenue', // Search by title
                                 'type' => 'income',
                                 'description' => 'This account handles the Sales Revenue transactions', // Added description key
                                 'opening_balance' => 0,
@@ -683,7 +683,6 @@ class SalesController extends Controller
                             $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                             $cash_account = Account::firstOrCreate(
                                 [
-                                    'title' => 'Cash', // Search by title
                                     'pre_defined' => 1,      // and pre_defined
                                     'store_id' => Auth::user()->store_id, 
                                     'account_number' => 1000,
@@ -691,6 +690,7 @@ class SalesController extends Controller
                                     'head_account' => true// and store_id
                                 ],
                                 [
+                                    'title' => 'Cash', // Search by title
                                     'type' => 'assets',
                                     'description' => 'This account is created by system on cash sales', // Added description key
                                     'opening_balance' => 0,

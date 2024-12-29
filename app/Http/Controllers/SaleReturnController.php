@@ -197,7 +197,6 @@ class SaleReturnController extends Controller
     
                     $revenue_account = Account::firstOrCreate(
                         [
-                            'title' => 'Sales Revenue', // Search by title
                             'pre_defined' => 1,      // and pre_defined
                             'store_id' => Auth::user()->store_id, // and store_id
                             'account_number' => 4000,
@@ -205,6 +204,7 @@ class SaleReturnController extends Controller
                             'head_account' => true
                         ],
                         [
+                            'title' => 'Sales Revenue', // Search by title
                             'type' => 'income',
                             'description' => 'This account handles the Sales Revenue transactions', // Added description key
                             'opening_balance' => 0,
@@ -215,15 +215,15 @@ class SaleReturnController extends Controller
                         $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                         $cash_account = Account::firstOrCreate(
                             [
-                                'title' => 'Cash', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
                                 'account_number' => 1000,
                                 'parent_id' => $current_asset_coa->id,
                                 'head_account' => true// and store_id
-    
+                                
                             ],
                             [
+                                'title' => 'Cash', // Search by title
                                 'type' => 'assets',
                                 'description' => 'This account is created by system on cash sales', // Added description key
                                 'opening_balance' => 0,
@@ -427,7 +427,6 @@ class SaleReturnController extends Controller
     
                     $revenue_account = Account::firstOrCreate(
                         [
-                            'title' => 'Sales Revenue', // Search by title
                             'pre_defined' => 1,      // and pre_defined
                             'store_id' => Auth::user()->store_id, // and store_id
                             'account_number' => 4000,
@@ -435,6 +434,7 @@ class SaleReturnController extends Controller
                             'head_account' => true
                         ],
                         [
+                            'title' => 'Sales Revenue', // Search by title
                             'type' => 'income',
                             'description' => 'This account handles the Sales Revenue transactions', // Added description key
                             'opening_balance' => 0,
@@ -445,15 +445,15 @@ class SaleReturnController extends Controller
                         $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                         $cash_account = Account::firstOrCreate(
                             [
-                                'title' => 'Cash', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
                                 'account_number' => 1000,
                                 'parent_id' => $current_asset_coa->id,
                                 'head_account' => true// and store_id
-    
+                                
                             ],
                             [
+                                'title' => 'Cash', // Search by title
                                 'type' => 'assets',
                                 'description' => 'This account is created by system on cash sales', // Added description key
                                 'opening_balance' => 0,

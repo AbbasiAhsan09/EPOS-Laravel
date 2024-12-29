@@ -48,7 +48,7 @@ class SendBackupToMailController extends Controller
         try {
             Artisan::call("backup:run");
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
 
         $this->removeAllBackupExceptRecent(2);
