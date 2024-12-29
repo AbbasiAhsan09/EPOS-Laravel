@@ -1,7 +1,9 @@
 @php
     use App\Models\Configuration;
+    use App\Models\KeyboardShortcut;
    
     $currenConfig = Configuration::filterByStore()->first();
+    $shortcuts = KeyboardShortcut::all();
 @endphp
 
 <!DOCTYPE html>
@@ -130,6 +132,35 @@
   <script src="{{asset('js/plugins/perfect-scrollbar.min.js')}}"></script>
   <script src="{{asset('js/plugins/smooth-scrollbar.min.js')}}"></script>
   <script src="{{asset('js/plugins/chartjs.min.js')}}"></script>
+
+  @if ($shortcuts && $shortcuts->count())
+      <script>
+         const shortcuts = @json($shortcuts);
+     
+          document.addEventListener('keydown', function (event) {
+              // Ignore keypresses in input fields or editable elements
+              if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.isContentEditable) {
+                  return;
+              }
+
+              shortcuts.forEach(shortcut => {
+                const [modifier, key] = shortcut.key.toLowerCase().split(' + ');
+                  if (
+                      (modifier === 'ctrl' && event.ctrlKey) ||
+                      (modifier === 'alt' && event.altKey) ||
+                      (modifier === 'shift' && event.shiftKey) ||
+                      (modifier === 'cmd' && event.metaKey)
+                  ) {
+                      if (event.key.toLowerCase() === key) {
+                          event.preventDefault(); // Prevent default action
+                          window.location.href = shortcut.uri; // Navigate to the action
+                      }
+                  }
+              });
+          });
+      </script>
+  @endif
+
   <script>
     var ctx = document.getElementById("chart-bars").getContext("2d");
 

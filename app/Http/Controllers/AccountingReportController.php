@@ -60,7 +60,9 @@ class AccountingReportController extends Controller
                 ->with("sale_return.order_details.item_details")
                 ->with("purchase_return")
                 ->orderByRaw("CASE WHEN (reference_type = 'opening_balance_customer' OR  reference_type =  'opening_balance_vendor'  OR  reference_type =  'opening_balance') THEN 0 ELSE 1 END")
-                ->orderBy('transaction_date');
+                ->orderBy('transaction_date')
+                ->orderBy('credit',"DESC")
+                ;
             }])->get();
             // dd($accounts);
 
@@ -71,7 +73,7 @@ class AccountingReportController extends Controller
                 // Calculate starting balance (all transactions before the start date)
                 $startingBalance = AccountTransaction::where('account_id', $account->id)->filterByStore()
                     ->where(function($subQry){
-                        $subQry->where("credit", '>',0)->orWhere("debit", '>',0);
+                        $subQry->where("credit", '!=',0)->orWhere("debit", '!=',0);
                     })
                     ->where('transaction_date', '<', $startDate)
                     ->sum(DB::raw('debit - credit'));
@@ -79,6 +81,10 @@ class AccountingReportController extends Controller
                 // Initialize running balance with starting balance
                 $runningBalance = $startingBalance;
 
+                $totalDebit = AccountTransaction::where("account_id",$account->id)->sum("debit");
+                $totalCredit = AccountTransaction::where("account_id",$account->id)->sum("credit");
+
+          
                 // Collect all transactions for the account within the specified period
                 $transactionsData = [];
                 foreach ($account->transactions as $transaction) {

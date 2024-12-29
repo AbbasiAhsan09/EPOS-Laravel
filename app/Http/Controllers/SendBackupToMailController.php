@@ -45,7 +45,11 @@ class SendBackupToMailController extends Controller
     function DbBackup()
     {
         // Creating new backup
-        Artisan::call("backup:run");
+        try {
+            Artisan::call("backup:run");
+        } catch (\Throwable $th) {
+            throw $th;
+        }
 
         $this->removeAllBackupExceptRecent(2);
         $filename = $this->getRecentBackupFilename() ?? "";
@@ -55,16 +59,29 @@ class SendBackupToMailController extends Controller
 
             // Check if the file exists
             if (Storage::exists('EPOS/' . $filename)) {
-
-                $file = response()->file($filePath);
-
-                $email = new SendBackupMail($filePath);
-
-                Mail::to('ahsansarim56@gmail.com')->send($email);
+                // Check if the BACKUP_ONLINE flag is set to true
+                if (env('BACKUP_ONLINE', false)) {
+                    // Send the file as a backup email
+                    try {
+                        $email = new SendBackupMail($filePath);
+                        Mail::to('ahsansarim56@gmail.com')->send($email);
+            
+                        return response()->json(['Backup sent to the email'], 200);
+                    } catch (\Exception $e) {
+                        // Log the error if email sending fails
+                        \Log::error("Error sending backup email: " . $e->getMessage());
+            
+                        return response()->json(['error' => 'Failed to send backup email'], 500);
+                    }
+                }
+            
+                // If no backup email is required, just download the file
+                return response()->download($filePath, $filename);
             } else {
                 // File does not exist
                 return response()->json(['error' => 'File not found'], 404);
             }
+            
         }
     }
 

@@ -34,6 +34,19 @@
 				@if (isset($order->condition) && $order->condition)
 				<h4>Condition : {{$order->condition}}</h4>
 				@endif
+				
+				@if (isset($order->broker) && $order->broker)
+				<h4>Broker: {{$order->broker}} </h4>
+				@endif
+
+				@if (isset($order->gp_no) && $order->gp_no)
+                    <h4>Gate Pass: {{$order->gp_no}}</h4> 
+                @endif
+
+                @if (isset($order->truck_no) && $order->truck_no)
+                      <h4>Truck No: {{$order->truck_no}}</h4> 
+                @endif
+
 			</div>
 		</div>
 		<table class="invoice-table">
@@ -71,7 +84,7 @@
 				</tr>
 				@if ($order->other_charges > 0)
 				<tr>
-					<th colspan="2">Other Charges</th>
+					<th colspan="2">Bardana</th>
 					<th>{{ConfigHelper::getStoreConfig()["symbol"].number_format($order->other_charges,2)}}</th>
 				</tr>
 				@endif
