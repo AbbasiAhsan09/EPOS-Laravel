@@ -64,8 +64,8 @@
             {{-- <th>Field</th> --}}
             <th>Category</th>
             <th>Product</th>
-            <th>Bag Size</th>
-            <th>Bags</th>
+            <!-- <th>Bag Size</th>
+            <th>Bags</th> -->
             <th>Rate</th>
             <th>Tax</th>
             <th>Disc</th>
@@ -83,8 +83,8 @@
                         <td>{{date('d/m/Y', strtotime($item->return->return_date))}}</td>
                     <td>{{$item->item_details->categories->category ?? ""}}</td>
                     <td>{{$item->item_details->name ?? ""}}</td>
-                    <td>{{$item->bag_size ?? "-"}}</td>
-                    <td>{{$item->bags ?? "-"}}</td>
+                    <!-- <td>{{$item->bag_size ?? "-"}}</td>
+                    <td>{{$item->bags ?? "-"}}</td> -->
                     <td>{{$item->returned_rate}}</td>
                     <td>%{{$item->returned_tax}}</td>
                     <td>%{{$item->returned_disc}}</td>

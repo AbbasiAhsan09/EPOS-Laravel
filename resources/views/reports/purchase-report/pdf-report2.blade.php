@@ -9,8 +9,8 @@
         {{-- <th>Field</th> --}}
         <th>Category</th>
         <th>Product</th>
-        <th>Bag Size</th>
-        <th>Bags</th>
+        <!-- <th>Bag Size</th>
+        <th>Bags</th> -->
         <th>Rate</th>
         <th>Tax</th>
         <th>Disc</th>
@@ -27,8 +27,8 @@
                 {{-- <td>{{$item->items->categories->field->name}}</td> --}}
                 <td>{{$item->items->categories->category}}</td>
                 <td>{{$item->items->name}}</td>
-                <td>{{$item->bag_size ?? "-"}}</td>
-                <td>{{$item->bags ?? "-"}}</td>
+                <!-- <td>{{$item->bag_size ?? "-"}}</td>
+                <td>{{$item->bags ?? "-"}}</td> -->
                 <td>{{$item->rate}}</td>
                 <td>%{{$item->tax}}</td>
                 <td>%{{0}}</td>
