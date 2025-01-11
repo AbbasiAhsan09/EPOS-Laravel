@@ -146,12 +146,6 @@ border-color: var(--bs-pink);
     background-position: center;
     }
     
-
-    .btn-dashboard{
-    
-    }
-
-    
     .readonly{
         pointer-events: none; background-color: #f0f0f0;
     }

@@ -101,7 +101,7 @@ class PartiesController extends Controller
 
 
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
-                if($request->has('opening_balance')){
+                if($request->has('opening_balance') && !empty($request->opening_balance)){
                     $party->opening_balance = $request->opening_balance ?? 0;
                 }
             }
@@ -479,6 +479,9 @@ class PartiesController extends Controller
                         AccountTransaction::where("account_id",$account->id)->delete();
                         $account->delete();
                     }
+                }else{
+                    AccountTransaction::where("account_id",$account->id)->delete();
+                    $account->delete();
                 }
                 }
 
@@ -528,7 +531,7 @@ class PartiesController extends Controller
                 $c_balance = Sales::where("customer_id",$party->id)
                 ->selectRaw("(SUM(net_total) - SUM(recieved)) as balance ")
                 ->get();
-                dd($c_balance);
+              
             }
 
 

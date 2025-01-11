@@ -57,6 +57,7 @@ class AccountingReportController extends Controller
                 })
                 ->with("sale.order_details.item_details")
                 ->with("purchase.details.items")
+                ->with("source_account_detail")
                 ->with("sale_return.order_details.item_details")
                 ->with("purchase_return")
                 ->orderByRaw("CASE WHEN (reference_type = 'opening_balance_customer' OR  reference_type =  'opening_balance_vendor'  OR  reference_type =  'opening_balance') THEN 0 ELSE 1 END")
@@ -133,6 +134,88 @@ class AccountingReportController extends Controller
             $accounts = $all_accounts->groupBy("type");
             // dd($accounts);
             return view("reports.accounts.general-ledger",compact("ledgerData","accounts"));
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    public function account_balance_report(Request $request)  {
+        try {
+
+            // $query = "SET PERSIST sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));";
+            // DB::statement($query);
+
+            $grandQuery = Account::filterByStore()
+            ->whereHas('transactions', function ($query) {
+                $query->whereNotNull('credit')
+                      ->orWhereNotNull('debit');
+            })
+            ->with(['transactions' => function ($query) {
+                $query->select('account_id', 
+                    DB::raw('SUM(credit) as total_credit'), 
+                    DB::raw('SUM(debit) as total_debit'))
+                    ->groupBy('account_id');
+            }])
+            ->orderByRaw("CASE 
+                    WHEN title LIKE '%cash%' THEN 0
+                    ELSE 1 
+                  END")
+            ->orderByRaw("CASE 
+                    WHEN title LIKE '%bank%' THEN 0
+                    ELSE 1 
+            END")
+            ->orderByRaw("CASE 
+            WHEN reference_type IS NOT NULL THEN 0
+            ELSE 1 
+            END")
+            ->orderBy("type",'ASC')
+            ->orderBy("title",'ASC');
+
+            if($request->query("type")&& !empty($request->query("type"))){
+                $grandQuery = $grandQuery->where("type",$request->query("type"));
+            }
+
+            if($request->query("search") && !empty($request->query("search"))){
+                $grandQuery = $grandQuery->where("title","like","%".$request->query("search")."%");
+            }
+
+            if ($request->query("zero-balance") && !empty($request->query("zero-balance"))) {
+                if ($request->query("zero-balance") == "NO") {
+                    
+                }
+            }
+
+            $total_balance = $grandQuery->get()->sum(function ($account) {
+                $transaction = $account->transactions->first();
+                return  $transaction->total_debit - $transaction->total_credit;
+            });
+        
+            if($request->query("report-type") == 'pdf'){
+                $accounts = $grandQuery->get();
+            }else{
+                $accounts = $grandQuery->paginate(50)->withQueryString();
+            }
+        
+            // Calculate remaining balance for each account
+            $accounts->each(function ($account) {
+                $transaction = $account->transactions->first();
+                $account->remaining_balance =  $transaction->total_debit - $transaction->total_credit;
+            });
+            
+         
+
+            if($request->has("report-type") && $request->query('report-type') == 'pdf'){
+                $data = [
+                        'report_title' => 'Account Balances Report',
+                        'accounts' => $accounts,
+                        'total_balance' => $total_balance
+                    ];
+                $pdf = Pdf::loadView('reports.accounts.pdfs.account-balance', $data)->setPaper('a4', 'portrait');
+                return $pdf->stream();
+            }
+            
+            return view("reports.accounts.account-balance", compact("accounts","total_balance"));
         } catch (\Throwable $th) {
             throw $th;
         }

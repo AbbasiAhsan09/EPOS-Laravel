@@ -100,6 +100,9 @@ class InventoryReportController extends Controller
                 ->selectRaw("
                     p.name,
                     p.id AS item_id,
+                    uom.base_unit as base_unit,
+                    uom.uom as uom,
+                    uom.base_unit_value as base_unit_value,
                     fields.id as field_id,
                     product_categories.id as category_id,
                     fields.name as field,
@@ -122,6 +125,7 @@ class InventoryReportController extends Controller
                     END AS avg_rate
                 ")
                 ->leftJoin('product_categories', 'p.category', '=', 'product_categories.id')
+                ->leftJoin("mou as uom", 'p.uom', '=', 'uom.id')
                 ->leftJoin('fields' , 'product_categories.parent_cat' , '=' ,'fields.id')
                 ->leftJoin(DB::raw("(SELECT item_id, SUM(qty) AS total_qty, SUM(rate * qty) AS total_value FROM purchase_invoice_details WHERE deleted_at IS NULL GROUP BY item_id) AS pid"), 'p.id', '=', 'pid.item_id')
                 ->leftJoin(DB::raw("(SELECT item_id, SUM(qty) AS total_qty FROM sales_details WHERE deleted_at IS NULL GROUP BY item_id) AS sd"), 'p.id', '=', 'sd.item_id')

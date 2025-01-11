@@ -106,7 +106,12 @@
                             {{number_format($item->sold_returned_qty,2)}}
                         @endif
                     </td>
-                    <td>{{number_format(($item->avl_qty),2)}}</td>
+                    <td>
+                        {{number_format(($item->avl_qty),2)}}
+                        @if ($item->uom)
+                            {{$item->uom}} | ({{number_format($item->avl_qty * $item->base_unit_value,2)}} {{$item->base_unit}})
+                        @endif
+                    </td>
                     <td>{{number_format(($item->avg_rate),2)}}</td>
                     <td>{{number_format(($item->avg_rate) * ($item->avl_qty) ,2)}}</td>
                 </tr>

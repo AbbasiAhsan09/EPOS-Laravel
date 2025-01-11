@@ -210,6 +210,8 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
     Route::prefix('accounting')->group(function () {
         Route::get("customer-payments",[AccountingReportController::class,'customer_payments']);
         Route::get("general-ledger",[AccountingReportController::class,'generate_general_ledger_report']);
+        Route::get('/account-balance',[AccountingReportController::class, 'account_balance_report']);
+
     });
     Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
     Route::get('purchase-summary-report', [PurchaseReportController::class, 'summary'])->name('purchase-report.summary');
