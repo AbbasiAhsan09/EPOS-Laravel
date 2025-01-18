@@ -368,8 +368,10 @@ class VoucherController extends Controller
             
             if(in_array($account_from->type,['assets','expenses'])){
                 $is_account_debit_increase = true;
-                if(in_array($account->type,['assets','expenses'])){
+                if(in_array($account->type,['assets','expenses']) && $voucher_type->type === 'reciept'){
                     $is_account_debit_increase = false;
+                }else{
+                    $is_account_debit_increase = true;
                 }
             }else{
                 $is_account_debit_increase = false;
