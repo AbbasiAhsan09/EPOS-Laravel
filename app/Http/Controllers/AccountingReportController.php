@@ -128,8 +128,8 @@ class AccountingReportController extends Controller
             }
 
             $all_accounts = Account::filterByStore()->whereHas('transactions', function ($query) {
-                $query->where('credit', '>', 0)
-                      ->orWhere('debit', '>', 0);
+                $query->where('credit', '!=', 0)
+                      ->orWhere('debit', '!=', 0);
             })->filterByStore()->get();
             $accounts = $all_accounts->groupBy("type");
             // dd($accounts);

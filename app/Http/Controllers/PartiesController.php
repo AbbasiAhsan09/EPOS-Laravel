@@ -101,8 +101,13 @@ class PartiesController extends Controller
 
 
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
-                if($request->has('opening_balance') && !empty($request->opening_balance)){
-                    $party->opening_balance = $request->opening_balance ?? 0;
+                if($request->has('opening_balance')){
+                    $party->opening_balance = $request->opening_balance !== null && !empty($request->opening_balance) ? $request->opening_balance : 0;
+                }
+                if($request->has("opening_balance_date") && !empty($request->opening_balance_date)){
+                    $party->opening_balance_date = $request->opening_balance_date;
+                }else{
+                    $party->opening_balance_date = date("YYYY-MM-DD");
                 }
             }
 
@@ -185,6 +190,7 @@ class PartiesController extends Controller
                         'debit' => $is_customer ? $account->opening_balance : 0,
                         'credit' => $is_vendor ? $account->opening_balance : 0,
                         'reference_type' => 'opening_balance_'.$account->reference_type,
+                        'transaction_date' => $party->opening_balance_date ?? null,
                         'reference_id' => $account->reference_id,
                         'source_account' => $opening_balance_equity->id
                     ]);
@@ -315,6 +321,11 @@ class PartiesController extends Controller
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                 if($request->has('opening_balance')){
                     $party->opening_balance = $request->opening_balance !== null && !empty($request->opening_balance) ? $request->opening_balance : 0;
+                }
+                if($request->has("opening_balance_date") && !empty($request->opening_balance_date)){
+                    $party->opening_balance_date = $request->opening_balance_date;
+                }else{
+                    $party->opening_balance_date = date("YYYY-MM-DD");
                 }
             }
 
