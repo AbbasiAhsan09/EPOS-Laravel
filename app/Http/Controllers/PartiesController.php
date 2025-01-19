@@ -107,7 +107,7 @@ class PartiesController extends Controller
                 if($request->has("opening_balance_date") && !empty($request->opening_balance_date)){
                     $party->opening_balance_date = $request->opening_balance_date;
                 }else{
-                    $party->opening_balance_date = date("YYYY-MM-DD");
+                    $party->opening_balance_date = date("Y-m-d");
                 }
             }
 
@@ -325,7 +325,7 @@ class PartiesController extends Controller
                 if($request->has("opening_balance_date") && !empty($request->opening_balance_date)){
                     $party->opening_balance_date = $request->opening_balance_date;
                 }else{
-                    $party->opening_balance_date = date("YYYY-MM-DD");
+                    $party->opening_balance_date = date("Y-m-d");
                 }
             }
 
