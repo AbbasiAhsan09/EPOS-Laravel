@@ -20,7 +20,8 @@ class VoucherType extends Model
         "show_head",
         "show_coa",
         "account_types",
-        "account_reference_types"
+        "account_reference_types",
+        "is_bank_recieve"
     ];
     use HasFactory, SoftDeletes, UniversalScopeTrait;
 }

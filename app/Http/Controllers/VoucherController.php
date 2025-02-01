@@ -210,26 +210,35 @@ class VoucherController extends Controller
             $account = Account::where("id",$voucher->account_id)->filterByStore()->first();
             $is_account_debit_increase = true;
             
-            if(in_array($account_from->type,['assets','expenses'])){
+            // if(in_array($account_from->type,['assets','expenses'])){
+            //     $is_account_debit_increase = true;
+            //     if(in_array($account->type,['assets','expenses']) && $voucher_type->type === 'reciept'){
+            //         $is_account_debit_increase = false;
+            //     }else if(in_array($account->type,['assets','expenses'])){
+            //         $is_account_debit_increase = false;
+            //     }else{
+            //         $is_account_debit_increase = true;
+            //     }
+            // }else{
+            //     $is_account_debit_increase = false;
+            // }
+
+            if($voucher_type->is_bank_recieve){
                 $is_account_debit_increase = true;
-                if(in_array($account->type,['assets','expenses']) && $voucher_type->type === 'reciept'){
-                    $is_account_debit_increase = false;
-                }else{
-                    $is_account_debit_increase = true;
-                }
             }else{
                 $is_account_debit_increase = false;
             }
 
 
+            // dd($voucher->total, $is_account_debit_increase, $account, $account_from);
             // dd($account, $account_from, $is_account_debit_increase);
 
             AccountController::record_journal_entry([
                 'account_id' => $voucher->account_id,
                 'transaction_date' => $voucher->date,
                 'note' => 'Transaction made on created '.$voucher_type->name.' '.$voucher->doc_no.' by '. Auth::user()->email,
-                'credit' => !$is_account_debit_increase ? $voucher->total : 0,
-                'debit' =>  $is_account_debit_increase ? $voucher->total : 0,
+                'credit' => !$voucher_type->is_bank_recieve ? $voucher->total : 0,
+                'debit' =>  $voucher_type->is_bank_recieve ? $voucher->total : 0,
                 'reference_type' => 'voucher',
                 'reference_id' => $voucher->id,
                 'source_account' => $account_from->id
@@ -364,18 +373,20 @@ class VoucherController extends Controller
             // $account = Account::where("id",$voucher->account_id)->filterByStore()->first();
             $account_from = Account::where("id",$voucher->account_from_id)->filterByStore()->first();
             $account = Account::where("id",$voucher->account_id)->filterByStore()->first();
-            $is_account_debit_increase = true;
+            // $is_account_debit_increase = true;
             
-            if(in_array($account_from->type,['assets','expenses'])){
-                $is_account_debit_increase = true;
-                if(in_array($account->type,['assets','expenses']) && $voucher_type->type === 'reciept'){
-                    $is_account_debit_increase = false;
-                }else{
-                    $is_account_debit_increase = true;
-                }
-            }else{
-                $is_account_debit_increase = false;
-            }
+            // if(in_array($account_from->type,['assets','expenses'])){
+            //     $is_account_debit_increase = true;
+            //     if(in_array($account->type,['assets','expenses']) && $voucher_type->type === 'reciept'){
+            //         $is_account_debit_increase = false;
+            //     }else if(in_array($account->type,['assets','expenses'])){
+            //         $is_account_debit_increase = false;
+            //     }else{
+            //         $is_account_debit_increase = true;
+            //     }
+            // }else{
+            //     $is_account_debit_increase = false;
+            // }
 
 
             AccountController::reverse_transaction([
@@ -393,8 +404,8 @@ class VoucherController extends Controller
                 'account_id' => $voucher->account_id,
                 'transaction_date' => $voucher->date,
                 'note' => 'Transaction made on update'.$voucher_type->name.' '.$voucher->doc_no.' by '. Auth::user()->email,
-                'credit' => !$is_account_debit_increase ? $voucher->total : 0,
-                'debit' =>  $is_account_debit_increase ? $voucher->total : 0,
+                'credit' => !$voucher_type->is_bank_recieve ? $voucher->total : 0,
+                'debit' =>  $voucher_type->is_bank_recieve ? $voucher->total : 0,
                 'reference_type' => 'voucher',
                 'reference_id' => $voucher->id,
                 'source_account' => $account_from->id
@@ -467,6 +478,7 @@ class VoucherController extends Controller
                     'slug' => "receipt-voucher",
                     "account_id" => Account::where("account_number",1000)->filterByStore()->first()->id,
                     "description" => "System Generate Voucher Type for Receiving Payment",
+                    'is_bank_recieve' => true
                 ]
             ];
 
@@ -476,6 +488,7 @@ class VoucherController extends Controller
                     'slug' => "payment-voucher",
                     "account_id" => Account::where("account_number",1000)->filterByStore()->first()->id,
                     "description" => "System Generate Voucher Type for Receiving Payment",
+                    'is_bank_recieve' => false
                 ]
             ];
 

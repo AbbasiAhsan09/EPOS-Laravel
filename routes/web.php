@@ -100,12 +100,13 @@ Route::middleware('manager.role')->prefix('uom')->group(function(){
 });
 
 Route::middleware('manager.role')->prefix("account")->group(function(){
-    Route::get("/",[AccountController::class, 'index']);
+    Route::get("/",[AccountController::class, 'index'])->name("account.index");
     Route::prefix('/report')->group(function(){
         Route::get('/trial-balance',[AccountController::class, 'trial_balance_report']);
         Route::get('/general-ledger',[AccountController::class, 'general_ledger_report']);
     });
     Route::post('/',[AccountController::class, 'store'])->name('account.add');
+    Route::delete('/{id}', [AccountController::class, 'destroy'])->name("delete.account");
     Route::get('/journal',[AccountController::class, 'journal'])->name('journal.index');
     Route::post('/journal',[AccountController::class, 'journal_post'])->name('journal.post');
     Route::delete('/journal/{id}',[AccountController::class, 'transaction_destroy'])->name('journal.delete');
@@ -272,6 +273,10 @@ Route::resources([
 ]);
 
 Route::get('db-backup', [SendBackupToMailController::class, 'DbBackup']);
+Route::get('db-backup-run', function(){
+    Artisan::call('backup:run');
+    return 'Backup run successfully!';
+});
 
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
 });

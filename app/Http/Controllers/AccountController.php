@@ -38,6 +38,10 @@ class AccountController extends Controller
             $items = $items->where('head_account', false);
         }
 
+        if($request->query("search")){
+            $items = $items->where("title",'LIKE','%'.$request->query("search").'%');
+        }
+
         // Assign the paginated result back to $items and keep query strings intact
         $items = $items->paginate(20)->withQueryString();
         // dd($items);
@@ -283,9 +287,45 @@ class AccountController extends Controller
      * @param  \App\Models\Account  $account
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Account $account)
+    public function destroy($id)
     {
-        //
+        try {
+          
+            $account = Account::where("id",$id)->filterByStore()->first();
+
+            
+            
+            if(!$account){
+                toast('Account not found', 'error');
+                return redirect()->back();
+            }
+            
+            $sub_account = Account::where("parent_id",$account->id)->count();
+            
+            if($sub_account){
+                toast("This account has active sub accounts associated with this account","error");
+                return redirect()->back();
+            }
+            
+            $transactions = AccountTransaction::where("account_id",$account->id)
+            ->where(function($query){
+                $query->where("debit",'>',0)->orWhere("credit",">",0);
+            })->count();
+
+            if($transactions){
+                toast("This account has active transactions please delete the Vouchers and Orders to delete this account","error");
+                return redirect()->back();
+            }
+
+            $account->delete();
+
+            toast("Account Deleted",'success');
+
+            return redirect()->back();
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
 
