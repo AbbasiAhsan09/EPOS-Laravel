@@ -571,7 +571,7 @@ class SaleReturnController extends Controller
 
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                 AccountController::reverse_transaction([
-                    'reference_type' => 'sale_return',
+                    'reference_type' => 'sales_return',
                     'reference_id' => $return->id,
                     'description' => 'This transaction is reversed because sale return '.$return->doc_no.'   is deleted by '. Auth::user()->name.'',
                     'transaction_count' => 0,
