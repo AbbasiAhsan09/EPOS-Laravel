@@ -119,9 +119,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-              <form action="{{route('delete.uom',$item->id)}}" method="POST">
+              <form action="{{route('labour.destroy',$item->id)}}" method="POST">
                   @csrf
-                  @method('put')
+                  @method('delete')
                  <label class="form-label">Are you sure you want to delete {{$item->name}}</label>
              
           </div>

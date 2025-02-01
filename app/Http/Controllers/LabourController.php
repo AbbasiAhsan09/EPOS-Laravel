@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\AccountTransaction;
 use App\Models\Labour;
+use App\Models\LabourWorkHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -159,8 +161,51 @@ class LabourController extends Controller
      * @param  \App\Models\Labour  $labour
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Labour $labour)
+    public function destroy($id)
     {
-        //
+        try {
+            
+            DB::beginTransaction();
+
+            $labour = Labour::find($id);
+
+            if(!$labour){
+                toast("Labour not found",'error');
+                return redirect()->back();
+            }
+
+            $work = LabourWorkHistory::where("labour_id",$labour->id)->count();
+
+            if($work){
+                toast("Cannot delete this labour becaue it has active labour bills please delete them first.",'error');
+                return redirect()->back();
+            }
+
+            $account = Account::where(['reference_type' => 'labour', 'reference_id' => $labour->id])->filterByStore()->first();
+
+            if($account){
+                $transactions = AccountTransaction::where('account_id',$account->id)->filterByStore()->where(function($query) {
+                    $query->where("credit","!=",0)->orWhere("debit",'!=',0);
+                })->count();
+
+                if($transactions){
+                    toast("Cannot delete this labour becaue it has active transactions please delete them first.",'error');
+                    return redirect()->back();
+                }
+            }
+
+            $labour->delete();
+
+            DB::commit();
+
+            toast("Labour deleted",'success');
+            return redirect()->back();
+
+
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
     }
 }

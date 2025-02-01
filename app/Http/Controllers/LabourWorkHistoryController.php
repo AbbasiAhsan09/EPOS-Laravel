@@ -342,8 +342,44 @@ class LabourWorkHistoryController extends Controller
      * @param  \App\Models\LabourWorkHistory  $labourWorkHistory
      * @return \Illuminate\Http\Response
      */
-    public function destroy(LabourWorkHistory $labourWorkHistory)
+    public function destroy($id)
     {
-        //
+        try {
+            
+            $history = LabourWorkHistory::where("id",$id)->filterByStore()->first();
+
+
+            DB::beginTransaction();
+
+            if(!$history){
+                toast("Labour bill not found",'error');
+                return redirect()->back();
+            }
+
+
+              AccountController::reverse_transaction([
+                'reference_type' => 'labour_bill',
+                'reference_id' => $history->id,
+                'date' => null,
+                'description' => 'Revrsed transaction for labour bill# '.$history->doc_no,
+                'transaction_count' => 2,
+                'order_column' => 'id',
+                'order_by' => 'DESC',
+            ]);
+
+            LabourWorkHistoryItems::where("labour_work_history_id",$history->id)->delete();
+
+            $history->delete();
+
+            DB::commit();
+
+            toast("Bill deleted",'success');
+            return redirect()->back();
+
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
     }
 }
