@@ -202,7 +202,7 @@ class PurchaseInvoiceController extends Controller
                             }else{
                                 $totalCost = $inventory->stock_qty * $inventory->wght_cost;
                                 $totalNewCost = $newQty * $newRate;
-                                $inventory->wght_cost = ($totalCost + $totalNewCost) / ($inventory->stock_qty + $newQty);
+                                $inventory->wght_cost = 0;
                                 $inventory->stock_qty = ($inventory->stock_qty + $newQty);
                             }
 
