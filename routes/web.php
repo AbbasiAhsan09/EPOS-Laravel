@@ -1,20 +1,28 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountingReportController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\CustomerLedgerController;
 use App\Http\Controllers\FieldsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\LabourController;
+use App\Http\Controllers\LabourWorkHistoryController;
+use App\Http\Controllers\JournalVoucherController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseReportController;
+use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\RegisterStoreController;
+use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SendBackupToMailController;
 use App\Http\Controllers\VendorLedgerController;
+use App\Http\Controllers\VoucherController;
+use App\Models\Voucher;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -92,11 +100,13 @@ Route::middleware('manager.role')->prefix('uom')->group(function(){
 });
 
 Route::middleware('manager.role')->prefix("account")->group(function(){
-    Route::get("/",[AccountController::class, 'index']);
+    Route::get("/",[AccountController::class, 'index'])->name("account.index");
     Route::prefix('/report')->group(function(){
         Route::get('/trial-balance',[AccountController::class, 'trial_balance_report']);
+        Route::get('/general-ledger',[AccountController::class, 'general_ledger_report']);
     });
     Route::post('/',[AccountController::class, 'store'])->name('account.add');
+    Route::delete('/{id}', [AccountController::class, 'destroy'])->name("delete.account");
     Route::get('/journal',[AccountController::class, 'journal'])->name('journal.index');
     Route::post('/journal',[AccountController::class, 'journal_post'])->name('journal.post');
     Route::delete('/journal/{id}',[AccountController::class, 'transaction_destroy'])->name('journal.delete');
@@ -142,14 +152,23 @@ Route::middleware('manager.role')->prefix('parties')->group(function () {
 });
 
 
+
+
 Route::prefix('sales')->group(function () {
     Route::get('/','App\Http\Controllers\SalesController@index');
     Route::get('/add','App\Http\Controllers\SalesController@addNewOrder');
     Route::get('change-status','App\Http\Controllers\SalesController@changeOrderStatus');
+    Route::get("/search",[SalesController::class, 'search_sale'])->name('sale.search');
     Route::middleware('manager.role')->get('/edit/{id}','App\Http\Controllers\SalesController@edit');
     Route::post('/add','App\Http\Controllers\SalesController@store')->name('add.sale');
     Route::put('/edit/{id?}','App\Http\Controllers\SalesController@update')->name('edit.sale');
     Route::middleware('manager.role')->delete('/delete/{id?}','App\Http\Controllers\SalesController@destroy')->name('delete.sale');
+    Route::get('return/{id?}',[SaleReturnController::class, 'create_update_sales_return']);
+    Route::post('return',[SaleReturnController::class, 'store'])->name("add.return");
+    Route::put('return/{id}',[SaleReturnController::class, 'update'])->name("update.return");
+    Route::delete('return/{id}',[SaleReturnController::class, 'destroy'])->name("delete.return");
+    Route::get('returns',[SaleReturnController::class, 'index'])->name("index.return");
+    Route::get('returns/detail',[SaleReturnController::class, 'details'])->name("detail.return");
     
 });
 
@@ -163,6 +182,22 @@ Route::get('/','App\Http\Controllers\PurchaseRequestController@main');
         Route::get("order/print/{id}",'App\Http\Controllers\PurchaseOrderController@print_invoice');
         Route::get("invoice/print/{id}",'App\Http\Controllers\PurchaseInvoiceController@print_invoice');
         Route::get('/invoice/{id}/create','App\Http\Controllers\PurchaseInvoiceController@create_inv');
+        // Purchase return routes
+        Route::get('return/{id?}',[PurchaseReturnController::class, 'create_update_purchase_return']);
+        Route::get('returns',[PurchaseReturnController::class, 'index'])->name('index.purchase_return');
+        Route::get('returns/detail',[PurchaseReturnController::class, 'details'])->name('detail.purchase_return');
+        Route::post('return',[PurchaseReturnController::class, 'store'])->name("add.purchase_return");
+        Route::put('return/{id}',[PurchaseReturnController::class, 'update'])->name("update.purchase_return");
+        Route::delete('return/{id}',[PurchaseReturnController::class, 'destroy'])->name("delete.purchase_return");
+});
+
+
+Route::middleware('manager.role')->group(function(){
+    // Route::res('labour',LabourController::class);
+    Route::resources([
+        'labour' => LabourController::class,
+        'labour-work' => LabourWorkHistoryController::class
+    ]);
 });
 
 Route::middleware('manager.role')->prefix('reports')->group(function(){
@@ -170,16 +205,50 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
     Route::resources([
         'sales-report' => SalesReportController::class,
         'purchase-report' => PurchaseReportController::class,
-        'inventory-report' => InventoryReportController::class
+        'inventory-report' => InventoryReportController::class,
     ]);
+    Route::get('inventory-balance',[InventoryReportController::class, 'real_inventory'])->name("inventory.balance");
+    Route::prefix('accounting')->group(function () {
+        Route::get("customer-payments",[AccountingReportController::class,'customer_payments']);
+        Route::get("general-ledger",[AccountingReportController::class,'generate_general_ledger_report']);
+        Route::get('/account-balance',[AccountingReportController::class, 'account_balance_report']);
 
+    });
     Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
     Route::get('purchase-summary-report', [PurchaseReportController::class, 'summary'])->name('purchase-report.summary');
     Route::get('sales-summary-report', [SalesReportController::class, 'summary'])->name('sales-report.summary');
     Route::get('sales-detail-report', [SalesReportController::class, 'detail'])->name('sales-report.detail');
 });
+
+
+Route::middleware('admin.role')->prefix('voucher-type')->group(function(){
+    Route::get("generate",[VoucherController::class,'generate_voucher_types']);
+});
+
+
+Route::middleware("manager.role")->prefix("voucher")->group(function(){
+    Route::get("/",[VoucherController::class, 'index'])->name("voucher.index");
+    Route::get("/create/{voucher_type_id}/{id?}",[VoucherController::class,'create']);
+    Route::post("/store",[VoucherController::class, 'store'])->name("voucher.store");
+    Route::put("/update/{id}",[VoucherController::class, 'update'])->name("voucher.update");
+    Route::get("/detail/{voucher_id}",[VoucherController::class, 'show'])->name('voucher.show');
+    Route::delete('/{id}',[VoucherController::class,'destroy'])->name("voucher.delete");
+});
+
+
+Route::middleware("manager.role")->prefix("journal-voucher")->group(function(){
+    Route::get("/",[JournalVoucherController::class, 'index'])->name("journal-voucher.index");
+    Route::get("/create/{id?}",[JournalVoucherController::class,'create']);
+    Route::get("/detail/{id}",[JournalVoucherController::class,'show']);
+    Route::post("/store",[JournalVoucherController::class, 'store'])->name("journal-voucher.store");
+    Route::put("/update/{id}",[JournalVoucherController::class, 'update'])->name("journal-voucher.update");
+    Route::delete('/{id}',[JournalVoucherController::class,'destroy'])->name("journal-voucher.delete");
+});
+
+
 Route::get('/ledgers',[CustomerLedgerController::class,'main']);
 Route::prefix('invoice')->group(function(){
+    Route::get("/return/{id}",[SaleReturnController::class,'invoice'])->name("return.print");
     Route::get('/{id}','App\Http\Controllers\SalesController@receipt');
 });
 Route::prefix('challan')->group(function(){
@@ -204,6 +273,10 @@ Route::resources([
 ]);
 
 Route::get('db-backup', [SendBackupToMailController::class, 'DbBackup']);
+Route::get('db-backup-run', function(){
+    Artisan::call('backup:run');
+    return 'Backup run successfully!';
+});
 
 Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
 });

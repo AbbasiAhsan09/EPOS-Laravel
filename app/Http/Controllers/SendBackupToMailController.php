@@ -15,10 +15,12 @@ class SendBackupToMailController extends Controller
     {
         try {
             // Get the path to the directory
-            $directory = storage_path('app/EPOS');
+            $directory = storage_path('app/Laravel');
 
             // Get all files in the directory
             $files = File::files($directory);
+
+            dd($files);
 
             // Sort the files by their last modified time
             usort($files, function ($a, $b) {
@@ -44,28 +46,46 @@ class SendBackupToMailController extends Controller
 
     function DbBackup()
     {
-        // Creating new backup
         Artisan::call("backup:run");
-
-        $this->removeAllBackupExceptRecent(2);
-        $filename = $this->getRecentBackupFilename() ?? "";
-
-        if ($filename) {
-            $filePath = storage_path('app/EPOS/' . $filename);
-
-            // Check if the file exists
-            if (Storage::exists('EPOS/' . $filename)) {
-
-                $file = response()->file($filePath);
-
-                $email = new SendBackupMail($filePath);
-
-                Mail::to('ahsansarim56@gmail.com')->send($email);
-            } else {
-                // File does not exist
-                return response()->json(['error' => 'File not found'], 404);
-            }
+        // Creating new backup
+        try {
+        } catch (\Throwable $th) {
+            throw $th;
         }
+
+        // // $this->removeAllBackupExceptRecent(2);
+        // $filename = $this->getRecentBackupFilename() ?? "";
+        // dd($filename);
+
+        // if ($filename) {
+        //     $filePath = storage_path('app/EPOS/' . $filename);
+
+        //     // Check if the file exists
+        //     if (Storage::exists('EPOS/' . $filename)) {
+        //         // Check if the BACKUP_ONLINE flag is set to true
+        //         if (env('BACKUP_ONLINE', false)) {
+        //             // Send the file as a backup email
+        //             try {
+        //                 $email = new SendBackupMail($filePath);
+        //                 Mail::to('ahsansarim56@gmail.com')->send($email);
+            
+        //                 return response()->json(['Backup sent to the email'], 200);
+        //             } catch (\Exception $e) {
+        //                 // Log the error if email sending fails
+        //                 \Log::error("Error sending backup email: " . $e->getMessage());
+            
+        //                 return response()->json(['error' => 'Failed to send backup email'], 500);
+        //             }
+        //         }
+            
+        //         // If no backup email is required, just download the file
+        //         return response()->download($filePath, $filename);
+            // } else {
+            //     // File does not exist
+            //     return response()->json(['error' => 'File not found'], 404);
+            // }
+            
+        // }
     }
 
 
@@ -73,7 +93,7 @@ class SendBackupToMailController extends Controller
     {
         try {
             // Define the directory path
-            $directory = storage_path('app/EPOS/');
+            $directory = storage_path('app/Laravel/');
             
             // Get all files in the directory
             $files = File::files($directory);
@@ -90,7 +110,7 @@ class SendBackupToMailController extends Controller
                 if (!in_array($file, $keepFiles)) {
                     // dd($file->getPathname());
                     // Delete the file
-                    $path = storage_path('app/EPOS/'.$file->getFilename());
+                    $path = storage_path('app/Laravel/'.$file->getFilename());
                     unlink($path);
                 }
             }

@@ -107,7 +107,7 @@
                       <input type="text" class="form-control" name="party_name" value="{{$item->party_name}}" required>
                     </div>
                     </div>  
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <label for="">Party  Group *</label>
                     <div class="input-group input-group-outline">
                         <select name="group_id" class="form-control" id="" required>
@@ -120,12 +120,18 @@
                     </div>
                     
                     @if (ConfigHelper::getStoreConfig()["use_accounting_module"])
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <label for="">Opening Balance</label>
                     <div class="input-group input-group-outline">
                       <input type="number" name="opening_balance" value="{{ $item->opening_balance }}" class="form-control" >
                     </div>
                     </div>
+                    <div class="col-lg-6">
+                      <label for="">Opening Balance Date</label>
+                    <div class="input-group input-group-outline">
+                      <input type="date" name="opening_balance_date" value="{{ $item->opening_balance_date }}" class="form-control" >
+                    </div>
+                  </div>
                     @endif  
                     <div class="col-lg-4">
                         <label for="">Party  Email</label>
@@ -245,7 +251,7 @@
                       <input type="text" class="form-control" name="party_name" required>
                     </div>
                     </div>  
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <label for="">Party  Group *</label>
                     <div class="input-group input-group-outline">
                         <select name="group_id" class="form-control" id="" required>
@@ -257,12 +263,18 @@
                     </div>
                     </div> 
                     @if (ConfigHelper::getStoreConfig()["use_accounting_module"])
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                       <label for="">Opening Balance</label>
                   <div class="input-group input-group-outline">
                      <input type="number" name="opening_balance" class="form-control" id="">
                   </div>
                   </div> 
+                    <div class="col-lg-6">
+                    <label for="">Opening Balance Date</label>
+                    <div class="input-group input-group-outline">
+                      <input type="date" name="opening_balance_date"  class="form-control" >
+                    </div>
+                  </div>
                   @endif
                     <div class="col-lg-4">
                         <label for="">Party  Email</label>
@@ -285,20 +297,7 @@
                     <input type="text" class="form-control" name="business_name"  placeholder="Demo Trades">
                   </div>
                   </div>
-
-                    
-                    
-                   
-{{-- 
-                    <div class="col-lg-4">
-                        <label for="">Party  Website </label>
-                    <div class="input-group input-group-outline">
-                      <input type="text" class="form-control" name="website"  placeholder="example.com">
-                    </div>
-                    </div> --}}
-                    
                     @livewire('location')
-                    
 
                     <div class="col-lg-12">
                         <label for="">Party  Address </label>

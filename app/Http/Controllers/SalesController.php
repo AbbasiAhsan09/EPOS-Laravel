@@ -121,11 +121,15 @@ class SalesController extends Controller
             if ($validate) {
 
                 $config = Configuration::filterByStore()->first();
-                $store_prefix = 'SA';
+                $store_prefix = 'SI';
                 $order  = new Sales();
-                $order->tran_no = date('d') . '/' . $store_prefix . '/' . date('y') . '/' . date('m') . '/' . (isset(Sales::latest()->first()->id) ? (Sales::max("id") + 1) : 1);
+                $order->tran_no = $store_prefix . '/'  . (isset(Sales::latest()->first()->id) ? (Sales::max("id") + 1) : 1);
                 $order->customer_id = ($request->party_id ? $request->party_id : 0);
                 $order->gross_total = $request->gross_total;
+                $order->gp_no = $request->gp_no;
+                $order->condition = $request->condition;
+                $order->truck_no = $request->truck_no;
+                $order->broker = $request->broker;
                 $order->other_charges = $request->other_charges;
                 $order->recieved = ($request->has('recieved') ? $request->recieved : 0); 
                 $order->payment_method = $request->has('payment_method') ? $request->payment_method : 'cash';
@@ -185,7 +189,9 @@ class SalesController extends Controller
                         $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];
-
+                        $details->extra_notes = isset($request->extra_notes[$i]) && $request->extra_notes[$i] ? $request->extra_notes[$i] : null;  
+                        $details->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
+                        $details->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
                         $details->rate = $request->rate[$i];
                         if ($request->has('item_disc')) {
                             $details->total = (($request->qty[$i] * $request->rate[$i]) + ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->tax[$i]) - ((($request->qty[$i] * $request->rate[$i]) / 100) * $request->item_disc[$i]));
@@ -215,7 +221,6 @@ class SalesController extends Controller
 
                     $revenue_account = Account::firstOrCreate(
                         [
-                            'title' => 'Sales Revenue', // Search by title
                             'pre_defined' => 1,      // and pre_defined
                             'store_id' => Auth::user()->store_id, // and store_id
                             'account_number' => 4000,
@@ -223,6 +228,7 @@ class SalesController extends Controller
                             'head_account' => true
                         ],
                         [
+                            'title' => 'Sales Revenue', // Search by title
                             'type' => 'income',
                             'description' => 'This account handles the Sales Revenue transactions', // Added description key
                             'opening_balance' => 0,
@@ -233,15 +239,15 @@ class SalesController extends Controller
                         $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                         $cash_account = Account::firstOrCreate(
                             [
-                                'title' => 'Cash', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
                                 'account_number' => 1000,
                                 'parent_id' => $current_asset_coa->id,
                                 'head_account' => true// and store_id
-
+                                
                             ],
                             [
+                                'title' => 'Cash', // Search by title
                                 'type' => 'assets',
                                 'description' => 'This account is created by system on cash sales', // Added description key
                                 'opening_balance' => 0,
@@ -269,15 +275,18 @@ class SalesController extends Controller
                     if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
                         $party = Parties::find($order->customer_id);
                         if($party){
+                        $group_validation = PartiesController::is_customer_group($party->group_id);
+                        $is_customer = $group_validation["is_customer"];
+                        $is_vendor = $group_validation["is_vendor"];
                            $party_account = Account::firstOrCreate(
                                 [ 
                                     'store_id' => Auth::user()->store_id, // and store_id,
-                                    'reference_type' => 'customer',
+                                    'reference_type' => $is_customer ? 'customer' : 'vendor',
                                     'reference_id' => $party->id,
                                 ],
                                 [
                                     'title' => $party->party_name,
-                                    'type' => 'assets',
+                                    'type' => $is_customer ? 'assets' : 'liabilities',
                                     'description' => 'This account is created by system on creating sale order '.$order->tran_no, // Added description key
                                     'opening_balance' => 0,
                                 ]
@@ -396,11 +405,11 @@ class SalesController extends Controller
         // Get or create the COGS and Inventory accounts
         $cogsAccount = Account::firstOrCreate(
             [
-                'title' => 'Cost of Goods Sold',
                 'store_id' => Auth::user()->store_id,
                 'account_number' => 5000,
             ],
             [
+                'title' => 'Cost of Goods Sold',
                 'type' => 'expense',
                 'description' => 'COGS for sales orders',
                 'opening_balance' => 0,
@@ -409,11 +418,11 @@ class SalesController extends Controller
 
         $inventoryAccount = Account::firstOrCreate(
             [
-                'title' => 'Inventory',
                 'store_id' => Auth::user()->store_id,
                 'account_number' => 1500,
             ],
             [
+                'title' => 'Inventory',
                 'type' => 'assets',
                 'description' => 'Tracks store’s inventory',
                 'opening_balance' => 0,
@@ -478,7 +487,9 @@ class SalesController extends Controller
                 $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
                 
                 if ($group) {
-                    $customers = Parties::where('group_id', $group->id)->byUser()->get();
+                    $customers = Parties::filterByStore()->with("groups")->get()->groupBy(function ($customer) {
+                        return optional($customer->groups)->group_name;
+                    });
                 } else {
                     $customers = [];
                 }
@@ -559,6 +570,10 @@ class SalesController extends Controller
                 }
                 $order->user_id = Auth::user()->id;
                 $order->net_total = $request->gross_total - $discount + ($request->has('other_charges') && $request->other_charges > 1 ? $request->other_charges : 0);
+                $order->gp_no = $request->gp_no;
+                $order->condition = $request->condition;
+                $order->truck_no = $request->truck_no;
+                $order->broker = $request->broker;
                 $order->save();
 
                    // Dynamic Fields Storing
@@ -618,7 +633,10 @@ class SalesController extends Controller
 
                         $details->sale_id = $order->id;
                         $details->item_id = $request->item_id[$i];
+                        $details->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
+                        $details->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
                         $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
+                        $details->extra_notes = isset($request->extra_notes[$i]) && $request->extra_notes[$i] ? $request->extra_notes[$i] : null;  
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];
                         $details->rate = $request->rate[$i];
@@ -636,7 +654,6 @@ class SalesController extends Controller
 
                         $revenue_account = Account::firstOrCreate(
                             [
-                                'title' => 'Sales Revenue', // Search by title
                                 'pre_defined' => 1,      // and pre_defined
                                 'store_id' => Auth::user()->store_id, // and store_id
                                 'account_number' => 4000,
@@ -645,6 +662,7 @@ class SalesController extends Controller
                                 'head_account' => true    
                             ],  
                             [
+                                'title' => 'Sales Revenue', // Search by title
                                 'type' => 'income',
                                 'description' => 'This account handles the Sales Revenue transactions', // Added description key
                                 'opening_balance' => 0,
@@ -667,7 +685,6 @@ class SalesController extends Controller
                             $current_asset_coa = AccountController::get_coa_account(['title' => 'Current Assets']);
                             $cash_account = Account::firstOrCreate(
                                 [
-                                    'title' => 'Cash', // Search by title
                                     'pre_defined' => 1,      // and pre_defined
                                     'store_id' => Auth::user()->store_id, 
                                     'account_number' => 1000,
@@ -675,6 +692,7 @@ class SalesController extends Controller
                                     'head_account' => true// and store_id
                                 ],
                                 [
+                                    'title' => 'Cash', // Search by title
                                     'type' => 'assets',
                                     'description' => 'This account is created by system on cash sales', // Added description key
                                     'opening_balance' => 0,
@@ -700,15 +718,19 @@ class SalesController extends Controller
                         if($request->has('order_tyoe') && $request->order_tyoe !== 'pos'){
                             $party = Parties::find($order->customer_id);
                             if($party){
-                               $party_account = Account::firstOrCreate(
+                                $group_validation = PartiesController::is_customer_group($party->group_id);
+                                $is_customer = $group_validation["is_customer"];
+                                $is_vendor = $group_validation["is_vendor"];
+                              
+                                $party_account = Account::firstOrCreate(
                                     [ 
                                         'store_id' => Auth::user()->store_id, // and store_id,
-                                        'reference_type' => 'customer',
+                                        'reference_type' => $is_customer ? 'customer' : 'vendor',
                                         'reference_id' => $party->id,
                                     ],
                                     [
                                         'title' => $party->party_name,
-                                        'type' => 'assets',
+                                        'type' => $is_customer ? 'assets' : 'liabilities',
                                         'description' => 'This account is created by system on creating sale order '.$order->tran_no, // Added description key
                                         'opening_balance' => 0,
                                     ]
@@ -768,6 +790,29 @@ class SalesController extends Controller
         }
     }
 
+
+    public function search_sale(Request $request){
+        try {
+            
+            $doc_no = $request->has("doc_no") && (int) $request->input("doc_no") ?  (int) $request->input("doc_no") : null;
+            if(!$doc_no){
+                toast("Invalid document no.",'error');
+                return redirect()->back();
+            }
+
+            $order = Sales::where("id",$doc_no)->filterByStore()->first();
+
+            if(!$order){
+                toast("Invalid document no.",'error');
+                return redirect()->back();
+            }
+
+            return redirect()->to('/sales/edit/' . $order->id);
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -788,39 +833,14 @@ class SalesController extends Controller
 
 
                      if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
-                        $reversible_transactions = AccountTransaction::where([
-                            'store_id' => Auth::user()->store_id,
+                        AccountController::reverse_transaction([
                             'reference_type' => 'sales_order',
-                            'reference_id' => $id,
-                        ])->orderBy("id","DESC")->take(2)->get();
-        
-                        if($reversible_transactions && count($reversible_transactions) > 0){
-                            foreach ($reversible_transactions as $key => $reversible_transaction) {
-                                if($reversible_transaction->credit && $reversible_transaction->credit > 0){
-                                    AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
-                                        'account_id' => $reversible_transaction->account_id,
-                                        'reference_type' => 'sales_order',
-                                        'reference_id' => $id,
-                                        'credit' => 0,
-                                        'debit' => $reversible_transaction->credit,
-                                        'transaction_date' => date('Y-m-d',time()),
-                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.' because Order '.$id.'   is deleted by '. Auth::user()->name.'',
-                                    ]);
-                                }else{
-                                    AccountTransaction::create([
-                                        'store_id' => Auth::user()->store_id,
-                                        'account_id' => $reversible_transaction->account_id,
-                                        'reference_type' => 'sales_order',
-                                        'reference_id' => $id,
-                                        'credit' => $reversible_transaction->debit,
-                                        'debit' => 0,
-                                        'transaction_date' => date('Y-m-d',time()),
-                                        'note' => 'This transaction is reversed transaction Ref ID '.$reversible_transaction->id.'  because Order '.$id.'   is deleted by  '. Auth::user()->name.'',
-                                    ]);
-                                }
-                            }
-                        }
+                            'reference_id' => $sale->id,
+                            'transaction_count'=> 2,
+                            'order_by' => 'DESC',
+                            'order_column' => 'id',
+                            'description' => 'Transaction reversed because Order '.$sale->tran_no.'   is updated by '. Auth::user()->name.''
+                        ]);
                     }
                     
                     Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
@@ -845,7 +865,11 @@ class SalesController extends Controller
             $group = PartyGroups::where('group_name', 'LIKE', 'Customer%')->first();
             $config = Configuration::filterByStore()->first();
             if ($group) {
-                $customers = Parties::where('group_id', $group->id)->filterByStore()->get();
+                // $customers = Parties::filterByStore()->with("groups")->get();
+                $customers = Parties::filterByStore()->with("groups")->get()->groupBy(function ($customer) {
+                    return optional($customer->groups)->group_name;
+                });
+                // dd($customers);
             } else {
                 $customers = [];
             }
@@ -855,7 +879,8 @@ class SalesController extends Controller
                 $query->filterByStore();
             })->first();
 
-            return view('sales.sale_orders.new_order', compact('customers','config','orderid','dynamicFields'));
+            $last_id = Sales::max("id");
+            return view('sales.sale_orders.new_order', compact('customers','config','orderid','dynamicFields','last_id'));
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -926,4 +951,34 @@ class SalesController extends Controller
             throw $th;
         }
     }
+
+
+    public function get_order_details(Request $request) {
+        try {
+            
+            $request->validate([
+                'store_id' => 'required',
+                'tran_no' => 'required'
+            ]);
+
+            $tran_no = $request->input('tran_no');
+            $store_id = $request->input('store_id');
+
+            $order = Sales::where("store_id", $store_id)->where("tran_no",$tran_no)
+            ->with("order_details","customer")
+            ->first();
+
+            if($order){
+                return response()->json($order);
+            }
+
+            return false;
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    
 }

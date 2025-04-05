@@ -38,6 +38,10 @@ class AccountController extends Controller
             $items = $items->where('head_account', false);
         }
 
+        if($request->query("search")){
+            $items = $items->where("title",'LIKE','%'.$request->query("search").'%');
+        }
+
         // Assign the paginated result back to $items and keep query strings intact
         $items = $items->paginate(20)->withQueryString();
         // dd($items);
@@ -74,6 +78,12 @@ class AccountController extends Controller
                 'color_code' => $request->color_code ?? null
             ];
 
+            if($request->has('parent_id')){
+                $input['parent_id'] = $request->has('parent_id') ? $request->parent_id : null;
+            }else{
+                $input["parent_id"] = $request->has("coa_id") ? $request->input("coa_id") : null; 
+            }
+            
             $coa = Account::where(['coa' => true, 'id' => $request->coa_id, 'store_id' => Auth::user()->store_id])->first();
             
             if(!$coa){
@@ -124,7 +134,7 @@ class AccountController extends Controller
                 'reference_id' => $account->id,
                 'debit' => $is_debit  ? $account->opening_balance : 0, // Credit to Opening Balance Equity
                 'credit' => $is_credit ? $account->opening_balance : 0,
-                'transaction_date' => now(),
+                'transaction_date' => '2000-01-01',
                 'recorded_by' => Auth::user()->id,
                 'note' => 'Debit for new account opening balance',
                 'source_account' => $opening_balance_equity->id
@@ -177,11 +187,16 @@ class AccountController extends Controller
             // dd($request->all());
             $input = [
                 'title' => $request->title,
-                'parent_id' => $request->has('parent_id') ? $request->parent_id : null, 
                 'opening_balance' => $request->opening_balance !== null ? $request->opening_balance : 0,
                 'description' => $request->description ?? null,
                 'color_code' => $request->color_code ?? null
             ];
+
+            if($request->has('parent_id')){
+                $input['parent_id'] = $request->has('parent_id') ? $request->parent_id : null;
+            }else{
+                $input["parent_id"] = $request->has("coa_id") ? $request->input("coa_id") : null; 
+            }
 
             $coa = Account::where(['coa' => true, 'id' => $request->coa_id, 'store_id' => Auth::user()->store_id])->first();
             
@@ -189,6 +204,7 @@ class AccountController extends Controller
                 toast('Bad Request Please Contact Support','error');
                 return redirect()->back();
             }
+
 
             $input["type"] = $coa->type;
             $input["head_account"] = $request->has('parent_id') ? false : true; 
@@ -243,7 +259,7 @@ class AccountController extends Controller
                 'reference_id' => $account->id,
                 'debit' => $is_debit  ? $account->opening_balance : 0, // Credit to Opening Balance Equity
                 'credit' => $is_credit ? $account->opening_balance : 0,
-                'transaction_date' => now(),
+                'transaction_date' => '2000-01-01',
                 'recorded_by' => Auth::user()->id,
                 'note' => ' New account opening balance Updated',
                 'source_account' => $opening_balance_equity->id
@@ -271,9 +287,45 @@ class AccountController extends Controller
      * @param  \App\Models\Account  $account
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Account $account)
+    public function destroy($id)
     {
-        //
+        try {
+          
+            $account = Account::where("id",$id)->filterByStore()->first();
+
+            
+            
+            if(!$account){
+                toast('Account not found', 'error');
+                return redirect()->back();
+            }
+            
+            $sub_account = Account::where("parent_id",$account->id)->count();
+            
+            if($sub_account){
+                toast("This account has active sub accounts associated with this account","error");
+                return redirect()->back();
+            }
+            
+            $transactions = AccountTransaction::where("account_id",$account->id)
+            ->where(function($query){
+                $query->where("debit",'>',0)->orWhere("credit",">",0);
+            })->count();
+
+            if($transactions){
+                toast("This account has active transactions please delete the Vouchers and Orders to delete this account","error");
+                return redirect()->back();
+            }
+
+            $account->delete();
+
+            toast("Account Deleted",'success');
+
+            return redirect()->back();
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
 
@@ -444,9 +496,8 @@ class AccountController extends Controller
         }
     }
 
-    static function reverse_transaction($reference = ['reference_type' => '', 'reference_id' => 0, 'date' => '','description' => '', 'transaction_count' => 0, 'order_by' => null, 'order_column' => 'id']){
+    static function reverse_transaction($reference = ['reference_type' => '', 'reference_id' => 0, 'date' => '','description' => '', 'transaction_count' => 0, 'order_by' => null, 'order_column' => 'id'], $delete = true){
         try {
-
             
             if(!isset($reference["date"]) || !$reference["date"] || empty($reference["date"])){
                 $reference["date"] = date('Y-m-d',time());
@@ -474,6 +525,12 @@ class AccountController extends Controller
                 DB::beginTransaction();
                 if($transactions && count($transactions)){
                     foreach ($transactions as  $transaction) {
+
+                        if($delete){
+                            $transaction->delete();
+                            continue;
+                        }
+
                         if(abs($transaction->credit)> 0){
                             AccountTransaction::create([
                                 'account_id' => $transaction->account_id,
@@ -529,6 +586,7 @@ class AccountController extends Controller
     ]){
         try {
             
+            
             if (empty($entry["account_id"]) || (abs($entry["debit"]) == 0 && abs($entry["credit"]) == 0)) {
                 return false;
             }
@@ -543,7 +601,7 @@ class AccountController extends Controller
             DB::beginTransaction();
             if (!empty($entry["source_account"])) {
                    
-                if ($entry["debit"] > 0) {
+                if (abs($entry["debit"]) > 0) {
                     // Create debit entry first
                     $debit_entry1 = AccountTransaction::create($entry);
                     
@@ -556,16 +614,18 @@ class AccountController extends Controller
                         'note' => $debit_entry1->note,
                         'store_id' => $debit_entry1->store_id,
                         'recorded_by' => $debit_entry1->recorded_by,
-                        'credit' => $debit_entry1->debit > 0 ? $debit_entry1->debit : 0, 
-                        'debit' => $debit_entry1->credit > 0 ? $debit_entry1->credit : 0, 
-                    ]);
+                        'credit' => $debit_entry1->debit !== null && !empty($debit_entry1->debit) ? $debit_entry1->debit : 0, 
+                        'debit' => $debit_entry1->credit !== null && !empty($debit_entry1->credit)  ? $debit_entry1->credit : 0, 
+                        'source_account' => $debit_entry1->account_id,
+                     ]);
 
                     $debit_entry1->update([
                         'reference_id' => $entry["reference_id"] ?? $debit_entry1->id,
                         'reference_type' => $entry["reference_type"] ?? "journal_entry",
                     ]);
                 } 
-                if($entry["credit"] > 0){
+                if(abs($entry["credit"]) > 0){
+                  
                     // Handle the case where debit is not present
                    $debit_entry_2 = AccountTransaction::create([
                         'account_id' => $entry['source_account'],
@@ -573,19 +633,22 @@ class AccountController extends Controller
                         'note' => $entry['note'],
                         'store_id' => $entry['store_id'],
                         'recorded_by' => $entry["recorded_by"],
-                        'credit' => $entry["debit"] > 0 ? $entry["debit"] : 0, 
-                        'debit' => $entry["credit"] > 0 ? $entry["credit"] : 0, 
+                        'credit' =>  $entry["debit"] !== null && !empty($entry["debit"]) ? $entry["debit"] : 0, 
+                        'debit' => $entry["credit"] !== null && !empty($entry["credit"])  ? $entry["credit"] : 0, 
                     ]);
+                
+                    // dd($debit_entry_2);
 
                     // Create the credit entry as well
                     $entry["reference_type"] = $entry["reference_type"] ?? "journal_entry";
                     $entry["reference_id"] = $entry["reference_id"] ?? $debit_entry_2->id;
 
-                    AccountTransaction::create($entry);
+                    $creditEntry = AccountTransaction::create($entry);
 
                     $debit_entry_2->update([
                         'reference_id' => $entry["reference_id"] ?? $debit_entry_2->id,
                         'reference_type' => $entry["reference_type"] ?? "journal_entry",
+                        'source_account' => $creditEntry->account_id
                     ]);
                 }
 
@@ -893,7 +956,7 @@ class AccountController extends Controller
                 $head_credit_debit = $this->get_credit_debit_sum(["account_id" => $head->id]);
                 $item = [];
                 $item["account_id"] = $head->id;
-                $item["parent_account"] = $head->parent->title;
+                $item["parent_account"] = $head->parent->title ?? '';
                 $item["title"] = $head->title;
                 $item["type"] = $head->type;
                 $item["parent"] = true;
@@ -934,7 +997,10 @@ class AccountController extends Controller
             $data = collect($data)->groupBy('parent_account');
             
             if($pdf){
-                $data = ["data" => $data->toArray()];
+                $data = [
+                    "data" => $data->toArray(),
+                    'report_title' => 'Financial Report'
+                ];
                 $pdf = Pdf::loadView('accounts.reports.pdf.trial-balance', $data)->setPaper('a4', 'portrait');
                 return $pdf->stream();
             }
@@ -967,7 +1033,54 @@ class AccountController extends Controller
 
 
     public function general_ledger_report(Request $request){
+
+        $range = [date('Y-m-d',time()),date('Y-m-d',time())]; 
+        $pdf = $request->has("type") && $request->type === "pdf" ;
         
+        if($request->has("from") && !empty($request->from)){
+            $range[0] = $request->from;
+            
+        }
+
+        if($request->has("to") && !empty($request->to)){
+            $range[1] = $request->to;
+        }
+        
+
+        $data = Account::filterByStore()
+        ->whereHas('transactions', function ($query) use ($range) {
+            // Filter the transactions based on the date range
+            $query->whereBetween('transaction_date', $range);
+        })
+        ->orderBy("parent_id",'ASC')
+        ->with("parent") // Ensures only accounts with transactions are fetched
+        ->with(['transactions' => function ($query)use($range) {
+            session()->put('general_ledger_from',$range[0]);
+            session()->put('general_ledger_to',$range[1]);
+            $query->orderBy('transaction_date', 'ASC')->whereBetween('transaction_date',$range); // Orders the transactions by transaction_date DESC
+        }]);
+
+        if($request->has("account_id") && !empty($request->account_id) && $request->account_id > 0){
+            $data = $data->where("id",$request->account_id);
+            session()->put('general_account_id',abs($request->account_id));
+
+        }else{
+            session()->put('general_account_id',null);
+
+        }
+
+        $data = $data->get();
+
+        if($pdf){
+            $data = ["data" => $data];
+            $pdf = Pdf::loadView('accounts.reports.pdf.general-ledger', $data)->setPaper('a4', 'landscape');
+            return $pdf->stream();
+        }
+
+        $accounts = Account::filterByStore()
+        ->where("coa", false)->whereHas('transactions')->orderBy("title",'ASC')->get();
+
+        return view("accounts.reports.general-ledger", compact('data','accounts'));
     }
 
     public function generate_sales_ledger_report(Request $request) {

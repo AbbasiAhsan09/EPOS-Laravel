@@ -8,8 +8,9 @@
 @endphp
 @include('comp.tvModal', ['src' => 'https://www.youtube.com/embed/eNhzTjJ2rIE'])
 @include("includes.spinner")
-
     <div class="page-wrapper">
+      
+        
           {{-- Form start --}}
           @if ($isEditMode)
           <form action="{{route('edit.sale' , $order->id)}}" method="POST" id="sale_form">
@@ -28,14 +29,28 @@
                         <div class="row align-items-center">
                             <div class="col-lg-2">
                                 <h1 class="page-title">{{$isEditMode ? 'Edit' : 'Create'}} Order {{$isEditMode ? (' : '.$order->tran_no ?? '') : '' }}</h1>
+                                @if (isset($last_id) && $last_id)
+                                    SI/{{$last_id + 1}}
+                                @endif
                             </div>
+
+                           
                     
                             <div class="col-lg-10">
+                               
                                 <div class="order-meta">
                                     <div class="row">
-                                       
+                                        <div class="col-lg-2">
+                                            <h4 class="order_section_sub_title">
+                                                Doc #
+                                            </h4>
+                                            <div class="input-group input-group-outline w-100 d-flex align-items-center justify-content-center">
+                                                <input type="text" id="search_value" class="form-control" value="{{$isEditMode ? $order->tran_no : ''}}">
+                                                <button  type="button" class="btn btn-small btn-primary" style="margin: 0" id="search_order_button" ><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
                                         @if ($config->bill_date_changeable && Auth::user()->userroles->role_name == 'Admin' || Auth::user()->userroles->role_name == 'SuperAdmin')
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                         <div class="bill-date-wrapper">
                                          <h3 class="order_section_sub_title">
                                              Bill Date
@@ -58,31 +73,39 @@
                                                     </h3>
                                                     <div class="order_type_items" style="display: flex; align-items: center; justify-content: space-between">   
                                                                 <label for="posOrder" class="order-type-item" style="width: 49%">
-                                                                <input type="radio" name="order_tyoe" id="posOrder" value="pos" class="form-check-input order_type_val" checked>
+                                                                <input type="radio" name="order_tyoe" id="posOrder" value="pos" class="form-check-input order_type_val" >
                                                                     POS ORDER
                                                                 </label>
                                                       
                                                                 <label for="normalOrder" class="order-type-item" style="width: 49%">
-                                                                <input type="radio" name="order_tyoe" id="normalOrder" value="normal" class="form-check-input order_type_val" {{ $isEditMode && $order->customer_id ? 'checked'  : '' }}>
+                                                                <input type="radio" name="order_tyoe" checked id="normalOrder" value="normal" class="form-check-input order_type_val" {{ $isEditMode && $order->customer_id ? 'checked'  : '' }}>
                                                                     CREDIT ORDER
                                                                 </label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                             {{-- Customer  --}}
                                         <div class="select_party_wrapper">
-                                            <h4 class="order_section_sub_title">
-                                                Select Customer
+                                            <h4 class="order_section_sub_title d-flex align-items-center justify-content-between">
+                                                <span>Select Party </span> <i style="cursor: pointer;" class="fa fa-plus" data-bs-toggle="modal" data-bs-target="#addPartyModal"></i>
                                             </h4>
                                             <div class="select_party">
                                                 
                                                 <div class="input-group input-group-outline">
+                                                    {{-- @livewire('party-dropdown', ['name' => 'customer_select', 'selected_id' => ($isEditMode && $order->customer_id ? $order->customer_id : null)]) --}}
                                                     <select name="party_id" class="form-control" id="customer_select" >
-                                                        <option value="">Select Customer</option>
-                                                        @foreach ($customers as $party)
-                                                            <option value="{{$party->id}}" {{ $isEditMode  && $order->customer_id ? ($order->customer_id === $party->id ? 'selected' : '') : '' }}>{{$party->party_name}}</option>
+                                                        <option value="">Select Party</option>
+                                                        @foreach ($customers as $group => $parties)
+                                                            <optgroup label="{{ ucfirst($group ?? '') }}">
+                                                                @foreach ($parties as $party)
+                                                                    <option value="{{ $party->id }}" 
+                                                                        {{ $isEditMode && $order->customer_id == $party->id ? 'selected' : '' }}>
+                                                                        {{ $party->party_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </optgroup>
                                                         @endforeach
                                                     </select>
                                                   </div> 
@@ -137,11 +160,7 @@
                                   <table class="table table-sm table-responsive-sm table-striped table-bordered ">
                                     <thead>
                                         <th>Description</th>
-                                        <th>UOM</th>
-                                        @if ($config->show_tp_in_order_form)
-                                        <th>TP
-                                        </th>
-                                        @endif
+                                        <th width="300px">Extra Notes</th>
                                         <th>Rate</th>
                                         <th>Qty</th>
                                         <th>Tax</th>
@@ -155,21 +174,9 @@
                                             <td>{{$item->item_details->name}}</td>
                                             <td> 
                                              <input type="hidden" name="item_id[]" value="{{$item->item_id}}">
-                                             @if ($item->item_details->uom != 0)
-                                             <select name="uom[]" class="form-control uom" data-id="{{$item->item_details->uoms->base_unit_value}}">
-                                                 <option value="1">{{$item->item_details->uoms->uom}}</option>
-                                                 <option value="{{$item->item_details->uoms->base_unit_value}}" {{$item->is_base_unit ? 'selected' : ''}}>{{$item->item_details->uoms->base_unit}}</option>
-                                             </select>
-                                             @else
-                                             <select name="uom[]" class="form-control uom" data-id="1" >
-                                                 <option value="1">Default</option>
-                                             </select>
-                                             @endif
+                                             <input type="hidden" name="uom[]" value="1">
+                                             <textarea name="extra_notes[]">{{$item->extra_notes ?? ""}}</textarea>
                                              </td>
-                                             @if ($config->show_tp_in_order_form)
-                                             <td><input name="tp[]" readonly disabled type="number" step="0.01" placeholder="TP"
-                                                min="1" class="form-control" value="{{$item->item_details->tp}}"></td>
-                                             @endif
                                             <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                     min="1" class="form-control rate" value="{{$item->rate}}"></td>
                                             <td><input name="qty[]" type="number" step="0.01" data-item-id="{{$item->item_details->id}}" placeholder="Qty"
@@ -340,6 +347,39 @@
                       
                        {{-- Payment Methods --}}
                            </div>
+                          
+                           <div class="col-lg-3">
+                            <h4 class="order_section_sub_title">
+                                Broker Name:
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="broker" id="broker" class="form-control"  value="{{$isEditMode ? $order->broker : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
+                           <div class="col-lg-3">
+                            <h4 class="order_section_sub_title">
+                                Condition:
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="condition" id="condition" class="form-control"  value="{{$isEditMode ? $order->condition : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
+                           <div class="col-lg-3">
+                            <h4 class="order_section_sub_title">
+                                Gate Pass No.
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="gp_no" id="gp_no" class="form-control"  value="{{$isEditMode ? $order->gp_no : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
+                           <div class="col-lg-2">
+                            <h4 class="order_section_sub_title">
+                                Truck No.
+                            </h4>
+                            <div class="input-group input-group-outline">
+                                <input type="text" name="truck_no" id="truck_no" class="form-control"  value="{{$isEditMode ? $order->truck_no : ''}}" min="0" onkeypress="validationForSubmit()" >
+                            </div>
+                           </div>
                            <div class="col-lg">
                             <h4 class="order_section_sub_title">
                                 Print Invoice
@@ -385,6 +425,10 @@
         </div>
     </form>
     </div>
+
+    @livewire('party-live-wire')
+
+
     @if (session('openNewWindow'))
         <script>
             $(document).ready(function(){
@@ -473,6 +517,18 @@ window.addEventListener('beforeunload', function (event) {
  }
 });
 
+
+ // Pass the base URL from Laravel to JavaScript
+    const baseUrl = `{{ url("sales/search") }}`;
+
+    $("#search_order_button").click(function(){
+        const docNo = $("#search_value").val();
+        const lastNumber = docNo.split('/').pop();
+        if (lastNumber) {
+            // Construct the full URL with the parameter
+            window.location.href = `${baseUrl}?doc_no=${lastNumber}`;
+        }
+    });
 </script>
 
 <style>

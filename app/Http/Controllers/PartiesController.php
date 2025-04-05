@@ -102,7 +102,12 @@ class PartiesController extends Controller
 
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                 if($request->has('opening_balance')){
-                    $party->opening_balance = $request->opening_balance ?? 0;
+                    $party->opening_balance = $request->opening_balance !== null && !empty($request->opening_balance) ? $request->opening_balance : 0;
+                }
+                if($request->has("opening_balance_date") && !empty($request->opening_balance_date)){
+                    $party->opening_balance_date = $request->opening_balance_date;
+                }else{
+                    $party->opening_balance_date = date("Y-m-d");
                 }
             }
 
@@ -129,7 +134,7 @@ class PartiesController extends Controller
     }
 
 
-    public function create_party_account(int $party_id) {
+    static function create_party_account(int $party_id) {
         try {
 
             $party = Parties::find($party_id);
@@ -138,7 +143,7 @@ class PartiesController extends Controller
                 return false;
             }
 
-            $group_validation = $this->is_customer_group($party->group_id);
+            $group_validation = PartiesController::is_customer_group($party->group_id);
             $is_vendor = $group_validation['is_vendor'];
             $is_customer = $group_validation['is_customer'];
 
@@ -158,10 +163,10 @@ class PartiesController extends Controller
                 [
                     
                     'title' => $party->party_name,
-                    'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
+                    'opening_balance' => $party->opening_balance !== null && !empty($party->opening_balance) ? $party->opening_balance : 0,
                 ]
             );
-             $opening_balance_head = AccountController::get_head_account(["account_number" => 3000]);
+             $opening_balance_head = AccountController::get_head_account(["account_number" => 3000]);  
 
              $opening_balance_equity = Account::firstOrCreate(
                 [
@@ -185,6 +190,7 @@ class PartiesController extends Controller
                         'debit' => $is_customer ? $account->opening_balance : 0,
                         'credit' => $is_vendor ? $account->opening_balance : 0,
                         'reference_type' => 'opening_balance_'.$account->reference_type,
+                        'transaction_date' => $party->opening_balance_date ?? null,
                         'reference_id' => $account->reference_id,
                         'source_account' => $opening_balance_equity->id
                     ]);
@@ -203,7 +209,7 @@ class PartiesController extends Controller
 
 
 
-    public function is_customer_group(int $group_id) {
+    static function is_customer_group(int $group_id) {
         try {
             $party_group = PartyGroups::find($group_id);
 
@@ -314,7 +320,12 @@ class PartiesController extends Controller
             
             if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
                 if($request->has('opening_balance')){
-                    $party->opening_balance = $request->opening_balance ?? 0;
+                    $party->opening_balance = $request->opening_balance !== null && !empty($request->opening_balance) ? $request->opening_balance : 0;
+                }
+                if($request->has("opening_balance_date") && !empty($request->opening_balance_date)){
+                    $party->opening_balance_date = $request->opening_balance_date;
+                }else{
+                    $party->opening_balance_date = date("Y-m-d");
                 }
             }
 
@@ -378,7 +389,7 @@ class PartiesController extends Controller
                     'title' => $party->party_name,
                     'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0, 
                     'reference_type' => $is_customer ? 'customer' : ($is_vendor ? 'vendor' : ''),
-                    'type' => $is_customer ? 'income' : 'liabilities',
+                    'type' => $is_customer ? 'assets' : 'liabilities',
                     'parent_id' => $head_account->id,
                 ]);
                 }else{
@@ -391,7 +402,7 @@ class PartiesController extends Controller
                         ],
                         [
                             'title' => $party->party_name,
-                            'type' => $is_customer ? 'income' : 'liabilities',
+                            'type' => $is_customer ? 'assets' : 'liabilities',
                             'opening_balance' => $party->opening_balance !== null ? $party->opening_balance : 0,
                         ]
                     );
@@ -479,6 +490,9 @@ class PartiesController extends Controller
                         AccountTransaction::where("account_id",$account->id)->delete();
                         $account->delete();
                     }
+                }else{
+                    AccountTransaction::where("account_id",$account->id)->delete();
+                    $account->delete();
                 }
                 }
 
@@ -528,7 +542,7 @@ class PartiesController extends Controller
                 $c_balance = Sales::where("customer_id",$party->id)
                 ->selectRaw("(SUM(net_total) - SUM(recieved)) as balance ")
                 ->get();
-                dd($c_balance);
+              
             }
 
 

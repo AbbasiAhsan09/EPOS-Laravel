@@ -45,7 +45,7 @@
                                     <th>UOM</th>
                                     <th>Rate</th>
                                     <th>MRP</th>
-                                    <th>Qty</th>
+                                    <th>Weight</th>
                                     <th>Tax</th>
                                     <th>Total</th>
                                 </thead>
@@ -324,7 +324,7 @@
             </div>
         </div>
     </div>
-    
+
 @section('scripts')
      {{-- Custom jS --}}
 <script src="{{asset('js/quotation.js')}}"></script>

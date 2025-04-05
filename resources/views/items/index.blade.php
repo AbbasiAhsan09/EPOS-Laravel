@@ -191,17 +191,26 @@
                             <input type="number" step="0.01" class="form-control" name="tp" value="{{$item->tp}}"   min="0">
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <label class="form-label">Low Stock Alert </label>
-                        <div class="input-group input-group-outline">
-                        <input type="number" class="form-control" name="low_stock"  value="{{$item->low_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
-                          </div>
-                      
-                    </div>
+                    
                     <div class="col-lg-6">
                         <label class="form-label">Opening Inventory </label>
                         <div class="input-group input-group-outline">
-                        <input type="number" class="form-control" name="opening_stock"  value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                        <input type="number" class="form-control" step="0.01" name="opening_stock"  value="{{$item->opening_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                          </div>
+                      
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label class="form-label">Opening Stock Unit Cost </label>
+                        <div class="input-group input-group-outline">
+                        <input type="number" class="form-control" step="0.01" name="opening_stock_unit_cost"  value="{{$item->opening_stock_unit_cost}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                          </div>
+                      
+                    </div>
+                    <div class="col-lg-12">
+                        <label class="form-label">Low Stock Alert </label>
+                        <div class="input-group input-group-outline">
+                        <input type="number" class="form-control" name="low_stock"  value="{{$item->low_stock}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                           </div>
                       
                     </div>
@@ -357,17 +366,27 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
-                                <label class="form-label">Low Stock Alert </label>
-                                <div class="input-group input-group-outline">
-                                <input type="number" class="form-control" name="low_stock"  value="{{old('low_stock') ? old('low_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
-                                  </div>
-                              
-                            </div>
+                           
                             <div class="col-lg-6">
                                 <label class="form-label">Opening Inventory </label>
                                 <div class="input-group input-group-outline">
-                                <input type="number" class="form-control" name="opening_stock"  value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                <input type="number" class="form-control" step="0.01" name="opening_stock"  value="{{old('opening_stock') ? old('opening_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                  </div>
+                              
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="form-label">Opening Stock Unit Cost </label>
+                                <div class="input-group input-group-outline">
+                                <input type="number" class="form-control" step="0.01" name="opening_stock_unit_cost"  value="{{old('opening_stock_unit_cost') ? old('opening_stock_unit_cost') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
+                                  </div>
+                              
+                            </div>
+
+                            <div class="col-lg-12">
+                                <label class="form-label">Low Stock Alert </label>
+                                <div class="input-group input-group-outline">
+                                <input type="number" class="form-control" name="low_stock"  value="{{old('low_stock') ? old('low_stock') : 0}}"  min="0" onfocus="focused(this)" onfocusout="defocused(this)">
                                   </div>
                               
                             </div>

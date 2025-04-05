@@ -37,4 +37,57 @@ class AccountTransaction extends Model
    {
        return $this->belongsTo(Account::class, 'account_id', 'id');
    }
+
+
+    /**
+    * Get the account that owns the AccountTransaction
+    *
+    * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+    */
+    public function source_account_detail(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'source_account', 'id');
+    }
+
+
+    /**
+     * Get the sale that owns the AccountTransaction
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function sale(): BelongsTo
+    {
+        return $this->belongsTo(Sales::class, 'reference_id', 'id');
+    }
+
+    /**
+     * Get the sale that owns the AccountTransaction
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function purchase(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseInvoice::class, 'reference_id', 'id');
+    }
+
+    /**
+     * Get the sale that owns the AccountTransaction
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function purchase_return(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseReturn::class, 'reference_id', 'id');
+    }
+
+    /**
+     * Get the sale that owns the AccountTransaction
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function sale_return(): BelongsTo
+    {
+        return $this->belongsTo(SaleReturn::class, 'reference_id', 'id');
+    }
+    
 }

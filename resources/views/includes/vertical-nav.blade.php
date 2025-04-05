@@ -1,3 +1,10 @@
+
+
+@php
+    use App\Models\VoucherType;
+    $voucher_types = VoucherType::filterByStore()->orderBy("name","ASC")->get();
+@endphp
+
 <div class="xp-navbar">
     <ul class="menu">
         <li class="menu-item">
@@ -5,28 +12,110 @@
         </li>
         <li class="menu-item"> <a href="/sales">Sales</a>
             <ul class="submenu">
-                <li class="submenu-item"><a href="/sales/add">New</a></li>
-                <li class="submenu-item"><a href="/sales">List</a></li>
-                <li class="submenu-item"><a href="/reports/sales-report">Report</a></li>
-                <li class="submenu-item"><a href="/reports/sales-detail-report">Detail Report </a></li>
-                <li class="submenu-item"><a href="/reports/sales-summary-report">Summary Report </a></li>
-                <li class="submenu-item"><a href="/reports/sales-report?filter_deleted=true">Report (Deleted) </a></li>
+                <li class="submenu-item"><a href="/sales/add">Create</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/sales/add">Sale Invoice</a></li>
+                        <li class="childmenu-item"><a href="/sales/return">Sale Return</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"><a href="/sales">List</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/sales/">Sale Invoices</a></li>
+                        <li class="childmenu-item"><a href="/sales/returns">Sale Returns</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"><a href="/reports/sales-report">Report</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/reports/sales-report">Sale Report</a></li>
+                        <li class="childmenu-item"><a href="/reports/sales-report?filter_deleted=true">Sale Report (Deleted) </a></li>
+                        <li class="childmenu-item"><a href="/reports/sales-detail-report">Detail Report </a></li>
+                        <li class="childmenu-item"><a href="/sales/returns">Sale Returns</a></li>
+                        <li class="childmenu-item"><a href="/sales/returns/detail"> Sales Return Detail Report </a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"></li>
+                {{-- <li class="submenu-item"><a href="/reports/sales-summary-report">Summary Report </a></li> --}}
             </ul>
         </li>
-        <li class="menu-item">Purchase
+        <li class="menu-item"><a href="/purchase">Purchase</a> 
             <ul class="submenu">
-                <li class="submenu-item">New Purchase</li>
-                <li class="submenu-item">Zoom Out</li>
-                <li class="submenu-item">Full Screen</li>
+                <li class="submenu-item">Create
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/purchase/invoice/0/create">Purchase Invoice</a></li>
+                        <li class="childmenu-item"><a href="/purchase/return">Purchase Return </a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"><a href="/purchase/invoice">List</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/purchase/invoice/">Purchase Invoices</a></li>
+                        <li class="childmenu-item"><a href="/purchase/returns">Purchase Returns</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-item"><a href="/reports/purchase-report">Report</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
+                        <li class="childmenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
+                        <li class="childmenu-item"><a href="/purchase/returns">Purchase Returns</a></li>
+                        <li class="childmenu-item"><a href="/purchase/returns/detail">Purchase Return Detail Report</a></li>
+                    </ul>
+                </li>
             </ul>
         </li>
 
         <li class="menu-item">Accounting
             <ul class="submenu">
+                <li class="submenu-item"><a href="/journal-voucher/create">Journal Voucher</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"> <a href="/journal-voucher/create/">Create</a> </li>
+                        <li class="childmenu-item"> <a href="/journal-voucher"> List</a> </li>
+                    </ul>
+                </li>
                 <li class="submenu-item"><a href="/account">Accounts</a></li>
+                <li class="submenu-item"><a href="/reports/accounting/account-balance">Account Balance</a></li>
                 <li class="submenu-item"><a href="/account/journal">New Transactions</a></li>
                 <li class="submenu-item"><a href="/account/transactions">Transaction</a></li>
-                <li class="submenu-item">Reports</li>
+                <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
+                <li class="submenu-item"><a href="/reports/accounting/general-ledger">Ledger Report</a></li>
+            </ul>
+        </li>
+
+        <li class="menu-item">
+            Vouchers
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/journal-voucher/create">Journal Voucher</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"> <a href="/journal-voucher/create/">Create</a> </li>
+                        <li class="childmenu-item"> <a href="/journal-voucher"> List</a> </li>
+                    </ul>
+                </li>
+                @foreach ($voucher_types as $voucher_type)
+                <li class="submenu-item"><a href="/voucher/create/{{$voucher_type->id}}">{{$voucher_type->name}}</a>
+                    <ul class="childmenu">
+                        <li class="childmenu-item"> <a href="/voucher/create/{{$voucher_type->id}}">Create </a> </li>
+                        <li class="childmenu-item"> <a href="/voucher?voucher_type_id={{$voucher_type->id}}">List</a> </li>
+                    </ul>
+                </li>
+            @endforeach
+            </ul>
+        </li>
+
+        <li class="menu-item">Reporting
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
+                <li class="submenu-item"><a href="/reports/inventory-balance">Inventory Balance Report</a></li>
+                <li class="submenu-item"><a href="/journal-voucher">Journal Voucher Report</a></li>
+                <li class="submenu-item"><a href="/reports/accounting/account-balance">Account Balance</a></li>
+                <li class="submenu-item"><a href="/reports/accounting/general-ledger">Ledger Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-report">Purchase Report</a></li>
+                <li class="submenu-item"><a href="/reports/purchase-detail-report">Purchase Detail Report</a></li>
+                <li class="submenu-item"><a href="/purchase/returns">Purchase Return Report</a></li>
+                <li class="submenu-item"><a href="/purchase/returns/detail">Purchase Return Detail Report</a></li>
+                <li class="submenu-item"><a href="/reports/sales-report">Sale Report</a></li>
+                <li class="submenu-item"><a href="/reports/sales-detail-report">Sale Detail Report</a></li>
+                <li class="submenu-item"><a href="/sales/returns">Sale Return Report</a></li>
+                <li class="submenu-item"><a href="/sales/returns/detail"> Sales Return Detail Report </a></li>
+            
+                <li class="submenu-item"><a href="/labour-work/">Labour Bills Report</a></li>
             </ul>
         </li>
 
@@ -35,17 +124,32 @@
             <a href="/parties">Parties</a>
         </li>
 
-        <li class="menu-item">Products
+        <li class="menu-item"> <a href="/products">Products</a>
             <ul class="submenu">
-                <li class="submenu-item">List</li>
-                <li class="submenu-item">Fields</li>
-                <li class="submenu-item">Categories</li>
+                <li class="submenu-item"><a href="/products">Products</a></li>
+                <li class="submenu-item"><a href="/fields">Categories</a></li>
+                <li class="submenu-item"><a href="/product-category">Sub Categories</a></li>
+                <li class="submenu-item"><a href="/uom">UOM</a></li>
+            </ul>
+        </li>
+        <li class="menu-item"><a href="/system/configurations">Settings</a>
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/db-backup" target="_blank">DB Backup</a></li>
+            </ul></li>
+
+        <li class="menu-item"><a href="/labour">Labour</a>
+            <ul class="submenu">
+                <li class="submenu-item"><a href="/labour">Labours</a></li>
+                <li class="submenu-item"><a href="/labour-work/create">Create Bill</a></li>
+                <li class="submenu-item"><a href="/labour-work/">Bills</a></li>
+                {{-- <li class="submenu-item"><a href="/product-category">Reports</a></li> --}}
             </ul>
         </li>
 
-        <li class="menu-item">Favorites</li>
-        <li class="menu-item">Tools</li>
-        <li class="menu-item">Help</li>
+        <li class="menu-item bg-logout"><a href="{{route('auth.logout')}}">Logout</a></li>
+        <li class="menu-item">
+            <a class="" target="_blank" href="https://wa.me/03200681969?text=Hello,%20%0AName:%20{{Auth::check() ? Auth::user()->name : ''}}%0AStore:%20{{Auth::check() && isset(Auth::user()->store)? Auth::user()->store->store_name : ''}}%0AUser%20Role:%20{{Auth::check() && isset(Auth::user()->userroles->role_name) ? Auth::user()->userroles->role_name : ''}}%0AI%20need%20help%20regarding...."  type="button">Need Help?</a>
+        </li>
     </ul>
 </div>
 
@@ -97,10 +201,10 @@
     color: #9ec200
 }
 
-.menu-item:hover {
+/* .menu-item:hover {
     background-color: #d0d0d0;
     border-color: #8b8b8b;
-}
+} */
 
 .menu-item:active {
     background-color: #c0c0c0;
@@ -117,6 +221,7 @@
     padding: 0;
     list-style: none;
     z-index: 1000;
+    transition: .2s
 }
 
 .submenu-item {
@@ -133,5 +238,68 @@
 .menu-item:hover .submenu {
     display: block; /* Show submenu on hover */
 }
+
+.menu-item:hover, .menu-active{
+    background: #9ec200;
+    color: white;
+    box-shadow:  0px 0px 20px #8b8b8b
+}
+
+.menu-item:hover > a{
+    color: white
+}
+
+
+.bg-logout{
+    background: red;
+    color: white
+}
+
+.bg-logout >a {
+    color: white
+}
+.bg-logout:hover{
+    background: rgb(216, 44, 44)
+}
+
+
+/* Refactoring */
+
+
+ul.childmenu{
+    list-style: none;
+    display: none;
+    position: absolute;
+    top: 20%;
+    left: 100%;
+    padding: 0;
+    min-width: 150px;
+    background: #cecece;
+    border: solid 1px #9ec200;
+    transition: 0.5s;
+
+}
+
+.submenu-item{
+    color: #344767
+}
+
+.childmenu-item{
+    background: #cecece;
+    padding:5px 10px;
+}
+.childmenu-item:hover{
+    background: #ececec;
+}
+
+.submenu-item{
+    position: relative;
+}
+
+.submenu-item:hover > .childmenu{
+    display: inline;
+    /* height: fit-content; */
+}
+
 
 </style>

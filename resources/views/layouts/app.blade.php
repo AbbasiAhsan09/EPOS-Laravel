@@ -1,7 +1,9 @@
 @php
     use App\Models\Configuration;
+    use App\Models\KeyboardShortcut;
    
     $currenConfig = Configuration::filterByStore()->first();
+    $shortcuts = KeyboardShortcut::all();
 @endphp
 
 <!DOCTYPE html>
@@ -21,6 +23,7 @@
 
   {{-- Sweet Alert CDN --}}
   <script src="{{asset("js/sweetalert.min.js")}}"></script>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
   <!-- Nucleo Icons -->
@@ -33,6 +36,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <!-- CSS Files -->
   <link id="pagestyle" href="{{asset('css/material-dashboard.css?v=3.0.4')}}" rel="stylesheet" />
+
+  <script src="{{asset("js/plugins/moment.min.js")}}"></script>
+
   <script src="{{asset('js/plugins/jquery.min.js')}}"></script>
   @livewireStyles
 </head>
@@ -126,6 +132,35 @@
   <script src="{{asset('js/plugins/perfect-scrollbar.min.js')}}"></script>
   <script src="{{asset('js/plugins/smooth-scrollbar.min.js')}}"></script>
   <script src="{{asset('js/plugins/chartjs.min.js')}}"></script>
+
+  @if ($shortcuts && $shortcuts->count())
+      <script>
+         const shortcuts = @json($shortcuts);
+     
+          document.addEventListener('keydown', function (event) {
+              // Ignore keypresses in input fields or editable elements
+              if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.isContentEditable) {
+                  return;
+              }
+
+              shortcuts.forEach(shortcut => {
+                const [modifier, key] = shortcut.key.toLowerCase().split(' + ');
+                  if (
+                      (modifier === 'ctrl' && event.ctrlKey) ||
+                      (modifier === 'alt' && event.altKey) ||
+                      (modifier === 'shift' && event.shiftKey) ||
+                      (modifier === 'cmd' && event.metaKey)
+                  ) {
+                      if (event.key.toLowerCase() === key) {
+                          event.preventDefault(); // Prevent default action
+                          window.location.href = shortcut.uri; // Navigate to the action
+                      }
+                  }
+              });
+          });
+      </script>
+  @endif
+
   <script>
     var ctx = document.getElementById("chart-bars").getContext("2d");
 
@@ -411,6 +446,7 @@
 
  @yield('scripts')
  <script src="{{asset("externals/select2/select2.min.js")}}"></script>
+ <script src="{{asset("js/multiple-form-submit-prevent.js")}}"></script>
 
  <script>
    $(document).on('keydown', function(event) {

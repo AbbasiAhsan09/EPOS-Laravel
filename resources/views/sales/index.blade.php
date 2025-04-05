@@ -55,7 +55,7 @@
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
             <th>ID</th>
-            <th>Transaction #</th>
+            <th>Doc #</th>
             <th>Customer</th>
             <th>Created at</th>
             <th>User</th>

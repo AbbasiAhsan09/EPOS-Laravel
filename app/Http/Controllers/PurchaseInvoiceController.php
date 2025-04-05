@@ -56,12 +56,18 @@ class PurchaseInvoiceController extends Controller
         }
 
         $order = PurchaseOrder::where('id',$id)->with('details.items')->first();
-        $vendors = Parties::where('group_id' , 2)->byUser()->get();
+        $vendors = Parties::filterByStore()->with("groups")->get()->groupBy(function ($vendor) {
+            return optional($vendor->groups)->group_name;
+        });
+
         $dynamicFields = AppForms::where("name",'purchase_invoice')
         ->with("fields")->whereHas("fields", function($query){
             return $query->where('show_in_table', 1)->filterByStore();
         })->first();
-        return view('purchase.invoices.p_create_inv',compact('order','vendors','config','dynamicFields'));
+
+        $last_id = PurchaseInvoice::max("id"); 
+
+        return view('purchase.invoices.p_create_inv',compact('order','vendors','config','dynamicFields','last_id'));
         } catch (\Throwable $th) {
             //throw $th;
         }
@@ -90,7 +96,7 @@ class PurchaseInvoiceController extends Controller
             $validate = $request->validate([
                 'order_tyoe' => 'required',
                 'party_id' => 'required | integer',
-                'payment_method' => 'required',
+                // 'payment_method' => 'required',
                 'item_id' => 'required',
                 'uom' => 'required',
                 'tax' => 'required',
@@ -98,9 +104,10 @@ class PurchaseInvoiceController extends Controller
             ]);
 
             if($validate){
+                
             DB::beginTransaction();
             $invoice = new PurchaseInvoice();
-            $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. (PurchaseInvoice::max("id") ?? 0) + 1;
+            $invoice->doc_num ='PI'.'/'. (PurchaseInvoice::max("id") ?? 0) + 1;
             $invoice->party_id = $request->party_id;
             $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id ?? null;
             $invoice->total = $request->gross_total;
@@ -115,6 +122,7 @@ class PurchaseInvoiceController extends Controller
                 $discount =  $request->discount;
             }
 
+            // dd((($request->gross_total + $request->other_charges) - ($discount)));
             $invoice->others = $request->other_charges;
             $invoice->tax = 0;
             $invoice->shipping = 0;
@@ -158,14 +166,16 @@ class PurchaseInvoiceController extends Controller
             if($invoice && count($request->item_id)){
                 
                     for ($i=0; $i < count($request->item_id) ; $i++) { 
-                        
+                        $item = Products::where("id",$request->item_id[$i])->filterByStore()->first();
                         $detail = new PurchaseInvoiceDetails();
                         $detail->inv_id = $invoice->id;
                         $detail->item_id = $request->item_id[$i];
                         $detail->rate = $request->rate[$i];
-                        $detail->mrp = $request->mrp[$i];
+                        $detail->mrp = isset($request->mrp[$i]) ? $request->mrp[$i] : $item->tp ?? 0 ;
                         $detail->qty = $request->qty[$i];
                         $detail->tax = $request->tax[$i];
+                        $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : 0;
+                        $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : 0;
                         $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                         $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                         $detail->save();
@@ -192,7 +202,7 @@ class PurchaseInvoiceController extends Controller
                             }else{
                                 $totalCost = $inventory->stock_qty * $inventory->wght_cost;
                                 $totalNewCost = $newQty * $newRate;
-                                $inventory->wght_cost = ($totalCost + $totalNewCost) / ($inventory->stock_qty + $newQty);
+                                $inventory->wght_cost = 0;
                                 $inventory->stock_qty = ($inventory->stock_qty + $newQty);
                             }
 
@@ -211,17 +221,17 @@ class PurchaseInvoiceController extends Controller
                 if($invoice->party_id){
                     $party = Parties::find($invoice->party_id);
                     if($party){
-                       $party_head = AccountController::get_head_account(['account_number' => 2000]);
+                       $group_validation = PartiesController::is_customer_group($party->group_id);
+                       $is_customer = $group_validation["is_customer"];
                        $party_account = Account::firstOrCreate(
                             [ 
                                 'store_id' => Auth::user()->store_id, // and store_id,
-                                'reference_type' => 'vendor',
+                                'reference_type' => $is_customer ? "customer" : 'vendor',
                                 'reference_id' => $party->id,
-                                'parent_id' => $party_head->id,
                             ],
                             [
                                 'title' => $party->party_name,
-                                'type' => 'assets',
+                                'type' => $is_customer ? 'assets' : 'liabilities',
                                 'description' => 'This account is created by system on creating Purchase Invoice '.$invoice->doc_num, // Added description key
                                 'opening_balance' => 0,
                             ]
@@ -277,7 +287,9 @@ class PurchaseInvoiceController extends Controller
         try {
         $invoice = PurchaseInvoice::where('id',$id)->with('dynamicFeildsData')->filterByStore()->first();
             if($invoice){
-                $vendors = Parties::where('group_id' , 2)->filterByStore()->get();
+                $vendors = Parties::filterByStore()->with("groups")->get()->groupBy(function ($vendor) {
+                    return optional($vendor->groups)->group_name;
+                });
                 $config = Configuration::filterByStore()->first();
                     
                 $dynamicFields = AppForms::where("name",'purchase_invoice')
@@ -324,7 +336,7 @@ class PurchaseInvoiceController extends Controller
                 $old_amount = $invoice->recieved;
                 $invoice->doc_num = date('d',time()).'/POI'.'/'. date('m/y',time()).'/'. $invoice->id;
                 $invoice->party_id = $request->party_id;
-                $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id;
+                $invoice->po_id = PurchaseOrder::where('doc_num',$request->q_num)->first()->id ?? null;
                 $invoice->total = $request->gross_total;
                 if($request->has('discount') && (substr($request->discount,0,1) == '%')){
                     $invoice->discount_type = 'PERCENT';
@@ -426,9 +438,12 @@ class PurchaseInvoiceController extends Controller
                             $detail->inv_id = $invoice->id;
                             $detail->item_id = $request->item_id[$i];
                             $detail->rate = $request->rate[$i];
-                            $detail->mrp = $request->mrp[$i];
+                            $detail->mrp = isset($request->mrp[$i]) ? $request->mrp[$i] : $item->tp ?? 0 ;
                             $detail->qty = $request->qty[$i];
                             $detail->tax = $request->tax[$i];
+                            $detail->bags = isset($request->bags[$i]) ? $request->bags[$i] : 0;
+                            $detail->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : 0;
+                           
                             $detail->is_base_unit = ((isset($request->uom[$i]) && $request->uom[$i] > 1) ? true : false);
                             $detail->total = ((($request->qty[$i] * $request->rate[$i]) / 100 )* $request->tax[$i]) + ($request->qty[$i] * $request->rate[$i]);
                             $detail->save();
@@ -456,16 +471,16 @@ class PurchaseInvoiceController extends Controller
                     
                     if($invoice->party_id){
                         $party = Parties::find($invoice->party_id);
+                        $group_validation  = PartiesController::is_customer_group($party->group_id);
+                        $is_customer = $group_validation["is_customer"];
                         if($party){
-                           $party_head = AccountController::get_head_account(['account_number' => 2000]);
-                    
+
                            $party_account = Account::firstOrCreate(
                                 [ 
                                     'store_id' => Auth::user()->store_id, // and store_id,
-                                    'reference_type' => 'vendor',
+                                    'reference_type' => $is_customer ? 'customer' : 'vendor',
                                     'reference_id' => $party->id,
-                                    'type' => 'liabilities',
-                                    'parent_id' => $party_head->id,
+                                    'type' => $is_customer ? 'assets' : 'liabilities',
                                 ],
                                 [
                                     'title' => $party->party_name,
@@ -527,8 +542,8 @@ class PurchaseInvoiceController extends Controller
                 'reference_id' => $invoice->id,
                 'order_by' => 'DESC',
                 'order_column' => 'id',
-                'transaction_count' => 0,
-                'This transaction is reversed because Purchase Invoice'.$invoice->doc_num.'   is deleted by '. Auth::user()->name.'',
+                'transaction_count' => 2,
+                'description' => 'This transaction is reversed because Purchase Invoice'.$invoice->doc_num.'   is deleted by '. Auth::user()->name.'',
             ]);
            }
 
@@ -561,5 +576,30 @@ class PurchaseInvoiceController extends Controller
         }
     }
 
+    public function get_invoice_details(Request $request) {
+        try {
+            
+            $request->validate([
+                'store_id' => 'required',
+                'tran_no' => 'required'
+            ]);
+
+            $tran_no = $request->input('tran_no');
+            $store_id = $request->input('store_id');
+
+            $order = PurchaseInvoice::where("store_id", $store_id)->where("doc_num",$tran_no)
+            ->with("details","party")
+            ->first();
+
+            if($order){
+                return response()->json($order);
+            }
+
+            return false;
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 
 }

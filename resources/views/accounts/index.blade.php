@@ -33,10 +33,25 @@
         </div>
     </div>
 </div> 
-  <div class="btn-group w-100 mt-4">
-    <a href="/account" class="btn btn-outline-secondary btn-sm mb-0 {{request()->has('head_accounts') ? '' : 'btn-primary'}}">Accounts</a>
-    <a href="/account?head_accounts" id="head_account_btn" class="btn btn-outline-secondary btn-sm mb-0 {{!request()->has('head_accounts') ? '' : 'btn-primary'}} ">Head Accounts</a>
+<div class="btn-group w-100 mt-4">
+  <a href="/account" class="btn btn-outline-secondary btn-sm mb-0 {{request()->has('head_accounts') ? '' : 'btn-primary'}}">Accounts</a>
+  <a href="/account?head_accounts" id="head_account_btn" class="btn btn-outline-secondary btn-sm mb-0 {{!request()->has('head_accounts') ? '' : 'btn-primary'}} ">Head Accounts</a>
+</div>
+<form action="{{ route("account.index") }}">
+  <div class="row my-2">
+    <div class="col-lg-4">
+      <div class="input-group input-group-outline">
+        <input type="search" value="{{ request()->query("search") ?? "" }}"  class="form-control" name="search" placeholder="Search By Title">
+        @if (request()->has("head_accounts"))
+        <input type="hidden" name="head_accounts" >
+        @endif
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <button class="btn btn-outline-primary">Search</button>
+    </div>
   </div>
+</form>
     <table class="table table-sm table-responsive-sm table-striped">
         <thead>
             <th>ID</th>
@@ -60,13 +75,16 @@
             <td>{{ ConfigHelper::getStoreConfig()["symbol"].$item->opening_balance}}</td>
             <td>
               {{-- @if (!$item->reference_type && !$item->reference_id && $item->title !== 'Cash Sales') --}}
-              @if (!request()->has('head_accounts'))
+              {{-- @if (!request()->has('head_accounts')) --}}
               <div class="s-btn-grp">
                 <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#accountModal{{$item->id}}">
                   <i class="fa fa-edit"></i>
                 </button>
+                <button class="btn btn-link text-danger text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
+                  <i class="fa fa-trash"></i>
+                </button>
               </div>  
-                @endif
+                {{-- @endif --}}
             </td>
         </tr>
 
@@ -156,14 +174,14 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="accountModalLabel">Delete UOM</h5>
+            <h5 class="modal-title" id="accountModalLabel">Delete Account</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-              <form action="{{route('delete.uom',$item->id)}}" method="POST">
+              <form action="{{route('delete.account',$item->id)}}" method="POST">
                   @csrf
-                  @method('put')
-                 <label class="form-label">Are you sure you want to delete {{$item->uom}}</label>
+                  @method('delete')
+                 <label class="form-label">Are you sure you want to delete {{$item->title}}</label>
              
           </div>
           <div class="modal-footer">

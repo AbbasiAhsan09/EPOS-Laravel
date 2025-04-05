@@ -51,7 +51,7 @@
                           <select name="transaction_type" id="" class="form-control">
                             <option value="">All</option>
                             @foreach (['credit', 'debit'] as $value)
-                            <option value="{{$value}}"  {{ (session('j_entry_transaction_type')) && (session('j_entry_transaction_type')) === $value ? 'selected' : ''  }}>{{$value === 'credit' ? 'Received' : 'Paid'}}</option>
+                            <option value="{{$value}}"  {{ (session('j_entry_transaction_type')) && (session('j_entry_transaction_type')) === $value ? 'selected' : ''  }}>{{$value === 'credit' ? 'Credit' : 'Debit'}}</option>
                             @endforeach
                           </select>
                         </div>
@@ -93,21 +93,16 @@
             <td><strong>{{$item->debit ?? 0}}</strong></td>
             <td><strong>{{$item->credit ?? 0}}</strong></td>
      
-           @if (isset($item->account->pre_defined) && $item->account->pre_defined)
-           <td>System Manages</td>
-           @else
+         
            <td>
             <div class="s-btn-grp">
-              {{-- <button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4" data-bs-toggle="modal" data-bs-target="#newStoreModal{{$item->id}}">
-                  <i class="fa fa-edit"></i>
-              </button> --}}
-              {{-- <button class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
+              
+              <button class="btn btn-link text-danger text-gradient px-3 mb-0" data-bs-toggle="modal" data-bs-target="#dltModal{{$item->id}}">
                   <i class="fa fa-trash"></i>
-              </button> --}}
+              </button>
            
           </div>
           </td>
-           @endif
         </tr>
 
           <!-- Modal -->

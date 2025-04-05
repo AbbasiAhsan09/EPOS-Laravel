@@ -5,6 +5,7 @@ use App\Helpers\ConfigHelper;
 use App\Models\Configuration;
 use App\Models\Inventory;
 use App\Models\Products;
+use Illuminate\Support\Facades\DB;
 
 trait InventoryTrait
 {
@@ -29,10 +30,10 @@ trait InventoryTrait
         //Check Inventory Available 
         public function checkAvaialableInventory($item, $is_base_unit = 0)
         {
-            $findProduct = Products::find($item);
-            if($findProduct->check_inv){
-                return true;
-            }
+            // $findProduct = Products::find($item);
+            // if(!$findProduct->check_inv){
+            //     return true;
+            // }
 
             $product = Inventory::where('item_id', $item)->where( 'is_opnening_stock', 0)->first();
             if($product){
@@ -138,6 +139,63 @@ trait InventoryTrait
                 return false;
 
             } catch (\Throwable $th) {
+                throw $th;
+            }
+        }
+
+        static function returnQtyInventory($is_base_unit = false, $qty, $item_id){
+            try {
+                DB::beginTransaction();
+                $item = Products::find($item_id);
+                            
+                $newQty = ($is_base_unit ? ($qty) : ((isset($item->uoms->base_unit_value ) ? $item->uoms->base_unit_value : 1 ) * $qty));
+                
+
+                $inventory = Inventory::where('item_id', $item_id)->where('is_opnening_stock', 0)->first();
+
+                if(!$inventory){
+                    $inventory = new Inventory();
+                    $inventory->item_id = $item_id;
+                    $inventory->is_opnening_stock = 0;
+                    $inventory->stock_qty = $newQty;
+                }else{
+                    $inventory->stock_qty = ($inventory->stock_qty + $newQty);
+                }
+
+                $inventory->save();
+                
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                throw $th;
+            }
+        }
+
+
+        static function UpdateReturnQtyInventory($is_base_unit = false, $was_base_unit= false,$subQty, $qty, $item_id){
+            try {
+                DB::beginTransaction();
+                $item = Products::find($item_id);
+                            
+                $newQty = ($is_base_unit ? ($qty) : ((isset($item->uoms->base_unit_value ) ? $item->uoms->base_unit_value : 1 ) * $qty));
+                $subtractQty = ($was_base_unit ? ($subQty) : ((isset($item->uoms->base_unit_value ) ? $item->uoms->base_unit_value : 1 ) * $subQty));
+
+                $inventory = Inventory::where('item_id', $item_id)->where('is_opnening_stock', 0)->first();
+
+                if(!$inventory){
+                    $inventory = new Inventory();
+                    $inventory->item_id = $item_id;
+                    $inventory->is_opnening_stock = 0;
+                    $inventory->stock_qty = $newQty;
+                }else{
+                    $inventory->stock_qty = (($inventory->stock_qty - $subtractQty) + $newQty);
+                }
+
+                $inventory->save();
+                
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollBack();
                 throw $th;
             }
         }

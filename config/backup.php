@@ -166,12 +166,13 @@ return [
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
         'mail' => [
-            'to' => 'ahsanabbasi5657@gmail.com',
+            'enabled' => false,
+            'to' => '',
 
-            'from' => [
-                'address' => env('MAIL_FROM_ADDRESS', 'backup@zullnoor.com'),
-                'name' => env('MAIL_FROM_NAME', 'Example'),
-            ],
+            // 'from' => [
+            //     'address' => null,
+            //     'name' => null,
+            // ],
         ],
 
         'slack' => [

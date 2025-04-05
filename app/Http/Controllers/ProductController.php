@@ -49,6 +49,7 @@ class ProductController extends Controller
     {
         
         try {
+            // dd($request->all());
             $validate = $request->validate([
                 'code' => 'required|unique:products,barcode,id,store_id',
             ]);
@@ -67,6 +68,7 @@ class ProductController extends Controller
                 $product->brand = $request->brand;
                 $product->description = $request->description;
                 $product->opening_stock = (int)$request->opening_stock ?? 0;
+                $product->opening_stock_unit_cost = (int)$request->opening_stock_unit_cost ?? 0;
                 $product->check_inv = isset($request->check_inv) && $request->check_inv ? true : false;
                 // Product IMage Logic
                 if ($request->hasFile('image')) {
@@ -140,6 +142,7 @@ class ProductController extends Controller
             $product->opening_stock = !empty($request->opening_stock) ? $request->opening_stock : 0;
             $product->tp = (int)$request->tp ?? 0;
             $product->taxes = (int)$request->tax ?? 0;
+            $product->opening_stock_unit_cost = (int)$request->opening_stock_unit_cost ?? 0;
             $product->check_inv = isset($request->check_inv) && $request->check_inv ? true : false;
             // $product->store_id = 1;
             // Product IMage Logic

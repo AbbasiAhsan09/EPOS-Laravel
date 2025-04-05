@@ -27749,6 +27749,16 @@ pre[class*="language-"] {
 
 }
 
+ *{
+            outline: none; /* Optional: Remove default focus outline */
+        }
+    *:focus {
+            outline: 2px solid red !important;  /* Optional: Custom focus style */
+    }
+
+    .mid-order-selection{
+      min-height: 60vh;
+    }
 .custom-box{
 border : solid 1px gray;
 margin : 5px 0;
@@ -27761,6 +27771,51 @@ padding : 10px ;
   background: rgb(55, 55, 55);
   color: white;
   margin:0  
+}
+table {
+  line-height: 1 !important;
+}
+
+.itemsInCart  textarea {
+  width: 400px;
+}
+
+.general-form-wrapper{
+  width : 99%;
+  margin : auto;
+  border : solid 2px #a3a2a2;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 20px ;
+}
+
+.general-form-wrapper .form-title{
+
+}
+
+.work-history-table-wrapper{
+  height: 50vh;
+  overflow: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+.work-history-table-wrapper table thead{
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+
+}
+.text-left{
+  text-align: left;
+}
+
+.text-right{
+  text-align: right;
+}
+
+.text-center{
+  text-align: center;
 }
 /*# sourceMappingURL=dashboard-free.css.map */
 
