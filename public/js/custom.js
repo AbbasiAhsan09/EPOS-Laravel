@@ -77,7 +77,7 @@ $(document).ready(function(){
     // Search and Append Product in Cart
     function searchAndAppendProduct(id){
         var show_tp_in_order_form = $("#show_tp_in_order_form").val();
-        console.log({show_tp_in_order_form});
+   
         if (!CheckProductIsExist(id)) {
             $.ajax({
                 url : '/api/items/1/'+id+'/'+storeId,
@@ -87,9 +87,10 @@ $(document).ready(function(){
                         '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
                                     '<td>'+e.name+'</td>'+
                                     '<td> <input type="hidden" name="item_id[]" value="'+e.id+'">'+
-                                    `<input type="hidden" name="uom[]" value="1">'
-                                    <textarea name="extra_notes[]"></textarea>
-                                    `+
+                                    '<select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
+                                    '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
+                                    '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
+                                    '</select>'+
                                     '</td>'+((1*show_tp_in_order_form) ? '<td><input readonly disabled type="number" step="0.01" placeholder="TP" min="0.01" class="form-control tp" value="'+e.tp+'"></td>' : '') + 
                                     '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="0.01" class="form-control rate" value="'+e.mrp+'"></td>'+
                                     '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty"  data-item-id="'+e.id+'" value="'+1+'"></td>'+

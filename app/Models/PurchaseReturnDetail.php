@@ -28,6 +28,7 @@ class PurchaseReturnDetail extends Model
         'bags',
         'bag_size',
         'status',
+        'base_unit_value',
     ];
 
     public function item_details(): BelongsTo

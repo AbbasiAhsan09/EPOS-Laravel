@@ -187,6 +187,7 @@ class SalesController extends Controller
                         $details->sale_id = $order->id;
                         $details->item_id = $request->item_id[$i];
                         $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
+                        $details->base_unit_value = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];
                         $details->extra_notes = isset($request->extra_notes[$i]) && $request->extra_notes[$i] ? $request->extra_notes[$i] : null;  
@@ -636,6 +637,7 @@ class SalesController extends Controller
                         $details->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
                         $details->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
                         $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
+                        $details->base_unit_value = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
                         $details->extra_notes = isset($request->extra_notes[$i]) && $request->extra_notes[$i] ? $request->extra_notes[$i] : null;  
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];
