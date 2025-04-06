@@ -161,11 +161,11 @@
                                   <table class="table table-sm table-responsive-sm table-striped table-bordered ">
                                     <thead>
                                         <th>Description</th>
-                                        {{-- <th>UOM</th> --}}
-                                        {{-- @if ($config->show_tp_in_order_form)
+                                        <th>UOM</th>
+                                        @if ($config->show_tp_in_order_form)
                                         <th>TP
                                         </th>
-                                        @endif --}}
+                                        @endif
                                         {{-- <th>Bag Size</th>
                                         <th>Bags</th> --}}
                                         <th>Rate</th>
@@ -180,8 +180,8 @@
                                            <tr data-id="{{$item->item_details->barcode}}" class="itemsInCart">
                                             <td>{{$item->item_details->name}} 
                                              <input type="hidden" name="item_id[]" value="{{$item->item_id}}">
-                                             <input type="hidden" name="uom[]" value="1">
-                                             {{-- @if ($item->item_details->uom != 0)
+                                             {{-- <input type="hidden" name="uom[]" value="1"> --}}
+                                             @if ($item->item_details->uom != 0)
                                              <select name="uom[]" class="form-control uom" data-id="{{$item->item_details->uoms->base_unit_value}}">
                                                  <option value="1">{{$item->item_details->uoms->uom}}</option>
                                                  <option value="{{$item->item_details->uoms->base_unit_value}}" {{$item->is_base_unit ? 'selected' : ''}}>{{$item->item_details->uoms->base_unit}}</option>
@@ -190,7 +190,7 @@
                                              <select name="uom[]" class="form-control uom" data-id="1" >
                                                  <option value="1">Default</option>
                                              </select>
-                                             @endif --}}
+                                             @endif
                                              </td>
                                              {{-- @if ($config->show_tp_in_order_form)
                                              <td><input name="tp[]" readonly disabled type="number" step="0.01" placeholder="TP"

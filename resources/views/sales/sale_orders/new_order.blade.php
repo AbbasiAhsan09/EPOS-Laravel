@@ -160,7 +160,7 @@
                                   <table class="table table-sm table-responsive-sm table-striped table-bordered ">
                                     <thead>
                                         <th>Description</th>
-                                        <th width="300px">Extra Notes</th>
+                                        <th>UOM</th>
                                         <th>Rate</th>
                                         <th>Qty</th>
                                         <th>Tax</th>
@@ -174,8 +174,17 @@
                                             <td>{{$item->item_details->name}}</td>
                                             <td> 
                                              <input type="hidden" name="item_id[]" value="{{$item->item_id}}">
-                                             <input type="hidden" name="uom[]" value="1">
-                                             <textarea name="extra_notes[]">{{$item->extra_notes ?? ""}}</textarea>
+                                             {{-- <input type="hidden" name="uom[]" value="1"> --}}
+                                             @if ($item->item_details->uom != 0)
+                                             <select name="uom[]" class="form-control uom" data-id="{{$item->item_details->uoms->base_unit_value}}">
+                                                 <option value="1">{{$item->item_details->uoms->uom}}</option>
+                                                 <option value="{{$item->item_details->uoms->base_unit_value}}" {{$item->is_base_unit ? 'selected' : ''}}>{{$item->item_details->uoms->base_unit}}</option>
+                                             </select>
+                                             @else
+                                             <select name="uom[]" class="form-control uom" data-id="1" >
+                                                 <option value="1">Default</option>
+                                             </select>
+                                             @endif
                                              </td>
                                             <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                     min="1" class="form-control rate" value="{{$item->rate}}"></td>

@@ -164,6 +164,7 @@ class SaleReturnController extends Controller
                     $return_detail = [];
                     $return_detail["item_id"] = $request->item_id[$i];
                     $return_detail["is_base_unit"] = ($request->uom[$i] > 1 ? true : false);
+                    $return_detail["base_unit_value"] = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
                     $return_detail["sale_id"] = $return->id;
                     if(isset($request->bags)){
                         $return_detail["bags"] = $request->bags[$i];
@@ -382,6 +383,7 @@ class SaleReturnController extends Controller
                     $return_detail = [];
                     $return_detail["item_id"] = $request->item_id[$i];
                     $return_detail["is_base_unit"] = ($request->uom[$i] > 1 ? true : false);
+                    $return_detail["base_unit_value"] = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
                     $return_detail["sale_id"] = $return->id;
                     if(isset($request->bags)){
                         $return_detail["bags"] = $request->bags[$i];
