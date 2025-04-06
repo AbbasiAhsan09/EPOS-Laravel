@@ -80,11 +80,11 @@ class ConfigurationController extends Controller
                     // Full path of the uploaded file
                     $filePath = $uploadPath . $rename_file;
             
-                    // Optimize the image
-                    $optimizerChain = OptimizerChainFactory::create();
-                    // dump($filePath);
-                    $optimizerChain->optimize($filePath);
-                    // dd($optimizerChain);
+                    // // Optimize the image
+                    // $optimizerChain = OptimizerChainFactory::create();
+                    // // dump($filePath);
+                    // $optimizerChain->optimize($filePath);
+                    // // dd($optimizerChain);
             
                     // Save the file name in the configuration or database
                     $config->logo = $rename_file;
