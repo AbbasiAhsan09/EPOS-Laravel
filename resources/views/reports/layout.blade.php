@@ -116,7 +116,7 @@
         <table>
             <thead>
                 <th style="text-align: left; width: 200px">
-                    <div class="brand" >
+                    {{-- <div class="brand" >
             @if (ConfigHelper::getStoreConfig() && ConfigHelper::getStoreConfig()['logo'] && ConfigHelper::getStoreConfig()['invoice_logo'])
             <img src="{{ 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(public_path('images/logo/' . ConfigHelper::getStoreConfig()['logo']))) }}" 
             alt="Not Available" 
@@ -130,12 +130,12 @@
            
             <strong style="text-transform: uppercase">{{ConfigHelper::getStoreConfig() ? ConfigHelper::getStoreConfig()['app_title'] : 'Demo'}}</strong>
             @endif
-        </div>
+        </div> --}}
                 </th>
                 <th style="text-align: center; width: 200px; text-decoration : underline">{{$report_title ?? "Report"}}</th>
                 <th style="text-align: right; width: 200px">
                      <div class="vendor">
-                        <img src="{{asset("images/logo.png")}}" alt="Not Available" width="80px">
+                        {{-- <img src="{{asset("images/logo.png")}}" alt="Not Available" width="80px"> --}}
                     </div>
                 </th>
             </thead>
