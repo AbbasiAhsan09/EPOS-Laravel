@@ -351,7 +351,7 @@ color: #969CAD;
                               <td>{{$key+1}}</td>
                               {{-- <td>{{$item->item_details->categories->field->name ?? ''}}</td>
                               <td>{{$item->item_details->categories->category ?? ''}}</td> --}}
-                              <td>{{$item->item_details->name ?? ''}}</td>
+                              <td>{{$item->item_details->name ?? ''}} {{ $item->item_details->uoms ? "(". ($item->is_base_unit ? $item->item_details->uoms->base_unit :  $item->item_details->uoms->uom) .")" : "" }}</td>
                               {{-- <td>{{$item->bag_size ?? '-'}}</td> --}}
                               {{-- <td>{{$item->bags ?? '-'}}</td> --}}
                               {{-- <td>{{$item->tax}}</td> --}}

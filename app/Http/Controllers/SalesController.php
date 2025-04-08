@@ -894,7 +894,7 @@ class SalesController extends Controller
             $config = Configuration::filterByStore()->first();
             $inv_type = $config->invoice_type;
             $template  = $config->invoice_template;
-            $order = Sales::where('id', $id)->with('order_details.item_details', 'customer', 'user')->filterByStore()->first();
+            $order = Sales::where('id', $id)->with('order_details.item_details.uoms', 'customer', 'user')->filterByStore()->first();
             $viewName = 'sales.invoices.'.($inv_type == 0 ? 'web.' : 'thermal.' ).$template;
             return view($viewName, compact('order', 'config'));
         } catch (\Throwable $th) {
