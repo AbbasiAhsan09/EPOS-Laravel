@@ -110,7 +110,7 @@
                               <table class="table table-sm table-responsive-sm table-striped table-bordered ">
                                 <thead>
                                     <th>Description</th>
-                                    {{-- <th>UOM</th> --}}
+                                    <th>UOM</th>
                                     {{-- <th>Bag Size</th>
                                     <th>Bags</th> --}}
                                     <th>Rate</th>
@@ -127,17 +127,31 @@
                                            <td>{{$item->items->name}}</td>
                                            <td> 
                                             <input type="hidden" name="item_id[]" value="{{$item->item_id}}">
-                                            <input type="hidden" name="uom[]" value="1">
-                                            {{-- @if ($item->items->uom != 0)
-                                            <select name="uom[]" class="form-control uom" data-id="{{$item->items->uoms->base_unit_value}}">
-                                                <option value="1">{{$item->items->uoms->uom}}</option>
-                                                <option value="{{$item->items->uoms->base_unit_value}}" {{$item->is_base_unit ? 'selected' : ''}}>{{$item->items->uoms->base_unit}}</option>
+                                            {{-- <input type="hidden" name="uom[]" value="1"> --}}
+                                            @if ($item->item_details->product_units->count() > 0)
+                                            <select class="form-control unit_id" name="unit_id[]"
+                                                data-unit_type_id="{{ $item->item_details->unit_type_id }}"
+                                                {{ !$item->item_details->unit_type_id ? 'readonly' : '' }}>
+
+                                                @if (!$item->item_details->unit_type_id)
+                                                    <option value="1">Single</option>
+                                                @endif
+
+                                                @if ($item->item_details->unit_type_id && isset($item->item_details->product_units) && count($item->item_details->product_units) > 0)
+                                                    @foreach (collect($item->item_details->product_units)->sortByDesc('default') as $product_unit)
+                                                        <option value="{{ $product_unit->unit->id }}"
+                                                            {{ $item->unit_id == $product_unit->unit->id ? 'selected' : '' }}
+                                                            data-conversion_rate="{{ $product_unit->conversion_rate }}"
+                                                            data-rate="{{ $product_unit->unit_rate }}"
+                                                            data-cost="{{ $product_unit->unit_cost }}">
+                                                            {{ $product_unit->unit->symbol }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
-                                            @else
-                                            <select name="uom[]" class="form-control uom" data-id="1" >
-                                                <option value="1">Default</option>
-                                            </select>
-                                            @endif --}}
+                                           
+                                        @else
+                                        @endif
                                             </td>
                                             {{-- <td><input name="bag_size[]" type="number" step="0.01" placeholder="Size"
                                                 min="0" class="form-control bag_size" value="{{$item->bag_size}}"></td> --}}

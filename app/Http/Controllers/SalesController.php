@@ -13,9 +13,11 @@ use App\Models\AppForms;
 use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PartyGroups;
+use App\Models\ProductUnit;
 use App\Models\PurchaseInvoiceDetails;
 use App\Models\Sales;
 use App\Models\SalesDetails;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -186,8 +188,25 @@ class SalesController extends Controller
                         $details = new SalesDetails();
                         $details->sale_id = $order->id;
                         $details->item_id = $request->item_id[$i];
-                        $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
-                        $details->base_unit_value = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
+                        if(isset($request->unit_id[$i]) && !empty($request->unit_id[$i])){
+                            $details->unit_id =  $request->unit_id[$i];
+                            $details->unit_conversion_rate = 1;
+                            $product_unit = ProductUnit::where("product_id",$request->item_id[$i])->where('unit_id',$request->unit_id[$i])->where("is_active",true)
+                            ->with('unit.conversion_unit')
+                            ->first();
+                  
+                            if($product_unit && $product_unit->unit->conversion_unit){
+                                $details->unit_conversion_rate = $product_unit->conversion_multiplier ?? 1;
+                            }
+
+                            
+
+                        }else{
+                            $details->unit_id =  null;
+                            $details->unit_conversion_rate = 1;
+                        }
+                        $details->is_base_unit = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? true : false);
+                        $details->base_unit_value = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? $request->uom[$i] : 1);
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];
                         $details->extra_notes = isset($request->extra_notes[$i]) && $request->extra_notes[$i] ? $request->extra_notes[$i] : null;  
@@ -481,7 +500,7 @@ class SalesController extends Controller
 
             DB::enableQueryLog();
             $config = Configuration::filterByStore()->first();
-            $order = Sales::where('id', $id)->with('order_details.item_details','dynamicFeildsData')->filterByStore()->first();
+            $order = Sales::where('id', $id)->with('order_details.item_details.product_units','order_details.item_details','dynamicFeildsData')->filterByStore()->first();
             // dump($order);
             // dd(DB::getQueryLog());
             if ($order) {
@@ -627,7 +646,7 @@ class SalesController extends Controller
                             $request->item_id[$i],
                             $details->qty,
                             $request->qty[$i],
-                            ($request->uom[$i] > 1 ? true : false),
+                            (isset($request0->uom[$i]) && $request->uom[$i] > 1 ? true : false),
                             $details->is_base_unit
                         );
                        }
@@ -636,8 +655,25 @@ class SalesController extends Controller
                         $details->item_id = $request->item_id[$i];
                         $details->bags = isset($request->bags[$i]) ? $request->bags[$i] : null;
                         $details->bag_size = isset($request->bag_size[$i]) ? $request->bag_size[$i] : null;
-                        $details->is_base_unit = ($request->uom[$i] > 1 ? true : false);
-                        $details->base_unit_value = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
+                        if(isset($request->unit_id[$i]) && !empty($request->unit_id[$i])){
+                            $details->unit_id =  $request->unit_id[$i];
+                            $details->unit_conversion_rate = 1;
+                            $product_unit = ProductUnit::where("product_id",$request->item_id[$i])->where('unit_id',$request->unit_id[$i])->where("is_active",true)
+                            ->with('unit.conversion_unit')
+                            ->first();
+                  
+                            if($product_unit && $product_unit->unit->conversion_unit){
+                                $details->unit_conversion_rate = $product_unit->conversion_multiplier ?? 1;
+                            }
+
+                            
+
+                        }else{
+                            $details->unit_id =  null;
+                            $details->unit_conversion_rate = 1;
+                        }
+                        $details->is_base_unit = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? true : false);
+                        $details->base_unit_value = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? $request->uom[$i] : 1);
                         $details->extra_notes = isset($request->extra_notes[$i]) && $request->extra_notes[$i] ? $request->extra_notes[$i] : null;  
                         $details->tax = $request->tax[$i];
                         $details->qty = $request->qty[$i];
@@ -894,7 +930,7 @@ class SalesController extends Controller
             $config = Configuration::filterByStore()->first();
             $inv_type = $config->invoice_type;
             $template  = $config->invoice_template;
-            $order = Sales::where('id', $id)->with('order_details.item_details.uoms', 'customer', 'user')->filterByStore()->first();
+            $order = Sales::where('id', $id)->with('order_details.item_details.uoms', 'order_details.unit', 'customer', 'user')->filterByStore()->first();
             $viewName = 'sales.invoices.'.($inv_type == 0 ? 'web.' : 'thermal.' ).$template;
             return view($viewName, compact('order', 'config'));
         } catch (\Throwable $th) {

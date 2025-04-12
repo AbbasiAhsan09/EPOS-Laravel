@@ -25,4 +25,9 @@ class PurchaseInvoiceDetails extends Model
     {
         return $this->belongsTo(PurchaseInvoice::class , 'inv_id' , 'id');
     }
+
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+    }
 }

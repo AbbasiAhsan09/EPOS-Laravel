@@ -76,24 +76,47 @@
                     <td>{{$item->field}}</td>
                     <td>{{$item->category}}</td>
                     <td>{{$item->name}}</td>
-                    <td>{{number_format(($item->opening_qty ?? 0),2)}}</td>
+                    <td>{{number_format(($item->opening_qty ?? 0),2)}}
+                        @if ($item->unit_symbol)
+                                {{ $item->base_unit_symbol }}
+                                    | {{ number_format($item->opening_qty / $item->conversion_multiplier,2) }} {{ $item->unit_symbol }}
+                                @endif
+                    </td>
                     <td>
                         @if ($item->purchased_qty != 0)
-                        <a href="/reports/purchase-detail-report?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank">{{number_format(($item->purchased_qty),2)}}</a>
+                        <a href="/reports/purchase-detail-report?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank">
+                            {{number_format(($item->purchased_qty),2)}}
+                            @if ($item->unit_symbol)
+                                {{ $item->base_unit_symbol }}
+                                    | {{ number_format($item->purchased_qty / $item->conversion_multiplier,2) }} {{ $item->unit_symbol }}
+                                @endif
+                        </a>
                         @else
                         {{number_format(($item->purchased_qty),2)}}
                         @endif
                     </td>
                     <td>
                         @if ($item->purchase_return_qty != 0)
-                        <a href="/purchase/returns/detail/?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank">{{number_format($item->purchase_return_qty,2)}}</a>
+                        <a href="/purchase/returns/detail/?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank">
+                            {{number_format($item->purchase_return_qty,2)}}
+                            @if ($item->unit_symbol)
+                                {{ $item->base_unit_symbol }}
+                                    | {{ number_format($item->purchase_return_qty / $item->conversion_multiplier,2) }} {{ $item->unit_symbol }}
+                                @endif
+                        </a>
                         @else
                             {{number_format($item->purchase_return_qty,2)}}
                         @endif
                     </td>
                     <td>
                         @if ($item->sold_qty != 0)
-                            <a href="/reports/sales-detail-report?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank" >{{number_format(($item->sold_qty),2)}}</a>
+                            <a href="/reports/sales-detail-report?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank" >
+                                {{number_format(($item->sold_qty),2)}}
+                                @if ($item->unit_symbol)
+                                {{ $item->base_unit_symbol }}
+                                    | {{ number_format($item->sold_qty / $item->conversion_multiplier,2) }} {{ $item->unit_symbol }}
+                                @endif
+                            </a>
                         @else
                         {{number_format(($item->sold_qty),2)}}
                         @endif
@@ -101,15 +124,22 @@
                     
                     <td>
                         @if ($item->sold_returned_qty != 0)
-                        <a href="/sales/returns/detail?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank" >{{number_format(($item->sold_returned_qty),2)}}</a>
+                        <a href="/sales/returns/detail?field={{$item->field_id}}&category={{$item->category_id}}&product={{$item->item_id}}&type=" target="_blank" >
+                            {{number_format(($item->sold_returned_qty),2)}}
+                            @if ($item->unit_symbol)
+                            {{ $item->base_unit_symbol }}
+                                | {{ number_format($item->sold_returned_qty / $item->conversion_multiplier,2) }} {{ $item->unit_symbol }}
+                            @endif
+                        </a>
                         @else
                             {{number_format($item->sold_returned_qty,2)}}
                         @endif
                     </td>
                     <td>
                         {{number_format(($item->avl_qty),2)}}
-                        @if ($item->uom)
-                            {{$item->uom}} | ({{number_format($item->avl_qty * $item->base_unit_value,2)}} {{$item->base_unit}})
+                        @if ($item->unit_symbol)
+                        {{ $item->base_unit_symbol }}
+                            | {{ number_format($item->avl_qty / $item->conversion_multiplier,2) }} {{ $item->unit_symbol }}
                         @endif
                     </td>
                     <td>{{number_format(($item->avg_rate),2)}}</td>

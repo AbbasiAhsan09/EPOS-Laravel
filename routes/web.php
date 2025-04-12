@@ -12,6 +12,7 @@ use App\Http\Controllers\LabourController;
 use App\Http\Controllers\LabourWorkHistoryController;
 use App\Http\Controllers\JournalVoucherController;
 use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseReportController;
 use App\Http\Controllers\PurchaseReturnController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SendBackupToMailController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\VendorLedgerController;
 use App\Http\Controllers\VoucherController;
 use App\Models\Voucher;
@@ -90,6 +92,7 @@ Route::middleware('manager.role')->prefix('products')->group(function(){
     Route::middleware('admin.role')->delete('/delete/{id}','App\Http\Controllers\ProductController@destroy')->name('delete.product');
     Route::middleware('admin.role')->post('/restore/{id}','App\Http\Controllers\ProductController@restore')->name('restore.product');
     Route::middleware('admin.role')->post('/import-csv','App\Http\Controllers\ProductController@importCsv')->name('import.product');
+    Route::middleware('admin.role')->get('/create/{id?}',[ProductController::class,'create'])->name('create.product');
 });
 
 Route::middleware('manager.role')->prefix('uom')->group(function(){
@@ -152,7 +155,12 @@ Route::middleware('manager.role')->prefix('parties')->group(function () {
 });
 
 
+Route::resource('unit', UnitController::class)->middleware('manager.role');
 
+Route::get('generate-unit',[UnitController::class,'generate_units'])
+->middleware('admin.role')->name('generate.unit');
+
+Route::get('units',[UnitController::class,'unit_type_id'])->name('get.units');
 
 Route::prefix('sales')->group(function () {
     Route::get('/','App\Http\Controllers\SalesController@index');

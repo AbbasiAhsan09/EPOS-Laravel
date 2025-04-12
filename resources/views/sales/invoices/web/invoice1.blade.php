@@ -356,7 +356,7 @@ color: #969CAD;
                               {{-- <td>{{$item->bags ?? '-'}}</td> --}}
                               {{-- <td>{{$item->tax}}</td> --}}
                               {{-- <td>{{$item->disc}}</td> --}}
-                              <td>{{$item->qty}}</td>
+                              <td>{{$item->qty}} {{ $item->unit->symbol }}</td>
                               <td>{{$item->rate}}</td>
                               <td>{{$item->total}}</td>
                           </tr>

@@ -28,5 +28,16 @@ class SalesDetails extends Model
     {
         return $this->belongsTo(Sales::class, 'sale_id', 'id');
     }
+
+
+    /**
+     * Get the unit that owns the SalesDetails
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+    }
     use HasFactory;
 }

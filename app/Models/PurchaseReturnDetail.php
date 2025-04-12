@@ -27,6 +27,8 @@ class PurchaseReturnDetail extends Model
         'returned_total',
         'bags',
         'bag_size',
+        'unit_id',
+        'unit_conversion_rate',
         'status',
         'base_unit_value',
     ];
@@ -47,5 +49,9 @@ class PurchaseReturnDetail extends Model
         return $this->belongsTo(PurchaseReturn::class, 'purchase_return_id', 'id');
     }
     
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+    }
     use HasFactory , SoftDeletes, UniversalScopeTrait;
 }
