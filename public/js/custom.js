@@ -126,7 +126,7 @@ $(document).ready(function () {
                         +
                         `   
                                     <select class="form-control unit_id" name="unit_id[]" data-unit_type_id="${e.unit_type_id}" ${!e.unit_type_id ? 'readonly' : ''}>
-                                        ${!e.unit_type_id ? '<option value="1">Single</option>' : ''}
+                                        ${!e.unit_type_id ? '<option value="">Single</option>' : ''}
                                         ${e.unit_type_id && e.product_units && e.product_units.length > 0
                             ? e.product_units
                                 .slice() // make a copy so original isn't mutated

@@ -189,7 +189,7 @@
                                                                 {{ !$item->item_details->unit_type_id ? 'readonly' : '' }}>
 
                                                                 @if (!$item->item_details->unit_type_id)
-                                                                    <option value="1">Single</option>
+                                                                    <option value="">Single</option>
                                                                 @endif
 
                                                                 @if ($item->item_details->unit_type_id && isset($item->item_details->product_units) && count($item->item_details->product_units) > 0)
