@@ -264,3 +264,19 @@ color: #8e8d8d;
     left: 0;
 
 }
+
+.uom-link.active{
+    background: var(--bs-pink) !important;
+    color: white !important;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+
+.non-editable-field {
+    pointer-events: none;
+    background-color: #e7e8e9 !important; /* optional: gives it a disabled look */
+    color: #6c757d;            /* optional: greyed-out text */
+}

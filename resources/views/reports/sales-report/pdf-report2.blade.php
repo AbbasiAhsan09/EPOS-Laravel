@@ -33,18 +33,18 @@
                 <td>{{$item->item_details->name ?? ""}}</td>
                 <!-- <td>{{$item->bag_size ?? "-"}}</td>
                 <td>{{$item->bags ?? "-"}}</td> -->
-                <td>{{$item->rate}}</td>
+                <td>{{number_format($item->rate,2)}}</td>
                 <td>%{{$item->tax}}</td>
                 <td>%{{0}}</td>
-                <td>{{$item->qty}}</td>
-                <td>{{$item->item_details->uom ? $item->item_details->uoms->base_unit :( isset($item->item_details->uoms->uom) ? $item->item_details->uoms->uom : 'Default') }}</td>
-                <td>{{$item->total}}</td>
+                <td>{{number_format($item->qty,2)}} {{ $item->unit ? $item->unit->symbol : '' }}</td>
+                <td>{{ $item->unit ? $item->unit->name : 'Single' }}</td>
+                <td>{{number_format($item->total,2)}}</td>
             </tr>
         @endforeach
        <tfoot>
         <tr>
-        <th colspan="11">Total</th>
-        <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].round($records->sum('total'))}}</th>
+        <th colspan="10">Total</th>
+        <th colspan="1">{{ConfigHelper::getStoreConfig()["symbol"].number_format($records->sum('total'),2)}}</th>
         </tr>
     </tfoot>
     </tbody>

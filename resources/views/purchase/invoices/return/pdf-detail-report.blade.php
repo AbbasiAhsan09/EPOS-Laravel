@@ -30,17 +30,18 @@
                     <td>{{$item->returned_rate}}</td>
                     <td>%{{$item->returned_tax}}</td>
                     <td>%{{$item->returned_disc}}</td>
-                    <td>{{$item->returned_qty}}</td>
-                    <td>{{$item->item_details->uom ? $item->item_details->uoms->base_unit :( isset($item->item_details->uoms->uom) ? $item->item_details->uoms->uom : 'Default') }}</td>
+                    <td>{{$item->returned_qty}} {{ $item->unit ? $item->unit->symbol : '' }}</td>
+                    <td>{{ $item->unit ? $item->unit->name : 'Single' }}</td>
                     <td>{{$item->returned_total}}</td>
                 </tr>
             @endforeach
         
         </tbody>
         <tfoot>
-            <th colspan="10">Total</th>
-            <th colspan="2">{{$records->sum('returned_qty')}}</th>
-            <th colspan="2">{{number_format($records->sum('returned_total'),2)}}</th>
+            <th colspan="8">Total</th>
+            <th colspan="1">{{$records->sum('returned_qty')}}</th>
+            <th></th>
+            <th colspan="1">{{number_format($records->sum('returned_total'),2)}}</th>
 
         </tfoot>
     </table>

@@ -28,7 +28,13 @@
                     <td>{{number_format(($item->opening_qty),2)}}</td>
                     <td>{{number_format(($item->purchased_qty) - ($item->purchase_return_qty),2)}}</td>
                     <td>{{number_format(($item->sold_qty) - ($item->sold_returned_qty),2)}}</td>
-                    <td>{{number_format(($item->avl_qty),2)}}</td>
+                    <td>
+                        {{number_format(($item->avl_qty),2)}}
+                        @if ($item->unit_symbol)
+                        {{ $item->base_unit_symbol }}
+                            | {{ number_format($item->avl_qty / $item->conversion_multiplier,2) }} {{ $item->unit_symbol }}
+                        @endif
+                    </td>
                     <td>{{number_format(($item->avg_rate),2)}}</td>
                     <td>{{number_format(($item->avg_rate) * ($item->avl_qty) ,2)}}</td>
                 </tr>

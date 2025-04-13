@@ -1,4 +1,27 @@
-// Orders JS
+
+
+//Sale Return JS 
+$(document).on("change", ".unit_id", function () {
+    
+    var selectedUnit = $(this).find("option:selected");
+    var conversionRate = selectedUnit.data("conversion_rate") || 1;
+    var rate = selectedUnit.data("rate") || 1;
+    var cost = selectedUnit.data("cost") || 1;
+    var selectedValue = $(this).val();
+    console.log({ selectedValue, conversionRate, selectedUnit });
+
+    // Example logic (uncomment if needed)
+    var parentRow = $(this).closest("tr");
+    var qtyInput = parentRow.find(".pr_qty");
+    var rateInput = parentRow.find(".rate");
+
+    rateInput.val(rate);
+    qtyInput.attr("data-item-id", selectedValue);
+    qtyInput.attr("data-conversion_rate", conversionRate);
+});
+
+
+
 $(document).ready(function(){
     var storeId = $("#storeId").val();
     var total_amount = 0;
@@ -83,20 +106,41 @@ $(document).ready(function(){
                 url : '/api/items/1/'+id+'/'+storeId,
                 type : 'GET',
                 success : function(e){
+                    let defaultRate = e.mrp;
+                    
+                    if(e.unit_type_id && e.product_units && e.product_units.length > 0) {
+                        defaultRate = e.product_units?.find((unit) => unit.default === true)?.unit_rate || e.mrp;
+                        console.log({defaultRate})
+                    }
+
                         $('#cartList').append(
                         '<tr data-id="'+e.barcode+'" class="itemsInCart">'+
                                     '<td>'+e.categories.field.name+' '+e.categories.category+' '+e.name+''+
                                     '<input type="hidden" name="item_id[]" value="'+e.id+'">'+
                                     // '<input type="hidden" name="uom[]" value="1"></td>'+
-                                    '<td><select name="uom[]" class="form-control uom" data-id="'+(e.uoms ? e.uoms.base_unit_value : '1')+'" '+(e.uoms == null ? 'readonly' : '')+'>'+
-                                    '<option value="1">'+(e.uoms ? e.uoms.uom : 'Default')+'</option>'+    
-                                    '<option value="'+(e.uoms ? e.uoms.base_unit_value : 1)+'">'+(e.uoms ? e.uoms.base_unit : 'Default')+'</option>'+    
-                                    '</select></td>'+
+                                    `<td>
+                                 
+                                    <select class="form-control unit_id" name="unit_id[]" data-unit_type_id="${e.unit_type_id}" ${!e.unit_type_id ? 'readonly' : ''}>
+                                        ${!e.unit_type_id ? '<option value="">Single</option>' : ''}
+                                        ${e.unit_type_id && e.product_units && e.product_units.length > 0
+                            ? e.product_units
+                                .slice() // make a copy so original isn't mutated
+                                .sort((a, b) => (b.default === true) - (a.default === true)) // sort so 'default: true' comes first
+                                .map(product_unit => `<option value="${product_unit.unit.id}" 
+                                                    data-conversion_rate="${product_unit.conversion_rate}"
+                                                    data-rate="${product_unit.unit_rate}"
+                                                    data-cost="${product_unit.unit_cost}"
+                                                    >${product_unit.unit.symbol}</option>`).join('')
+                            : ''
+                        }
+                                    </select>
+                                   
+                                    </td>`+
                                     '</td>'+((1*show_tp_in_order_form) ? '<td><input readonly disabled type="number" step="0.01" placeholder="TP" min="0.01" class="form-control tp" value="'+e.tp+'"></td>' : '') + 
                                     // '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>'+
                                     // '<td><input name="bags[]" type="number" step="0.01" placeholder="Bags" min="0" class="form-control bags" value="0"></td>'+
                                     
-                                    '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="0.01" class="form-control rate" value="'+e.mrp+'"></td>'+
+                                    '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="0.01" class="form-control rate" value="'+defaultRate+'"></td>'+
                                     '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty"  data-item-id="'+e.id+'" value="'+1+'"></td>'+
                                     '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="'+e.taxes+'"></td>'+
                                     '<td class="total">'+(e.mrp * 1)+'</td>'+

@@ -8,6 +8,7 @@ use App\Models\Account;
 use App\Models\Configuration;
 use App\Models\Parties;
 use App\Models\PartyGroups;
+use App\Models\ProductUnit;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnDetail;
@@ -168,8 +169,8 @@ class PurchaseReturnController extends Controller
                 for ($i=0; $i < count($request->item_id) ; $i++) { 
                     $return_detail = [];
                     $return_detail["item_id"] = $request->item_id[$i];
-                    $return_detail["is_base_unit"] = ($request->uom[$i] > 1 ? true : false);
-                    $return_detail["base_unit_value"] = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
+                    // $return_detail["is_base_unit"] = ($request->uom[$i] > 1 ? true : false);
+                    // $return_detail["base_unit_value"] = ($request->uom[$i] > 1 ? $request->uom[$i] : 1);
                     $return_detail["purchase_return_id"] = $return->id;                   
                     if(isset($request->bags)){
                         $return_detail["bags"] = $request->bags[$i];
@@ -178,7 +179,25 @@ class PurchaseReturnController extends Controller
                     if(isset($request->bag_size)){
                         $return_detail["bag_size"] = $request->bag_size[$i];
                     }
+                    $return_detail["is_base_unit"] = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? true : false);
+                    $return_detail["base_unit_value"] = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? $request->uom[$i] : 1);
+                    if(isset($request->unit_id[$i]) && !empty($request->unit_id[$i])){
+                        $return_detail['unit_id'] =  $request->unit_id[$i];
+                        $return_detail['unit_conversion_rate'] = 1;
+                        $product_unit = ProductUnit::where("product_id",$request->item_id[$i])->where('unit_id',$request->unit_id[$i])->where("is_active",true)
+                        ->with('unit.conversion_unit')
+                        ->first();
+              
+                        if($product_unit && $product_unit->unit->conversion_unit){
+                            $return_detail['unit_conversion_rate'] = $product_unit->conversion_multiplier ?? 1;
+                        }
 
+                        
+
+                    }else{
+                        $return_detail['unit_id'] =  null;
+                        $return_detail['unit_conversion_rate'] = 1;
+                    }
                     $return_detail["returned_rate"] = $request->rate[$i];
                     $return_detail["returned_tax"] = $request->tax[$i];
                     $return_detail["returned_qty"] = $request->qty[$i];
@@ -343,7 +362,25 @@ class PurchaseReturnController extends Controller
                     if(isset($request->bag_size)){
                         $return_detail["bag_size"] = $request->bag_size[$i];
                     }
+                    $return_detail["is_base_unit"] = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? true : false);
+                    $return_detail["base_unit_value"] = (isset($request->uom[$i]) && $request->uom[$i] > 1 ? $request->uom[$i] : 1);
+                    if(isset($request->unit_id[$i]) && !empty($request->unit_id[$i])){
+                        $return_detail['unit_id'] =  $request->unit_id[$i];
+                        $return_detail['unit_conversion_rate'] = 1;
+                        $product_unit = ProductUnit::where("product_id",$request->item_id[$i])->where('unit_id',$request->unit_id[$i])->where("is_active",true)
+                        ->with('unit.conversion_unit')
+                        ->first();
+              
+                        if($product_unit && $product_unit->unit->conversion_unit){
+                            $return_detail['unit_conversion_rate'] = $product_unit->conversion_multiplier ?? 1;
+                        }
 
+                        
+
+                    }else{
+                        $return_detail['unit_id'] =  null;
+                        $return_detail['unit_conversion_rate'] = 1;
+                    }
                     $return_detail["returned_rate"] = $request->rate[$i];
                     $return_detail["returned_tax"] = $request->tax[$i];
                     $return_detail["returned_qty"] = $request->qty[$i];

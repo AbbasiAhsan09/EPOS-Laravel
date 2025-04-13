@@ -118,6 +118,7 @@ class SalesReportController extends Controller
             } else {
 
                 $records = $records->paginate(20);
+                
                 return view('reports.sales-report.report2', compact('records', 'from', 'to', 'products'));
             }
         } catch (\Throwable $th) {

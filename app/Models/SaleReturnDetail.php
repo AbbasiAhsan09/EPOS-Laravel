@@ -27,6 +27,8 @@ class SaleReturnDetail extends Model
         'returned_total',
         'bags',
         'bag_size',
+        'unit_id',
+        'unit_conversion_rate',
         'status',
         'base_unit_value'
     ];

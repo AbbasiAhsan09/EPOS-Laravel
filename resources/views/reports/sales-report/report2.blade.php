@@ -88,14 +88,14 @@
                     <td>{{$item->rate}}</td>
                     <td>%{{$item->tax}}</td>
                     <td>%{{0}}</td>
-                    <td>{{$item->qty}}</td>
-                    <td>{{$item->item_details->uom ? $item->item_details->uoms->base_unit :( isset($item->item_details->uoms->uom) ? $item->item_details->uoms->uom : 'Default') }}</td>
+                    <td>{{$item->qty}} {{ $item->unit ? $item->unit->symbol : '' }}</td>
+                    <td>{{ $item->unit ? $item->unit->name : 'Single' }}</td>
                     <td>{{$item->total}}</td>
                 </tr>
             @endforeach
            <tfoot>
             <tr>
-            <th colspan="12">Total</th>
+            <th colspan="10">Total</th>
             <th colspan="1">{{ConfigHelper::getStoreConfig()["symbol"].$records->sum('total')}}</th>
             </tr>
         </tfoot>

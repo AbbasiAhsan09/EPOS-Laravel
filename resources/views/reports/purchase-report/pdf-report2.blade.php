@@ -32,16 +32,17 @@
                 <td>{{$item->rate}}</td>
                 <td>%{{$item->tax}}</td>
                 <td>%{{0}}</td>
-                <td>{{$item->qty}}</td>
-                <td>{{$item->items->uom ? $item->items->uoms->base_unit :( isset($item->items->uoms->uom) ? $item->items->uoms->uom : 'Default') }}</td>
+                <td>{{$item->qty}} {{ $item->unit ? $item->unit->symbol : '' }}</td>
+                <td>{{ $item->unit ? $item->unit->name : 'Single' }}</td>
                 <td>{{number_format($item->total,2)}}</td>
             </tr>
         @endforeach
     </tbody>
     <tfoot>
-        <th colspan="10">Total</th>
-        <th colspan="1">{{$records->sum('qty')}}</th>
-        <th colspan="2">{{ConfigHelper::getStoreConfig()["symbol"].number_format($records->sum('total'),2)}}</th>
+        <th colspan="8">Total</th>
+        <th >{{$records->sum('qty')}}</th>
+        <th></th>
+        <th >{{ConfigHelper::getStoreConfig()["symbol"].number_format($records->sum('total'),2)}}</th>
     </tfoot>
 </table>
 @endsection
