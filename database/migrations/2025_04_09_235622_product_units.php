@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->boolean('is_base')->default(false);
             $table->foreignId('conversion_unit_id')->nullable()->constrained('units')->onDelete('set null');
-            $table->decimal('default_conversion_factor', 10, 2)->nullable();
+            $table->decimal('default_conversion_factor', 20, 4)->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('unit_type_id')->nullable()->constrained('unit_types')->onDelete('set null');

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('product_units', function (Blueprint $table) {
-            $table->decimal('conversion_divider', 10, 2)->default(1)->after('conversion_multiplier')->comment('Conversion divider for the unit');
+            $table->decimal('conversion_divider', 10, 4)->default(1)->after('conversion_multiplier')->comment('Conversion divider for the unit');
         });
     }
 
