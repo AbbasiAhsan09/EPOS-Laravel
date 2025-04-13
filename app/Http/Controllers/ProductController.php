@@ -372,6 +372,9 @@ function setProductUnitConversionMultiplier($product_id)
                 return 1;
             }
 
+            if($productUnit->unit && $productUnit->unit->pre_defined&& $productUnit->unit->default_conversion_factor) {
+                return $productUnit->unit->default_conversion_factor;
+            }
             // If it has no convert_to_unit_id, we assume it's base as well
             if (!$productUnit->convert_to_unit_id) {
                 return 1;

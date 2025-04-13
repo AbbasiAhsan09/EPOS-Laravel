@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->foreignId('unit_id')->constrained('units')->onDelete('cascade');
             $table->foreignId('convert_to_unit_id')->nullable()->constrained('units')->onDelete('set null');
-            $table->decimal('conversion_rate', 10, 2)->default(1);
-            $table->decimal("unit_rate", 50, 2)->nullable();
-            $table->decimal("unit_cost", 50, 2)->nullable();
+            $table->decimal('conversion_rate', 10, 4)->default(1);
+            $table->decimal("unit_rate", 50, 4)->nullable();
+            $table->decimal("unit_cost", 50, 4)->nullable();
             $table->string('unit_barcode')->nullable();
             $table->boolean('default')->default(false);
             $table->string('description')->nullable();
