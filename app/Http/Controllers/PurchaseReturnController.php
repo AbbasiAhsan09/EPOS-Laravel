@@ -459,7 +459,7 @@ class PurchaseReturnController extends Controller
 
             DB::commit();
 
-            toast('Purchase Return created', 'success');
+            toast('Purchase Return Updated', 'success');
             return redirect()->back();
 
 

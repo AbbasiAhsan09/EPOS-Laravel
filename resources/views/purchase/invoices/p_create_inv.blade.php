@@ -111,8 +111,8 @@
                                 <thead>
                                     <th>Description</th>
                                     <th>UOM</th>
-                                    {{-- <th>Bag Size</th>
-                                    <th>Bags</th> --}}
+                                    <th>Bag Size</th>
+                                    <th>Bags</th>
                                     <th>Rate</th>
                                     {{-- <th>MRP</th> --}}
                                     <th>Qty</th>
@@ -153,10 +153,10 @@
                                         @else
                                         @endif
                                             </td>
-                                            {{-- <td><input name="bag_size[]" type="number" step="0.01" placeholder="Size"
-                                                min="0" class="form-control bag_size" value="{{$item->bag_size}}"></td> --}}
-                                                {{-- <td><input name="bags[]" type="number" step="0.01" placeholder="Bags"
-                                                    min="0" class="form-control bags" value="{{$item->bags}}"></td> --}}
+                                            <td><input name="bag_size[]" type="number" step="0.01" placeholder="Size"
+                                                min="0" class="form-control bag_size" value="{{$item->bag_size}}"></td>
+                                                <td><input name="bags[]" type="number" step="0.01" placeholder="Bags"
+                                                    min="0" class="form-control bags" value="{{$item->bags}}"></td>
                                             <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                 min="1" class="form-control rate" value="{{$item->rate}}"></td>
                                                 {{-- <td><input name="mrp[]" type="number" step="0.01" placeholder="Rate"

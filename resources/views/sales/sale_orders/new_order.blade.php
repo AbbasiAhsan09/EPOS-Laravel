@@ -181,6 +181,8 @@
                                     <thead>
                                         <th>Description</th>
                                         <th>UOM</th>
+                                        <th>Bag Size</th>
+                                        <th>Bags</th>
                                         <th>Rate</th>
                                         <th>Qty</th>
                                         <th>Tax</th>
@@ -195,14 +197,14 @@
                                                     <td>
                                                         <input type="hidden" name="item_id[]"
                                                             value="{{ $item->item_id }}">
-                                                        @if ($item->item_details->product_units->count() > 0)
                                                             <select class="form-control unit_id" name="unit_id[]"
-                                                                data-unit_type_id="{{ $item->item_details->unit_type_id }}"
-                                                                {{ !$item->item_details->unit_type_id ? 'readonly' : '' }}>
-
-                                                                @if (!$item->item_details->unit_type_id)
-                                                                    <option value="">Single</option>
-                                                                @endif
+                                                            data-unit_type_id="{{ $item->item_details->unit_type_id }}"
+                                                            {{ !$item->item_details->unit_type_id ? 'readonly' : '' }}>
+                                                            
+                                                            @if (!$item->item_details->unit_type_id)
+                                                            <option value="">Single</option>
+                                                            @endif
+                                                            @if ($item->item_details->product_units->count() > 0)
 
                                                                 @if ($item->item_details->unit_type_id && isset($item->item_details->product_units) && count($item->item_details->product_units) > 0)
                                                                     @foreach (collect($item->item_details->product_units)->sortByDesc('default') as $product_unit)
@@ -219,6 +221,14 @@
                                                            
                                                         @else
                                                         @endif
+                                                        <td>
+                                                            <input name="bag_size[]" type="number" step="0.01" placeholder="Size"
+                                                                min="0" class="form-control bag_size" value="{{$item->bag_size}}">
+                                                         </td>
+                                                         <td>
+                                                            <input name="bags[]" type="number" step="0.01" placeholder="Size"
+                                                                min="0" class="form-control bags" value="{{$item->bags}}">
+                                                         </td>
                                                         {{-- <input type="hidden" name="uom[]" value="1"> --}}
                                                         {{-- @if ($item->item_details->uom != 0)
                                              <select name="uom[]" class="form-control uom" data-id="{{$item->item_details->uoms->base_unit_value}}">
@@ -252,7 +262,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="5 text-left">Total</th>
+                                            <th colspan="5 text-left">Total </th>
                                             <th class="foot_g_total">{{ $isEditMode ? $order->gross_total : 0 }}</th>
                                         </tr>
                                     </tfoot>

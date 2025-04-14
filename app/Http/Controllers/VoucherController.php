@@ -67,9 +67,9 @@ class VoucherController extends Controller
                 }
                 
                 $account_reference_types = explode(',',trim($voucher_type->account_reference_types ?? ""));
-                if($account_reference_types && count(($account_reference_types))){
-                    $accounts = $accounts->whereIn("reference_type",$account_reference_types);
-                }
+                // if($account_reference_types && count(($account_reference_types))){
+                //     $accounts = $accounts->whereIn("reference_type",$account_reference_types);
+                // }
 
                 $accounts = $accounts->byUser()->filterByStore()->get();
 
@@ -111,10 +111,10 @@ class VoucherController extends Controller
         // from accounts lists
         $from_accounts = Account::orderBy('type','ASC')->orderBy('title', 'ASC');
 
-        $account_types = explode(',',trim($voucher_type->account_types));
-        if($account_types && count(($account_types))){
-            $from_accounts = $from_accounts->whereIn("type",$account_types);
-        }
+        // $account_types = explode(',',trim($voucher_type->account_types));
+        // if($account_types && count(($account_types))){
+        //     $from_accounts = $from_accounts->whereIn("type",$account_types);
+        // }
         
         // $account_reference_types = explode(',',trim($voucher_type->account_reference_types));
         // if($account_reference_types && count(($account_reference_types))){
