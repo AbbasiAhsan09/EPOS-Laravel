@@ -262,6 +262,32 @@ class UnitController extends Controller
             ];
 
 
+            $kg_bags = [
+                'name' => 'Kilogram',
+                'symbol' => 'kg',
+                'is_base' => true,
+                'is_active' => true,
+                'pre_defined' => true,
+                'default_conversion_factor' => 1,
+                'description' => 'Bag',
+                'children' => []
+            ];
+
+            // Add bags 1kg to 40kgs 
+            for ($i = 1; $i <= 40; $i++) {
+                $kg_bags['children'][] = [
+                    'name' => 'bag '.$i . ' kg',
+                    'symbol' => 'bag '.$i . ' kg',
+                    'is_base' => false,
+                    'is_active' => true,
+                    'pre_defined' => true,
+                    'description' => $i . ' kg',
+                    'default_conversion_factor' => $i,
+                ];
+            }
+            $unit_types['Bag,Katta'][] = $kg_bags;
+
+
 
             foreach ($unit_types as $unit_type_name => $unit_type_data) {
 

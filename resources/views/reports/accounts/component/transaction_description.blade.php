@@ -56,7 +56,7 @@
         !(isset($data->purchase_return) && $data->reference_type === 'purchase_return')
         ))
         {{$data->note}}
-        {{ $data->source_account_detail->title ? ", " . $data->source_account_detail->title : "" }}
+        {{ $data->source_account_detail&& $data->source_account_detail->title ? (", " . $data->source_account_detail->title) : "" }}
     @endif
     
 @endif
