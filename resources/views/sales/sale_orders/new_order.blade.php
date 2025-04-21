@@ -80,14 +80,14 @@
                                                     </h3>
                                                     <div class="order_type_items"
                                                         style="display: flex; align-items: center; justify-content: space-between">
-                                                        <label for="posOrder" class="order-type-item" style="width: 49%">
+                                                        <label for="posOrder" class="order-type-item" checked style="width: 49%">
                                                             <input type="radio" name="order_tyoe" id="posOrder"
                                                                 value="pos" class="form-check-input order_type_val">
                                                             POS ORDER
                                                         </label>
 
                                                         <label for="normalOrder" class="order-type-item" style="width: 49%">
-                                                            <input type="radio" name="order_tyoe" checked id="normalOrder"
+                                                            <input type="radio" name="order_tyoe"  id="normalOrder"
                                                                 value="normal" class="form-check-input order_type_val"
                                                                 {{ $isEditMode && $order->customer_id ? 'checked' : '' }}>
                                                             CREDIT ORDER
