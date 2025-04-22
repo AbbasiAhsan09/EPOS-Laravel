@@ -430,9 +430,11 @@ color: #969CAD;
                 <p style="text-align: center"> {{$config->invoice_message ?? ""}} </p>                  
             </td>
           </div>
-                      <div class="footer" style="color: black; font-weight: 700">
-                          The Software is Developed by TradeWisePOS | +92 320 0681969
-                      </div>
+                     @if (ConfigHelper::getStoreConfig()["show_ad_on_invoice"])
+                     <div class="footer" style="color: black; font-weight: 700">
+                      The Software is Developed by TradeWisePOS | +92 320 0681969
+                  </div>
+                     @endif
         </div>
       </div>
 

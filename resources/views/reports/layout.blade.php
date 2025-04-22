@@ -166,9 +166,11 @@
         @yield('report_content')
     </div>
    
+    @if ($config && $config["show_ad_on_invoice"])
     <footer>
         Powered by TradeWisePOS - PH : +92-320-0681969
     </footer>
+    @endif
 
     <style>
         table{
