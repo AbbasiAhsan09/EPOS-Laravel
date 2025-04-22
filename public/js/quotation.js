@@ -96,6 +96,7 @@ $(document).ready(function(){
 
     // Search and Append Product in Cart
     function searchAndAppendProduct(id){
+        var show_bag_sizing = $("#show_bag_sizing").val();
    
         if (!CheckProductIsExist(id)) {
             $.ajax({
@@ -129,8 +130,8 @@ $(document).ready(function(){
                             : ''
                         }</td>
                                     </select>`+
-                            '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>'+
-                            '<td><input name="bags[]" type="number" step="0.001" placeholder="Bags" min="0" class="form-control bags" value="0"></td>'+
+                            `${ (1 * show_bag_sizing)  ? '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>' : ''}`+
+                        `${(1 * show_bag_sizing) ? '<td><input name="bags[]" type="number" step="0.01" placeholder="Bags" min="0" class="form-control bags" value="0"></td>':''}`+
                             '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="1" class="form-control rate" value="'+defaultRate+'"></td>'+
                             // '<td><input name="mrp[]" type="number" step="0.01" placeholder="MRP" min="1" class="form-control mrp" value="'+e.mrp+'"></td>'+
                             '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty" value="'+1+'"></td>'+

@@ -1,6 +1,8 @@
 @extends('reports.layout')
 @section("report_content")
-
+@php
+$config = ConfigHelper::getStoreConfig();
+@endphp
 <table class="table table-sm table-responsive-sm table-striped ">
     <thead>
         <th>SID</th>
@@ -9,8 +11,11 @@
         {{-- <th>Field</th> --}}
         <th>Category</th>
         <th>Product</th>
-        <!-- <th>Bag Size</th>
-        <th>Bags</th> -->
+        @if ($config && $config['show_bag_sizing']) 
+
+        <th>Bag Size</th>
+        <th>Bags</th> 
+        @endif
         <th>Rate</th>
         <th>Tax</th>
         <th>Disc</th>
@@ -31,8 +36,11 @@
                 <td>{{date('d/m/Y', strtotime($item->created_at))}}</td>
                 <td>{{$item->item_details->categories->category ?? ""}}</td>
                 <td>{{$item->item_details->name ?? ""}}</td>
-                <!-- <td>{{$item->bag_size ?? "-"}}</td>
-                <td>{{$item->bags ?? "-"}}</td> -->
+        @if ($config && $config['show_bag_sizing']) 
+                
+                 <td>{{$item->bag_size ?? "-"}}</td>
+                <td>{{$item->bags ?? "-"}}</td>
+        @endif
                 <td>{{number_format($item->rate,2)}}</td>
                 <td>%{{$item->tax}}</td>
                 <td>%{{0}}</td>

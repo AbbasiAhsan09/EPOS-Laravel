@@ -166,8 +166,11 @@
                                         <th>TP
                                         </th>
                                         @endif
+                                        @if ($config->show_bag_sizing)                                            
                                         <th>Bag Size</th>
                                         <th>Bags</th>
+                                        @endif
+                                    
                                         <th>Rate</th>
                                         <th>Qty</th>
                                         <th>Tax</th>
@@ -212,6 +215,8 @@
                                              <td><input name="tp[]" readonly disabled type="number" step="0.01" placeholder="TP"
                                                 min="1" class="form-control" value="{{$item->item_details->tp}}"></td>
                                              @endif --}}
+                                             @if ($config->show_bag_sizing)     
+
                                              <td>
                                                 <input name="bag_size[]" type="number" step="0.01" placeholder="Size"
                                                     min="0" class="form-control bag_size" value="{{$item->bag_size}}">
@@ -220,6 +225,7 @@
                                                 <input name="bags[]" type="number" step="0.01" placeholder="Size"
                                                     min="0" class="form-control bags" value="{{$item->bags}}">
                                              </td>
+                                             @endif
                                             <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                     min="1" class="form-control rate" value="{{$item->returned_rate}}"></td>
                                             <td><input name="qty[]" type="number" step="0.01" data-item-id="{{$item->item_details->id}}" placeholder="Qty"

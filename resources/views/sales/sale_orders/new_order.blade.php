@@ -181,8 +181,10 @@
                                     <thead>
                                         <th>Description</th>
                                         <th>UOM</th>
+                                        @if ($config->show_bag_sizing)                                            
                                         <th>Bag Size</th>
                                         <th>Bags</th>
+                                        @endif
                                         <th>Rate</th>
                                         <th>Qty</th>
                                         <th>Tax</th>
@@ -221,6 +223,7 @@
                                                            
                                                         @else
                                                         @endif
+                                                        @if ($config->show_bag_sizing)     
                                                         <td>
                                                             <input name="bag_size[]" type="number" step="0.01" placeholder="Size"
                                                                 min="0" class="form-control bag_size" value="{{$item->bag_size}}">
@@ -229,6 +232,7 @@
                                                             <input name="bags[]" type="number" step="0.01" placeholder="Size"
                                                                 min="0" class="form-control bags" value="{{$item->bags}}">
                                                          </td>
+                                                         @endif
                                                         {{-- <input type="hidden" name="uom[]" value="1"> --}}
                                                         {{-- @if ($item->item_details->uom != 0)
                                              <select name="uom[]" class="form-control uom" data-id="{{$item->item_details->uoms->base_unit_value}}">

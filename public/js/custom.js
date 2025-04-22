@@ -100,6 +100,7 @@ $(document).ready(function () {
     // Search and Append Product in Cart
     function searchAndAppendProduct(id) {
         var show_tp_in_order_form = $("#show_tp_in_order_form").val();
+        var show_bag_sizing = $("#show_bag_sizing").val();
 
         if (!CheckProductIsExist(id)) {
             $.ajax({
@@ -141,8 +142,8 @@ $(document).ready(function () {
                                     </select>
                                     `+
                         '</td>' + ((1 * show_tp_in_order_form) ? '<td><input readonly disabled type="number" step="0.01" placeholder="TP" min="0.01" class="form-control tp" value="' + e.tp + '"></td>' : '') +
-                        '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>'+
-                        '<td><input name="bags[]" type="number" step="0.01" placeholder="Bags" min="0" class="form-control bags" value="0"></td>'+
+                        `${ (1 * show_bag_sizing)  ? '<td><input name="bag_size[]" type="number" step="0.01" placeholder="Size" min="0" class="form-control bag_size" value="0"></td>' : ''}`+
+                        `${(1 * show_bag_sizing)?'<td><input name="bags[]" type="number" step="0.01" placeholder="Bags" min="0" class="form-control bags" value="0"></td>':''}`+
                         '<td><input name="rate[]" type="number" step="0.01" placeholder="Rate" min="0.01" class="form-control rate" value="' + defaultRate + '"></td>' +
                         '<td><input name="qty[]" type="number" step="0.01" placeholder="Qty"  min="1" class="form-control pr_qty"  data-item-id="' + e.id + '" value="' + 1 + '"></td>' +
                         '<td><input name="tax[]" type="number" step="0.01" placeholder="Tax" min="0" class="form-control tax" value="' + e.taxes + '"></td>' +

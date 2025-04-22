@@ -111,6 +111,9 @@
 </head>
 
 <body>
+    @php
+    $config = ConfigHelper::getStoreConfig();
+@endphp
     <header class="main-header">
 
         <table>

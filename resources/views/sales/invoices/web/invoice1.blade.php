@@ -336,8 +336,11 @@ color: #969CAD;
                                   {{-- <th>Field</th>
                                   <th>Category</th> --}}
                                   <th>Description</th>
-                                  <th>Bag Pack.</th>
-                                  <th>Bags</th>
+                                  @if (ConfigHelper::getStoreConfig() && ConfigHelper::getStoreConfig()['show_bag_sizing'])                                            
+                                    <th>Bag Size</th>
+                                    <th>Bags</th>
+                                    @endif
+                        
                                   <th>Qty</th>
                                   {{-- <th>Tax</th> --}}
                                   {{-- <th>Disc.</th> --}}
@@ -353,8 +356,10 @@ color: #969CAD;
                               {{-- <td>{{$item->item_details->categories->field->name ?? ''}}</td>
                               <td>{{$item->item_details->categories->category ?? ''}}</td> --}}
                               <td>{{$item->item_details->name ?? ''}} </td>
+                              @if (ConfigHelper::getStoreConfig() && ConfigHelper::getStoreConfig()['show_bag_sizing'])                                            
                               <td>{{$item->bag_size ?? '-'}}</td> 
                                <td>{{$item->bags ?? '-'}}</td>
+                               @endif
                               {{-- <td>{{$item->tax}}</td> --}}
                               {{-- <td>{{$item->disc}}</td> --}}
                               <td>{{$item->qty}} {{ $item->unit ? $item->unit->symbol : '' }}</td>

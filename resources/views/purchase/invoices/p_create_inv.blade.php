@@ -111,8 +111,10 @@
                                 <thead>
                                     <th>Description</th>
                                     <th>UOM</th>
+                                    @if ($config->show_bag_sizing)                                            
                                     <th>Bag Size</th>
                                     <th>Bags</th>
+                                    @endif
                                     <th>Rate</th>
                                     {{-- <th>MRP</th> --}}
                                     <th>Qty</th>
