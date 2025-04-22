@@ -340,7 +340,7 @@ class PurchaseInvoiceController extends Controller
                 'party_id' => 'required | integer',
                 'payment_method' => 'required',
                 'item_id' => 'required',
-                'uom' => 'required',
+                // 'uom' => 'required',
                 'tax' => 'required',
                 'rate' => 'required'
             ]);

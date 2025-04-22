@@ -13,6 +13,12 @@ class Configuration extends Model
     'mutltiple_sales_order','start_date','contract_duration','store_id','order_processing','order_processing_template',
     'invoice_message','allow_inventory_check','allow_low_inventory','added_by','show_tp_in_order_form',
     'use_accounting_module','ui',
-    'invoice_logo','invoice_name'];
+    'invoice_logo','invoice_name',
+    'show_bag_sizing',
+    'cash_printer_thermal',
+    'credit_printer',
+    'receipt_printer'
+
+];
     use UniversalScopeTrait, HasFactory;
 }

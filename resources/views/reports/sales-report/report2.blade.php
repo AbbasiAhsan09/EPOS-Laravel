@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('content')
-
+@php
+$config = ConfigHelper::getStoreConfig();
+@endphp
 <div class="page-wrapper">
 <div class="container-fluid">
   <div class="row row-customized">
@@ -64,8 +66,11 @@
             {{-- <th>Field</th> --}}
             <th>Category</th>
             <th>Product</th>
-            <!-- <th>Bag Size</th>
-            <th>Bags</th> -->
+        @if ($config && $config['show_bag_sizing']) 
+
+            <th>Bag Size</th>
+            <th>Bags</th>
+        @endif
             <th>Rate</th>
             <th>Tax</th>
             <th>Disc</th>
@@ -83,8 +88,11 @@
                     {{-- <td>{{$item->item_details->categories->field->name ?? ""}}</td> --}}
                     <td>{{$item->item_details->categories->category ?? ""}}</td>
                     <td>{{$item->item_details->name ?? ""}}</td>
-                    <!-- <td>{{$item->bag_size ?? "-"}}</td>
-                    <td>{{$item->bags ?? "-"}}</td> -->
+        @if ($config && $config['show_bag_sizing']) 
+
+                    <td>{{$item->bag_size ?? "-"}}</td>
+                    <td>{{$item->bags ?? "-"}}</td> 
+        @endif
                     <td>{{$item->rate}}</td>
                     <td>%{{$item->tax}}</td>
                     <td>%{{0}}</td>

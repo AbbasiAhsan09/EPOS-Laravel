@@ -166,8 +166,10 @@
                                         <th>TP
                                         </th>
                                         @endif --}}
-                                        {{-- <th>Bag Size</th>
-                                        <th>Bags</th> --}}
+                                        @if ($config->show_bag_sizing)                                            
+                                    <th>Bag Size</th>
+                                    <th>Bags</th>
+                                    @endif
                                         <th>Rate</th>
                                         <th>Qty</th>
                                         <th>Tax</th>
@@ -183,15 +185,15 @@
                                                 <input type="hidden" name="uom[]" value="1">
                                             </td>
                                             <td>
-                                                @if ($item->item_details->product_units->count() > 0)
                                                 <select class="form-control unit_id" name="unit_id[]"
-                                                    data-unit_type_id="{{ $item->item_details->unit_type_id }}"
-                                                    {{ !$item->item_details->unit_type_id ? 'readonly' : '' }}>
-
-                                                    @if (!$item->item_details->unit_type_id)
-                                                        <option value="">Single</option>
-                                                    @endif
-
+                                                data-unit_type_id="{{ $item->item_details->unit_type_id }}"
+                                                {{ !$item->item_details->unit_type_id ? 'readonly' : '' }}>
+                                                
+                                                @if (!$item->item_details->unit_type_id)
+                                                <option value="">Single</option>
+                                                @endif
+                                                
+                                                @if ($item->item_details->product_units->count() > 0)
                                                     @if ($item->item_details->unit_type_id && isset($item->item_details->product_units) && count($item->item_details->product_units) > 0)
                                                         @foreach (collect($item->item_details->product_units)->sortByDesc('default') as $product_unit)
                                                             <option value="{{ $product_unit->unit->id }}"
@@ -225,14 +227,17 @@
                                              <td><input name="tp[]" readonly disabled type="number" step="0.01" placeholder="TP"
                                                 min="1" class="form-control" value="{{$item->item_details->tp}}"></td>
                                              @endif --}}
-                                             {{-- <td>
+                                             @if ($config->show_bag_sizing)     
+
+                                             <td>
                                                 <input name="bag_size[]" type="number" step="0.01" placeholder="Size"
                                                     min="0" class="form-control bag_size" value="{{$item->bag_size}}">
                                              </td>
                                              <td>
                                                 <input name="bags[]" type="number" step="0.01" placeholder="Size"
                                                     min="0" class="form-control bags" value="{{$item->bags}}">
-                                             </td> --}}
+                                             </td>
+                                                @endif
                                             <td><input name="rate[]" type="number" step="0.01" placeholder="Rate"
                                                     min="1" class="form-control rate" value="{{$item->returned_rate}}"></td>
                                             <td><input name="qty[]" type="number" step="0.01" data-item-id="{{$item->item_details->id}}" placeholder="Qty"
