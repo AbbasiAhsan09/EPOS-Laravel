@@ -19,11 +19,11 @@
                         <input type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
                       </div> --}}
                       <div class="input-group input-group-outline">
-                      <select  id="filter-party" class="form-control" readonly disabled>
+                      <select  id="filter-party" class="form-control" >
                         <option value="">All Parties</option>
                         
                         @foreach ($party_groups as $party_group)
-                        <option value="{{$party_group->id}}" {{ $group_id ? ($group_id == $party_group->id ? 'selected' : '') : ''}}>{{$party_group->group_name}}</option>
+                        <option value="{{$party_group->id}}" {{ $group_id ? (request()->query('party_group') == $party_group->id ? 'selected' : '') : ''}}>{{$party_group->group_name}}</option>
                         @endforeach
                       </select>
                       </div>
@@ -441,7 +441,7 @@
     $(document).ready(function(){
       $('#filter-party').change(function(){
         if($(this).val()){
-            window.location.replace('/parties/'+$(this).val()) ;
+            window.location.replace('/parties?party_group='+$(this).val()) ;
         }else{
             window.location.replace('/parties') ;
 

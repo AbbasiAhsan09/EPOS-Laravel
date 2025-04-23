@@ -29,9 +29,6 @@ class PartiesController extends Controller
 
         $party_groups = PartyGroups::all();
         $parties = Parties::with("groups")
-        ->when($request->has('party_group'), function($q) use ($request) {
-            $q->where("group_id", $request->party_group);
-        })
         ->when(
             function ($query) use ($request) {
                 return $request->filled('party_name') || $request->filled('party_phone') || $request->filled('party_email');
@@ -50,8 +47,11 @@ class PartiesController extends Controller
                 });
             }
         )
-        ->orderBy('group_id', 'DESC')
-        ->byUser()
+        ->orderBy('group_id', 'DESC');
+        if($request->query('party_group')){
+            $parties = $parties->where('group_id',$request->query('party_group'));
+        }
+        $parties= $parties->byUser()
         ->paginate(20)
         ->withQueryString();
     
