@@ -47,7 +47,8 @@ class PartiesController extends Controller
                 });
             }
         )
-        ->orderBy('group_id', 'DESC');
+        ->orderBy('group_id', 'DESC')
+        ->orderBy('party_name', 'ASC');
         if($request->query('party_group')){
             $parties = $parties->where('group_id',$request->query('party_group'));
         }
