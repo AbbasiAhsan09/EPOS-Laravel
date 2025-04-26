@@ -7,7 +7,7 @@ $(document).on("change", ".unit_id", function () {
     var rate = selectedUnit.data("rate") || 1;
     var cost = selectedUnit.data("cost") || 1;
     var selectedValue = $(this).val();
-    console.log({ selectedValue, conversionRate, selectedUnit });
+    
 
     // Example logic (uncomment if needed)
     var parentRow = $(this).closest("tr");
@@ -112,7 +112,7 @@ $(document).ready(function () {
                     
                     if(e.unit_type_id && e.product_units && e.product_units.length > 0) {
                         defaultRate = e.product_units?.find((unit) => unit.default === true)?.unit_rate || e.mrp;
-                        console.log({defaultRate})
+                        
                     }
 
                     $('#cartList').append(
@@ -379,70 +379,107 @@ $(document).ready(function () {
     var checkInventory = $('#checkInventory').val();
     checkInventory = +checkInventory;
 
-    $('body').on('change', '.uom', function () {
+    // $('body').on('change', '.uom', function () {
 
-        var curr = $(this);
-        var qty_ins = $(this).parent().parent().find('.pr_qty');
-        var qty = $(this).parent().parent().find('.pr_qty').val();
-        var is_base_unit = curr.val() > 1 ? true : false;
+    //     var curr = $(this);
+    //     var qty_ins = $(this).parent().parent().find('.pr_qty');
+    //     var qty = $(this).parent().parent().find('.pr_qty').val();
+    //     var is_base_unit = curr.val() > 1 ? true : false;
+    //     var item_id = $(this).parent().parent().find('.pr_qty').attr('data-item-id');
+    //     var unit_value = $(this).parent().parent().find('.unit_id');
+
+    //     console.log('unit_value', unit_value)
+    //     var calcultationQty = 0;
+
+    //     if (checkInventory) {
+    //         $.ajax({
+    //             url: '/check-inventory/' + item_id + '/' + (is_base_unit ? 1 : 0),
+    //             type: 'GET',
+    //             success: function (res) {
+
+    //                 if ((res * 1) < qty) {
+    //                     const lowInventoryCheck = +$("#lowInventoryCheck").val();
+
+    //                     if (!lowInventoryCheck) {
+    //                         swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)}`, 'error');
+    //                         qty_ins.val(Math.round(res));
+    //                         if ((res * 1) === 0) {
+    //                             curr.parent().parent().closest('tr').remove();
+
+    //                         }
+    //                     } else {
+    //                         swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)} this will be show as -Qty in inventory`, 'error');
+    //                     }
+
+    //                 }
+    //             }
+    //         });
+    //     }
+    // })
+
+    $('body').on('change', '.pr_qty, .unit_id', function () {
+       
+        var qty_input = $(this).parent().parent().find('.pr_qty');
         var item_id = $(this).parent().parent().find('.pr_qty').attr('data-item-id');
-
-        if (checkInventory) {
+        var unit_id = $(this).parent().parent().find('.unit_id').val();
+        var required_qty = qty_input.val();
+        
+        var allowLowInventory = $('#lowInventoryCheck').val();
+        
+        if(!(1*allowLowInventory) && required_qty && (1*required_qty) > 0){
             $.ajax({
-                url: '/check-inventory/' + item_id + '/' + (is_base_unit ? 1 : 0),
+                url: `/check-inventory/?product=${item_id }&qty=${required_qty}&unit_id=${unit_id}`  ,
                 type: 'GET',
                 success: function (res) {
-
-                    if ((res * 1) < qty) {
-                        const lowInventoryCheck = +$("#lowInventoryCheck").val();
-
-                        if (!lowInventoryCheck) {
-                            swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)}`, 'error');
-                            qty_ins.val(Math.round(res));
-                            if ((res * 1) === 0) {
-                                curr.parent().parent().closest('tr').remove();
-
-                            }
-                        } else {
-                            swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)} this will be show as -Qty in inventory`, 'error');
+                    if(res && res.name){
+                        const avl_stock = 1*res.avl_stock ;
+                        const low_inventory = res.low_stock
+                    
+                        if(low_inventory){
+                            swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${avl_stock}`, 'error');
+                            qty_input.val(avl_stock);
                         }
-
+    
                     }
                 }
             });
         }
+
+        
     })
 
-    $('body').on('keyup', '.pr_qty', function () {
-        var curr = $(this);
-        var qty = $(this).val();
-        var is_base_unit = curr.parent().parent().find('.uom').val() > 1 ? true : false;
-        var item_id = curr.attr('data-item-id');
 
-        if (checkInventory != 0) {
-            $.ajax({
-                url: '/check-inventory/' + item_id + '/' + (is_base_unit ? 1 : 0),
-                type: 'GET',
-                success: function (res) {
+    // $('body').on('keyup', '.pr_qty', function () {
+    //     var curr = $(this);
+    //     var qty = $(this).val();
+    //     var is_base_unit = curr.parent().parent().find('.uom').val() > 1 ? true : false;
+    //     var item_id = curr.attr('data-item-id');
 
-                    if ((res * 1) < qty) {
-                        const lowInventoryCheck = +$("#lowInventoryCheck").val();
-                        if (!lowInventoryCheck) {
-                            swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)}`, 'error');
-                            curr.val(Math.round(res));
-                            if ((res * 1) === 0) {
-                                curr.parent().parent().closest('tr').remove();
+    //     if (checkInventory != 0) {
+    //         $.ajax({
+    //             url: '/check-inventory/' + item_id + '/' + (is_base_unit ? 1 : 0),
+    //             type: 'GET',
+    //             success: function (res) {
 
-                            }
-                        } else {
-                            swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)} this will be show as -Qty in inventory`, 'error');
-                        }
-                    }
-                }
-            });
-        }
-    })
+    //                 if ((res * 1) < qty) {
+    //                     const lowInventoryCheck = +$("#lowInventoryCheck").val();
+    //                     if (!lowInventoryCheck) {
+    //                         swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)}`, 'error');
+    //                         curr.val(Math.round(res));
+    //                         if ((res * 1) === 0) {
+    //                             curr.parent().parent().closest('tr').remove();
+
+    //                         }
+    //                     } else {
+    //                         swal('Low Quantity', `Required Qty is Not Available. Available Qty is ${Math.round(res)} this will be show as -Qty in inventory`, 'error');
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // })
     //   Calculate Recieved Amount in percentage
+    
     function CalculateRecievedAmountInPercentage() {
         var rcvdAmountElem = $("#received-amount");
         var rcvPrcentage = $("#received-amount-in-percentage").val();
@@ -451,7 +488,7 @@ $(document).ready(function () {
             rcvPrcentage = 1 * rcvPrcentage;
             var bill_total = $(".g_total").text();
             var calulatedAmountRecieved = ((1 * bill_total / 100) * rcvPrcentage).toFixed(2);
-            console.log({ calulatedAmountRecieved });
+            
 
             rcvdAmountElem.prop('readonly', true);
             rcvdAmountElem.val(calulatedAmountRecieved);
