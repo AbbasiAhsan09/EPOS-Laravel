@@ -103,8 +103,7 @@ class InventoryReportController extends Controller
         }
     }
 
-    public function real_inventory(Request $request)
-    {
+    static function inventory_report(Request $request)  {
         try {
             DB::statement("SET SESSION sql_mode = (SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))");
 
@@ -191,11 +190,19 @@ class InventoryReportController extends Controller
                 $results = $results->where("p.id", $request->product);
             }
 
-            // if($request->has('filterBy') && $request->input('filterBy') == 'lowStock' ){
-            //     // dd("test");
-            //     $resulst = $results->where(DB::raw('p.low_stock <= (COALESCE(pid.total_qty, 0) + COALESCE(srd.total_returned_qty, 0) + COALESCE(p.opening_stock, 0)) - 
-            //     (COALESCE(sd.total_qty, 0) + COALESCE(prd.total_preturned_qty, 0))'));
-            // }
+
+            return $results;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function real_inventory(Request $request)
+    {
+        try {
+        
+            $results = $this->inventory_report($request);
+
             if ($request->type === 'pdf') {
                 $results = $results->get();
                 $data = [

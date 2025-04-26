@@ -286,5 +286,5 @@ Route::get('db-backup-run', function(){
     return 'Backup run successfully!';
 });
 
-Route::get('check-inventory/{item_id}/{is_base_unit}', [InventoryController::class , 'checkInventory'])->name('check.inventory');
+Route::get('check-inventory', [InventoryController::class , 'check_inventory_by_item'])->name('check.inventory');
 });

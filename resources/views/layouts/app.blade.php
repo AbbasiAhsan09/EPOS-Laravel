@@ -45,7 +45,7 @@
 
 <body class="g-sidenav-show  bg-gray-200">
   <input type="hidden" id="checkInventory" value="{{$currenConfig->inventory_tracking ?? 0}}">
-  <input type="hidden" id="lowInventoryCheck" value="{{$currenConfig->allow_low_inventory ?? 0}}">
+  <input type="hidden" id="lowInventoryCheck" value="{{$currenConfig->allow_low_inventory ? 1 : 0}}">
   <input type="hidden" id="show_bag_sizing" value="{{ $currenConfig->show_bag_sizing ?? 0}}">
   <input type="hidden" id="cash_printer_thermal" value="{{ $currenConfig->cash_printer_thermal ?? 0}}">
   <input type="hidden" id="credit_printer" value="{{ $currenConfig->credit_printer ?? 0}}">
