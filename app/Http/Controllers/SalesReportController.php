@@ -34,7 +34,11 @@ class SalesReportController extends Controller
                 session()->put('sales_report_end_date', $request->end_date);
             })
             ->when($request->has('customer') && $request->customer != null, function ($query) use ($request) {
-                $query->where('customer_id', $request->customer);
+                if($request->customer === 'exclude_cash'){
+                    $query->where('customer_id', '!=',0);
+                }else{
+                    $query->where('customer_id', $request->customer);
+                }
                 session()->put('sales_report_customer', $request->customer);
             })
             ->when($request->has('filter_deleted') && $request->filter_deleted == 'true' , function($query){
