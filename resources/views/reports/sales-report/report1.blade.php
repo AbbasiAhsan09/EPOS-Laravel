@@ -29,6 +29,7 @@
                             <select name="customer" class="form-control" id="">
                                 <option value="">All Customers</option>
                                 <option value="0" {{session()->get('sales_report_customer')  == '0' ? 'selected' : ''}}>Cash</option>
+                                <option value="exclude_cash" {{session()->get('sales_report_customer')  == 'exclude_cash' ? 'selected' : ''}}>Exclude Cash</option>
                                 @foreach ($customers as $customer)
                                     <option value="{{$customer->id}}" {{session()->get('sales_report_customer')  == $customer->id ? 'selected' : ''}}>{{$customer->party_name}}</option>
                                 @endforeach
