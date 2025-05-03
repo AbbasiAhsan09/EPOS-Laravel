@@ -3,9 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Trait\InventoryTrait;
+use App\Models\Account;
+use App\Models\AccountTransaction;
 use App\Models\Inventory;
 use App\Models\ProductUnit;
+use App\Models\PurchaseInvoice;
+use App\Models\Sales;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InventoryController extends Controller
 {
@@ -95,6 +101,74 @@ class InventoryController extends Controller
         }
     }
 
+    public function generate_old_cogs_data()  {
+        $this->generate_cogs();
+    }
+
+    static function generate_cogs($params = null){
+       try {
+         // initialy playing with 10 invoices
+         $sales = Sales::with("order_details")->where('store_id', Auth::user()->store_id)
+         ->orderBy('bill_date',"asc");
+         $deleteArray = AccountTransaction::where("reference_type",'sale_cogs');
+         if(isset($params) && isset($params['sale_id']) && !empty($params['sale_id'])){
+            $deleteArray = $deleteArray->where('reference_id',$params["sale_id"]);
+            $sales = $sales->where('id',$params["sale_id"]);
+         }
+
+         $sales = $sales->get();
+         $deleteArray = $deleteArray->delete();
+         
+         $cogs_account = Account::where('account_number',5000)->filterByStore()->first();
+         $inventory_account = Account::where('account_number',1030)->filterByStore()->first();
+    
+
+
+    
+         $start_date =Carbon::createFromDate(1999, 1, 1)->startOfDay();
+         foreach ($sales as $key => $sale) {
+             $amount = 0;
+             $end_date = Carbon::parse($sale->bill_date)->addDay()->endOfDay();
+ 
+             if ($sale->order_details && count($sale->order_details )) {
+                 foreach ($sale->order_details as $key => $detail) {
+                 $base_quantity = $detail->qty;
+                 $conversion_rate = $detail->unit_conversion_rate ?? 1;
+                 $base_quantity = $base_quantity * $conversion_rate;
+                //  if(isset($detail->item_details->product_units) && $detail->item_details->product_units && count($detail->item_details->product_units) > 0){
+
+                //  }
+                 
+                 $request =  new Request();
+                 $request->merge([
+                     'product' => $detail->item_id,
+                     'start_date' => $start_date,
+                     'end_date' => $end_date
+                 ]);
+                 $inventory =  InventoryReportController::inventory_report($request)->first();
+                 $amount += ($inventory->avg_rate ?? $inventory->tp) * $base_quantity;
+                 }
+             }
+ 
+             if($amount > 0){
+                // dd('hi', $amount);
+                 AccountController::record_journal_entry([
+                     'account_id' => $inventory_account->id,
+                     'credit' => $amount,
+                     'debit' => 0,
+                     'reference_id' => $sale->id,
+                     'reference_type' => 'sale_cogs',
+                     'note' => 'Sold Items cost for order '. ($sale->tran_no ?? "")." @" .number_format($amount,2),
+                     'source_account' => $cogs_account->id,
+                     'transaction_date' => $sale->bill_date ? $sale->bill_date : date('Y-m-d',strtotime($sale->created_at))
+                 ]);
+             }
+ 
+         }
+       } catch (\Throwable $th) {
+        throw $th;
+       }
+    }
 
     public function check_inventory_by_item(Request $request) {
        try{

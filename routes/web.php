@@ -220,6 +220,7 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
         Route::get("customer-payments",[AccountingReportController::class,'customer_payments']);
         Route::get("general-ledger",[AccountingReportController::class,'generate_general_ledger_report']);
         Route::get('/account-balance',[AccountingReportController::class, 'account_balance_report']);
+        Route::get('/trial-balance',[AccountingReportController::class, 'trial_balance_report']);
 
     });
     Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
@@ -270,7 +271,7 @@ Route::middleware('manager.role')->prefix('system')->group(function () {
     Route::resource('configurations', ConfigurationController::class);
     
 });
-
+Route::get('generate_cogs_old',[InventoryController::class, 'generate_old_cogs_data'])->middleware('manager.role');
 Route::get('/phpinfo', function () {
     phpinfo();
 });
@@ -287,4 +288,7 @@ Route::get('db-backup-run', function(){
 });
 
 Route::get('check-inventory', [InventoryController::class , 'check_inventory_by_item'])->name('check.inventory');
+
+
+
 });

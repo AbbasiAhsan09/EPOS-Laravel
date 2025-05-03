@@ -355,10 +355,14 @@ class SalesController extends Controller
                 }
                     
 
-                    toast('Order Created!', 'success');
-                    
-                    return redirect()->back()->with('openNewWindow',$request->has('print_invoice')  ? $order->id : false );
-                } else {
+                if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                    InventoryController::generate_cogs(['sale_id' => $order->id]);
+                }
+
+                toast('Order Created!', 'success'); 
+                return redirect()->back()->with('openNewWindow',$request->has('print_invoice')  ? $order->id : false );
+                
+            } else {
                     return 'Un-authorized Action';
                 }
             }
@@ -368,113 +372,8 @@ class SalesController extends Controller
     }
 
 
-    public function calculateCOGS($orderId, $itemIds, $quantities)
-    {
-        $totalCOGS = 0;
+   
 
-        for ($i = 0; $i < count($itemIds); $i++) {
-            $itemId = $itemIds[$i];
-            $quantitySold = $quantities[$i];
-            
-            // Get purchase records for the item from purchase_invoice_details (FIFO: oldest purchases first)
-            $purchases = PurchaseInvoiceDetails::where('item_id', $itemId)
-                ->with("invoice")
-                ->orderBy('invoice.doc_date', 'asc')
-                ->get();
-            
-            $remainingQuantity = $quantitySold;
-
-            foreach ($purchases as $purchase) {
-                if ($remainingQuantity == 0) {
-                    break;
-                }
-
-                $purchaseQuantity = $purchase->qty;
-                $purchaseRate = $purchase->rate;
-
-                // Calculate how much we can use from this purchase record
-                $quantityToUse = min($remainingQuantity, $purchaseQuantity);
-                
-                // Calculate the COGS for this quantity
-                $cogsForThisBatch = $quantityToUse * $purchaseRate;
-                $totalCOGS += $cogsForThisBatch;
-
-                // Reduce the remaining quantity to be fulfilled
-                $remainingQuantity -= $quantityToUse;
-
-                // Optionally, update the purchase record to reduce the qty available in stock
-                $purchase->qty -= $quantityToUse;
-                $purchase->save();
-            }
-
-            // After matching, update the SalesDetails table with COGS for this item
-            SalesDetails::where('sale_id', $orderId)
-                ->where('item_id', $itemId)
-                ->update(['cogs' => $totalCOGS]);
-        }
-
-        // Record the COGS in the accounting system (same as in the previous example)
-        $this->recordCOGSAccountingEntry($orderId, $totalCOGS);
-    }
-
-    /**
-     * Record COGS entry in the accounting journal
-     */
-    public function recordCOGSAccountingEntry($orderId, $totalCOGS)
-    {
-        // Get or create the COGS and Inventory accounts
-        $cogsAccount = Account::firstOrCreate(
-            [
-                'store_id' => Auth::user()->store_id,
-                'account_number' => 5000,
-            ],
-            [
-                'title' => 'Cost of Goods Sold',
-                'type' => 'expense',
-                'description' => 'COGS for sales orders',
-                'opening_balance' => 0,
-            ]
-        );
-
-        $inventoryAccount = Account::firstOrCreate(
-            [
-                'store_id' => Auth::user()->store_id,
-                'account_number' => 1500,
-            ],
-            [
-                'title' => 'Inventory',
-                'type' => 'assets',
-                'description' => 'Tracks store’s inventory',
-                'opening_balance' => 0,
-            ]
-        );
-
-        // Debit COGS, credit Inventory
-        AccountController::record_journal_entry([
-            'store_id' => Auth::user()->store_id,
-            'account_id' => $cogsAccount->id,
-            'reference_type' => 'sales_order',
-            'reference_id' => $orderId,
-            'debit' => $totalCOGS,
-            'credit' => 0,
-            'transaction_date' => date('Y-m-d'),
-            'note' => 'COGS for order #' . $orderId,
-            'source_account' => $inventoryAccount->id,
-        ]);
-
-        // Credit Inventory account (reduce inventory)
-        AccountController::record_journal_entry([
-            'store_id' => Auth::user()->store_id,
-            'account_id' => $inventoryAccount->id,
-            'reference_type' => 'sales_order',
-            'reference_id' => $orderId,
-            'debit' => 0,
-            'credit' => $totalCOGS,
-            'transaction_date' => date('Y-m-d'),
-            'note' => 'Inventory reduction for order #' . $orderId,
-            'source_account' => $cogsAccount->id,
-        ]);
-    }
 
 
     /**
@@ -813,6 +712,10 @@ class SalesController extends Controller
                         }
                     }
 
+                    if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                        InventoryController::generate_cogs(['sale_id' => $order->id]);
+                    }
+
                     DB::commit();
 
                     toast('Order Updated!', 'info');
@@ -871,13 +774,24 @@ class SalesController extends Controller
 
 
                      if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+
+                        AccountController::reverse_transaction([
+                            'reference_type' => 'sale_cogs',
+                            'reference_id' => $sale->id,
+                            'transaction_count'=> 2,
+                            'order_by' => 'DESC',
+                            'order_column' => 'id',
+                            'description' => 'Transaction reversed because Order '.$sale->tran_no.'   is deleted by '. Auth::user()->name.''
+                        
+                        ]);
+
                         AccountController::reverse_transaction([
                             'reference_type' => 'sales_order',
                             'reference_id' => $sale->id,
                             'transaction_count'=> 2,
                             'order_by' => 'DESC',
                             'order_column' => 'id',
-                            'description' => 'Transaction reversed because Order '.$sale->tran_no.'   is updated by '. Auth::user()->name.''
+                            'description' => 'Transaction reversed because Order '.$sale->tran_no.'   is deleted by '. Auth::user()->name.''
                         ]);
                     }
                     

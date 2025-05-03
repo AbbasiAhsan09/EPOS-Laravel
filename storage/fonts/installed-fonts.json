@@ -1,33 +1,33 @@
 {
     "roboto": {
-        "300": "D:\\projects\\github\\Project001\\storage\\fonts\/roboto_300_946532f67a57584be06dd863f541ac7d",
-        "normal": "D:\\projects\\github\\Project001\\storage\\fonts\/roboto_normal_db1168cc5f8fc5193d9c7b7eda0425aa",
-        "500": "D:\\projects\\github\\Project001\\storage\\fonts\/roboto_500_d177939444fd8c92ee010dd8555b80cd",
-        "bold": "D:\\projects\\github\\Project001\\storage\\fonts\/roboto_bold_24123a87fbd881816d70b33a3b5b8d72",
-        "900": "roboto_900_c0b90c3d4073a93955e8f0c478bd97cf"
+        "300": "D:\\projects\\EPOS-Laravel\\storage\\fonts\/roboto_300_373f816e49d8622890f07d83ec8d9dab",
+        "normal": "D:\\projects\\EPOS-Laravel\\storage\\fonts\/roboto_normal_19250a3c7a2346a578e91836ef344bb1",
+        "500": "D:\\projects\\EPOS-Laravel\\storage\\fonts\/roboto_500_947f3c107f46aee70a82dc5f0f0f422d",
+        "bold": "D:\\projects\\EPOS-Laravel\\storage\\fonts\/roboto_bold_7add27c6330be31e8750ec1816378b48",
+        "900": "roboto_900_cfe24a69adfadd85928b823515b6322e"
     },
     "roboto slab": {
-        "normal": "D:\\projects\\github\\Project001\\storage\\fonts\/roboto_slab_normal_89c6a8cb0224612f8e1417e1f9689503",
-        "bold": "roboto_slab_bold_bddee33e767186e6bf5bd0ece0576b18"
+        "normal": "roboto_slab_normal_89c6a8cb0224612f8e1417e1f9689503",
+        "bold": "D:\\projects\\EPOS-Laravel\\storage\\fonts\/roboto_slab_bold_bddee33e767186e6bf5bd0ece0576b18"
     },
     "nucleoicons": {
-        "normal": "nucleoicons_normal_92b8d364f6e4ca2438333b56131d65b5"
+        "normal": "nucleoicons_normal_8ca0e44b22777ef8fd8aaf611e5f803c"
     },
     "font awesome 6 brands": {
-        "normal": "font_awesome_6_brands_normal_474dccc902223d619dca625d5efa71ab"
+        "normal": "font_awesome_6_brands_normal_e69d7d5d20a2f1736b50ef68cae646b2"
     },
     "font awesome 6 free": {
-        "normal": "D:\\projects\\github\\Project001\\storage\\fonts\/font_awesome_6_free_normal_eb805127d9ca789ad021b9569c407b24",
-        "900": "font_awesome_6_free_900_30f9994e0f5506e7b3f2436fccbf5ea9"
+        "normal": "D:\\projects\\EPOS-Laravel\\storage\\fonts\/font_awesome_6_free_normal_2ed72e1251d30677445ccbfeff0da341",
+        "900": "font_awesome_6_free_900_052d3b37b690813035118e1e701fcdcd"
     },
     "font awesome 5 brands": {
-        "normal": "font_awesome_5_brands_normal_474dccc902223d619dca625d5efa71ab"
+        "normal": "font_awesome_5_brands_normal_e69d7d5d20a2f1736b50ef68cae646b2"
     },
     "font awesome 5 free": {
-        "900": "D:\\projects\\github\\Project001\\storage\\fonts\/font_awesome_5_free_900_30f9994e0f5506e7b3f2436fccbf5ea9",
-        "normal": "font_awesome_5_free_normal_eb805127d9ca789ad021b9569c407b24"
+        "900": "D:\\projects\\EPOS-Laravel\\storage\\fonts\/font_awesome_5_free_900_052d3b37b690813035118e1e701fcdcd",
+        "normal": "font_awesome_5_free_normal_2ed72e1251d30677445ccbfeff0da341"
     },
     "fontawesome": {
-        "normal": "fontawesome_normal_7c766854659cca324cc776e5963a9435"
+        "normal": "fontawesome_normal_8a5ca24bcf4fc3f7607328ad03e1394a"
     }
 }

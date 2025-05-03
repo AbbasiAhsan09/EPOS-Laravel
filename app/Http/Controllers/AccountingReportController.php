@@ -220,4 +220,75 @@ class AccountingReportController extends Controller
             throw $th;
         }
     }
+
+    public function trial_balance_report(Request $request)  {
+        try {
+            
+            $results = DB::table('accounts as head')
+            ->leftJoin('accounts as child', 'child.parent_id', '=', 'head.id')
+            ->leftJoin('account_transactions as at', function ($join) {
+                $join->on('at.account_id', '=', 'head.id')
+                    ->orOn('at.account_id', '=', 'child.id');
+            })
+            ->where('head.store_id', 2)
+            ->where('head.head_account', 1)
+            ->where('at.deleted_at',null)
+            ->groupBy('head.id', 'head.title') // best to group by both in MySQL strict mode
+            ->select(
+                'head.id',
+                'head.title',
+                DB::raw('SUM(at.credit) as credit'),
+                DB::raw('SUM(at.debit) as debit'),
+                'head.parent_id'
+            )
+            ->get()->toArray();
+
+            $coas = Account::where("coa",1)->filterByStore()->get();
+
+            $data = [];
+
+            foreach ($coas as $key => $coa) {
+                if($data && isset($data[$coa->id])){
+
+                }else{
+                    $total_credit = 0;
+                    $total_debit = 0;
+                    
+                    $data_objects = array_filter($results, function($obj) use($coa){
+                        return $obj->parent_id === $coa->id;
+                    });
+
+                    if ($data_objects && count($data_objects)) {
+                        foreach ($data_objects as $key => $object) {
+                            $total_credit += $object->credit;
+                            $total_debit += $object->debit;
+                        }
+                    }
+
+                    $data[$coa->account_number . " " . $coa->title] = [
+                        'coa' => $coa->title,
+                        'heads' => $data_objects,
+                        'total_credit' => $total_credit,
+                        'total_debit' => $total_debit
+                    ];
+                }
+            }
+
+
+            if($request->has("report-type") && $request->query('report-type') == 'pdf'){
+                $data = ['data' => $data, 'report_title' => 'Trial Balance'];
+                $pdf = Pdf::loadView('reports.accounts.pdfs.trial-balance', $data)->setPaper('a4', 'portrait');
+                return $pdf->stream();
+            }
+           
+            return view('reports.accounts.trial-balance',compact('data'));
+            
+
+
+        
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }
