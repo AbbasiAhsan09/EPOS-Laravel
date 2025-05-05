@@ -127,6 +127,7 @@ class InventoryReportController extends Controller
                     (default_unit.conversion_multiplier) as conversion_multiplier,
                     (default_unit.conversion_divider) as conversion_divider,
                     p.low_stock as low_stock_indicator,
+                    p.tp as tp,
                     product_categories.category as category,
                     COALESCE(pid.total_qty, 0) AS purchased_qty,
                     COALESCE(p.opening_stock, 0) AS opening_qty,
@@ -159,10 +160,19 @@ class InventoryReportController extends Controller
                 })
                 ->leftJoin("mou as uom", 'p.uom', '=', 'uom.id')
                 ->leftJoin('fields', 'product_categories.parent_cat', '=', 'fields.id')
-                ->leftJoin(DB::raw("(SELECT item_id, SUM(qty * unit_conversion_rate) AS total_qty, SUM(rate * qty) AS total_value FROM purchase_invoice_details WHERE deleted_at IS NULL GROUP BY item_id) AS pid"), 'p.id', '=', 'pid.item_id')
-                ->leftJoin(DB::raw("(SELECT item_id, SUM(qty * unit_conversion_rate) AS total_qty FROM sales_details WHERE deleted_at IS NULL GROUP BY item_id) AS sd"), 'p.id', '=', 'sd.item_id')
-                ->leftJoin(DB::raw("(SELECT item_id, SUM(returned_qty * unit_conversion_rate) AS total_returned_qty FROM sale_return_details WHERE deleted_at IS NULL GROUP BY item_id) AS srd"), 'p.id', '=', 'srd.item_id')
-                ->leftJoin(DB::raw("(SELECT item_id, SUM(returned_qty * unit_conversion_rate) AS total_preturned_qty FROM purchase_return_details WHERE deleted_at IS NULL GROUP BY item_id) AS prd"), 'p.id', '=', 'prd.item_id')
+                // ->leftJoin(DB::raw("(SELECT item_id, SUM(qty * unit_conversion_rate) AS total_qty, SUM(rate * qty) AS total_value FROM purchase_invoice_details WHERE deleted_at IS NULL GROUP BY item_id) AS pid"), 'p.id', '=', 'pid.item_id')
+                // ->leftJoin(DB::raw("(SELECT item_id, SUM(qty * unit_conversion_rate) AS total_qty FROM sales_details WHERE deleted_at IS NULL GROUP BY item_id) AS sd"), 'p.id', '=', 'sd.item_id')
+                // ->leftJoin(DB::raw("(SELECT item_id, SUM(returned_qty * unit_conversion_rate) AS total_returned_qty FROM sale_return_details WHERE deleted_at IS NULL GROUP BY item_id) AS srd"), 'p.id', '=', 'srd.item_id')
+                // ->leftJoin(DB::raw("(SELECT item_id, SUM(returned_qty * unit_conversion_rate) AS total_preturned_qty FROM purchase_return_details WHERE deleted_at IS NULL GROUP BY item_id) AS prd"), 'p.id', '=', 'prd.item_id')
+                ->leftJoin(DB::raw("(SELECT item_id, SUM(qty * unit_conversion_rate) AS total_qty, SUM(rate * qty) AS 
+                total_value FROM purchase_invoice_details as pid1 
+                INNER JOIN purchase_invoices as pi on pi.id = pid1.inv_id
+                WHERE pid1.deleted_at IS NULL and pi.deleted_at is null"
+                 . ($request->has('start_date') && $request->has('end_date') ? " AND pi.doc_date BETWEEN DATE('{$request->start_date}') AND DATE('{$request->end_date}')" : "") .  
+                " GROUP BY pid1.item_id) AS pid"), 'p.id', '=', 'pid.item_id')
+                ->leftJoin(DB::raw("(SELECT item_id, SUM(qty * unit_conversion_rate) AS total_qty FROM sales_details WHERE deleted_at IS NULL" . ($request->has('start_date') && $request->has('end_date') ? " AND sales_details.created_at BETWEEN DATE('{$request->start_date}') AND DATE('{$request->end_date}')" : "") . " GROUP BY item_id) AS sd"), 'p.id', '=', 'sd.item_id')
+                ->leftJoin(DB::raw("(SELECT item_id, SUM(returned_qty * unit_conversion_rate) AS total_returned_qty FROM sale_return_details WHERE deleted_at IS NULL" . ($request->has('start_date') && $request->has('end_date') ? " AND sale_return_details.created_at BETWEEN DATE('{$request->start_date}') AND DATE('{$request->end_date}')" : "") . " GROUP BY item_id) AS srd"), 'p.id', '=', 'srd.item_id')
+                ->leftJoin(DB::raw("(SELECT item_id, SUM(returned_qty * unit_conversion_rate) AS total_preturned_qty FROM purchase_return_details WHERE deleted_at IS NULL" . ($request->has('start_date') && $request->has('end_date') ? " AND purchase_return_details.created_at BETWEEN DATE('{$request->start_date}') AND DATE('{$request->end_date}')" : "") . " GROUP BY item_id) AS prd"), 'p.id', '=', 'prd.item_id')    
                 ->leftJoin('units', 'default_unit.unit_id', '=', 'units.id')
                 ->whereNull('p.deleted_at')
                 ->where('p.store_id', Auth::user()->store_id)
