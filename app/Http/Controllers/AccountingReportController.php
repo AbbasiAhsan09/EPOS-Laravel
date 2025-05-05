@@ -253,6 +253,7 @@ class AccountingReportController extends Controller
            $opening_stock_cost = DB::table('products')
             ->selectRaw('SUM(opening_stock * CASE WHEN opening_stock_unit_cost > 0 THEN opening_stock_unit_cost ELSE tp END) AS opening_stock_value')
             ->where('opening_stock', '!=', 0)
+            ->where('deleted_at', null)
             ->where('store_id', '=', Auth()->user()->store_id)
             ->value('opening_stock_value');
 
