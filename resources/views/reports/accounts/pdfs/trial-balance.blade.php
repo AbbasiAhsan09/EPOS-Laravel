@@ -27,9 +27,9 @@
                    @foreach ($item['heads'] as $child)
                   
                    <tr>
-                       <td style="width: 300px">{{ $child->title ?? "" }}</td>
-                       <td style="width: 200px">{{ $config["symbol"] ." ". number_format($child->debit,2) }}</td>
-                       <td style="width: 200px">{{ $config["symbol"] ." ". number_format($child->credit,2) }}</td>
+                       <td style="width: 300px">{{ $child['title'] ?? "" }}</td>
+                       <td style="width: 200px">{{ $config["symbol"] ." ". number_format($child['debit'],2) }}</td>
+                       <td style="width: 200px">{{ $config["symbol"] ." ". number_format($child['credit'],2) }}</td>
                 
                    </tr>
                    @endforeach

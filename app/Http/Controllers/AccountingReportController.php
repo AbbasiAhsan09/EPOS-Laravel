@@ -9,6 +9,7 @@ use App\Models\PartyGroups;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AccountingReportController extends Controller
@@ -224,17 +225,21 @@ class AccountingReportController extends Controller
     public function trial_balance_report(Request $request)  {
         try {
             
-            $results = DB::table('accounts as head')
+            // dd("hi");
+            DB::statement("SET SESSION sql_mode = (SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))");
+
+            $temp = DB::table('accounts as head')
             ->leftJoin('accounts as child', 'child.parent_id', '=', 'head.id')
             ->leftJoin('account_transactions as at', function ($join) {
                 $join->on('at.account_id', '=', 'head.id')
                     ->orOn('at.account_id', '=', 'child.id');
             })
-            ->where('head.store_id', 2)
+            ->where('head.store_id', Auth()->user()->store_id)
             ->where('head.head_account', 1)
             ->where('at.deleted_at',null)
             ->groupBy('head.id', 'head.title') // best to group by both in MySQL strict mode
             ->select(
+                'head.account_number',
                 'head.id',
                 'head.title',
                 DB::raw('SUM(at.credit) as credit'),
@@ -244,6 +249,22 @@ class AccountingReportController extends Controller
             ->get()->toArray();
 
             $coas = Account::where("coa",1)->filterByStore()->get();
+
+           $opening_stock_cost = DB::table('products')
+            ->selectRaw('SUM(opening_stock * CASE WHEN opening_stock_unit_cost > 0 THEN opening_stock_unit_cost ELSE tp END) AS opening_stock_value')
+            ->where('opening_stock', '!=', 0)
+            ->where('store_id', '=', Auth()->user()->store_id)
+            ->value('opening_stock_value');
+
+            $results = array_map(function($account) use ($opening_stock_cost) {
+                if ($account->account_number == 1030) {
+               
+                    $accountArray = (array) $account;
+                    $accountArray['debit'] = $account->debit + $opening_stock_cost;
+                    return $accountArray;
+                }
+                return (array) $account;
+            }, $temp);
 
             $data = [];
 
@@ -255,13 +276,14 @@ class AccountingReportController extends Controller
                     $total_debit = 0;
                     
                     $data_objects = array_filter($results, function($obj) use($coa){
-                        return $obj->parent_id === $coa->id;
+                        return $obj['parent_id'] === $coa->id;
                     });
 
                     if ($data_objects && count($data_objects)) {
                         foreach ($data_objects as $key => $object) {
-                            $total_credit += $object->credit;
-                            $total_debit += $object->debit;
+                            // dump($object);
+                            $total_credit += $object['credit'];
+                            $total_debit += ($object['debit']);
                         }
                     }
 
