@@ -8,6 +8,7 @@ use App\Models\AccountTransaction;
 use App\Models\Inventory;
 use App\Models\ProductUnit;
 use App\Models\PurchaseInvoice;
+use App\Models\SaleReturn;
 use App\Models\Sales;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -103,6 +104,7 @@ class InventoryController extends Controller
 
     public function generate_old_cogs_data()  {
         $this->generate_cogs();
+        $this->generate_cogs_return();
     }
 
     static function generate_cogs($params = null){
@@ -117,6 +119,7 @@ class InventoryController extends Controller
          }
 
          $sales = $sales->get();
+
          $deleteArray = $deleteArray->delete();
          
          $cogs_account = Account::where('account_number',5000)->filterByStore()->first();
@@ -127,6 +130,7 @@ class InventoryController extends Controller
     
          $start_date =Carbon::createFromDate(1999, 1, 1)->startOfDay();
          foreach ($sales as $key => $sale) {
+            
              $amount = 0;
              $end_date = Carbon::parse($sale->bill_date)->addDay()->endOfDay();
  
@@ -151,7 +155,7 @@ class InventoryController extends Controller
              }
  
              if($amount > 0){
-                // dd('hi', $amount);
+                
                  AccountController::record_journal_entry([
                      'account_id' => $inventory_account->id,
                      'credit' => $amount,
@@ -165,10 +169,78 @@ class InventoryController extends Controller
              }
  
          }
+
+        
        } catch (\Throwable $th) {
         throw $th;
        }
     }
+
+    static function generate_cogs_return($params = null){
+        try {
+          // initialy playing with 10 invoices
+          $sales_returns = SaleReturn::with("order_details")->where('store_id', Auth::user()->store_id)
+          ->orderBy('return_date',"asc");
+          $deleteArray = AccountTransaction::where("reference_type",'sale_return_cogs');
+          if(isset($params) && isset($params['sale_return_id']) && !empty($params['sale_return_id'])){
+             $deleteArray = $deleteArray->where('reference_id',$params["sale_return_id"]);
+             $sales_returns = $sales_returns->where('id',$params["sale_return_id"]);
+          }
+ 
+          $sales_returns = $sales_returns->get();
+          $deleteArray = $deleteArray->delete();
+          
+          $cogs_account = Account::where('account_number',5000)->filterByStore()->first();
+          $inventory_account = Account::where('account_number',1030)->filterByStore()->first();
+     
+ 
+ 
+        //   dd($sales_returns);/
+     
+          $start_date =Carbon::createFromDate(1999, 1, 1)->startOfDay();
+          foreach ($sales_returns as $key => $sale_return) {
+              $amount = 0;
+              $end_date = Carbon::parse($sale_return->return_date)->addDay()->endOfDay();
+  
+              if ($sale_return->order_details && count($sale_return->order_details )) {
+                  foreach ($sale_return->order_details as $key => $detail) {
+                  $base_quantity = $detail->returned_qty;
+                  $conversion_rate = $detail->unit_conversion_rate ?? 1;
+                  $base_quantity = $base_quantity * $conversion_rate;
+                 //  if(isset($detail->item_details->product_units) && $detail->item_details->product_units && count($detail->item_details->product_units) > 0){
+ 
+                 //  }
+                  
+                  $request =  new Request();
+                  $request->merge([
+                      'product' => $detail->item_id,
+                      'start_date' => $start_date,
+                      'end_date' => $end_date
+                  ]);
+                  $inventory =  InventoryReportController::inventory_report($request)->first();
+                  $amount += ($inventory->avg_rate ?? $inventory->tp) * $base_quantity;
+                  }
+              }
+  
+              if($amount > 0){
+                 // dd('hi', $amount);
+                  AccountController::record_journal_entry([
+                      'account_id' => $inventory_account->id,
+                      'credit' => 0,
+                      'debit' => $amount,
+                      'reference_id' => $sale_return->id,
+                      'reference_type' => 'sale_return_cogs',
+                      'note' => 'Sold Items cost reversal for return '. ($sale_return->doc_no ?? "")." @" .number_format($amount,2),
+                      'source_account' => $cogs_account->id,
+                      'transaction_date' => $sale_return->return_date ? $sale_return->return_date : date('Y-m-d',strtotime($sale_return->created_at))
+                  ]);
+              }
+  
+          }
+        } catch (\Throwable $th) {
+         throw $th;
+        }
+     }
 
     public function check_inventory_by_item(Request $request) {
        try{

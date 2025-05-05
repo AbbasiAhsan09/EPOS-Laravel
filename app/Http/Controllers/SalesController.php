@@ -356,6 +356,7 @@ class SalesController extends Controller
                     
 
                 if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                   
                     InventoryController::generate_cogs(['sale_id' => $order->id]);
                 }
 
@@ -795,6 +796,10 @@ class SalesController extends Controller
                         ]);
                     }
                     
+                    if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                        InventoryController::generate_cogs(['sale_id' => $sale->id]);
+                    }
+
                     Alert::toast( 'Sale '.$sale->tran_no.' Deleted  Successfuly!', 'success');
                     return redirect('/sales');
                     

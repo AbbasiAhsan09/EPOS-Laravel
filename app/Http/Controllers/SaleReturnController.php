@@ -309,7 +309,9 @@ class SaleReturnController extends Controller
                 }
             }
 
-            
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                InventoryController::generate_cogs_return(['sale_return_id' => $return->id]);
+            }
 
             DB::commit();
 
@@ -558,6 +560,9 @@ class SaleReturnController extends Controller
             }
 
             
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                InventoryController::generate_cogs_return(['sale_return_id' => $return->id]);
+            }
 
             DB::commit();
 
@@ -623,6 +628,11 @@ class SaleReturnController extends Controller
 
 
             DB::commit();
+
+            if(ConfigHelper::getStoreConfig()["use_accounting_module"]){
+                InventoryController::generate_cogs_return(['sale_return_id' => $return->id]);
+            }
+            
 
             toast('Sale return deleted','success');
 
