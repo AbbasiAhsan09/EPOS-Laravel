@@ -74,8 +74,8 @@
                     <th style="width: 100px">Reference No.</th>
                     <th>Account</th>
                     <th>Description</th>
-                    <th>Credit</th>
                     <th>Debit</th>
+                    <th>Credit</th>
                     <th>Mode</th>
                     <th>Action</th>
                 </thead>
@@ -112,14 +112,14 @@
                             </td>
                             <td style="width: 200px">
                                 <div class="input-group input-group-outline">
-                                    <input type="number" name="credit[]" value="{{$entry->credit}}" min="0" step="0.01" 
-                                        class="form-control credit_amount">
+                                    <input type="number" name="debit[]" value="{{$entry->debit}}" min="0" step="0.01" 
+                                    class="form-control debit_amount">
                                 </div>
                             </td>
                             <td style="width: 200px">
                                 <div class="input-group input-group-outline">
-                                    <input type="number" name="debit[]" value="{{$entry->debit}}" min="0" step="0.01" 
-                                        class="form-control debit_amount">
+                                    <input type="number" name="credit[]" value="{{$entry->credit}}" min="0" step="0.01" 
+                                        class="form-control credit_amount">
                                 </div>
                             </td>
                             <td>
@@ -174,14 +174,14 @@
                         </td>
                         <td style="width: 200px">
                             <div class="input-group input-group-outline">
-                                <input type="number" name="credit[]"   min="0" step="0.01" 
-                                    class="form-control credit_amount">
+                                <input type="number" name="debit[]"  min="0" step="0.01" 
+                                class="form-control debit_amount">
                             </div>
                         </td>
                         <td style="width: 200px">
                             <div class="input-group input-group-outline">
-                                <input type="number" name="debit[]"  min="0" step="0.01" 
-                                    class="form-control debit_amount">
+                                <input type="number" name="credit[]"   min="0" step="0.01" 
+                                    class="form-control credit_amount">
                             </div>
                         </td>
                         <td>
@@ -209,8 +209,8 @@
                 <tfoot>
                     <tr>
                         <th colspan="3">Total</th>
-                        <th><span id="totalCredit">0.00</span></th>
                         <th><span id="totalDebit">0.00</span></th>
+                        <th><span id="totalCredit">0.00</span></th>
                     </tr>
                 </tfoot>
             </table>
@@ -299,14 +299,14 @@
                         </td>
                         <td style="width: 200px">
                             <div class="input-group input-group-outline">
-                                <input type="number" name="credit[]"   min="0" step="0.01" 
-                                    class="form-control credit_amount">
+                                <input type="number" name="debit[]"  min="0" step="0.01" 
+                                    class="form-control debit_amount">
                             </div>
                         </td>
                         <td style="width: 200px">
                             <div class="input-group input-group-outline">
-                                <input type="number" name="debit[]"  min="0" step="0.01" 
-                                    class="form-control debit_amount">
+                                <input type="number" name="credit[]"   min="0" step="0.01" 
+                                    class="form-control credit_amount">
                             </div>
                         </td>
                          <td>
