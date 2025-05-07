@@ -193,6 +193,8 @@ class SalesReportController extends Controller
                 $records = $records->whereBetween("bill_date", [$request->from, $request->to]);
             }
 
+            $records = $records->orderBy("bill_date", "DESC")->orderBy("customer_id", "ASC");
+
             if($request->has("type") && $request->type == "pdf") {
                 $records = $records->get();
                 $data = [
