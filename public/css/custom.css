@@ -280,3 +280,11 @@ color: #8e8d8d;
     background-color: #e7e8e9 !important; /* optional: gives it a disabled look */
     color: #6c757d;            /* optional: greyed-out text */
 }
+
+.inv-table th, .inv-table td {
+    padding: 10px;
+    text-align: left !important;
+    border-bottom: 1px solid #ddd;
+    width: 150px;
+
+}

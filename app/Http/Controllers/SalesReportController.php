@@ -174,6 +174,49 @@ class SalesReportController extends Controller
             throw $th;
         }
     }
+
+
+    public function invoice_detail_report(Request $request) {
+        try {
+            
+            $customers = Parties::filterByStore()->get();
+            $records = Sales::filterByStore()->with("order_details.item_details","customer");
+            if($request->has("customer") && $request->customer != null) {
+                if($request->customer == "exclude_cash"){
+                    $records = $records->where("customer_id", "!=", 0);
+                }else{
+                    $records = $records->where("customer_id", $request->customer);
+                }
+            }
+
+            if($request->has("from") && $request->from != null && $request->has("to") && $request->to != null) {
+                $records = $records->whereBetween("bill_date", [$request->from, $request->to]);
+            }
+
+            if($request->has("type") && $request->type == "pdf") {
+                $records = $records->get();
+                $data = [
+                    "records" => $records,
+                    "from" => $request->from,
+                    "to" => $request->to,
+                    'report_title' => 'Invoice Detail Report',
+                ];
+                $pdf = PDF::loadView("reports.sales-report.pdf-invoice-detail-report", $data)->setPaper("a4", "portrait");
+                return $pdf->stream();
+            }else{
+                $records = $records->paginate(20);
+            }
+            // dd($records);
+
+
+
+            return view('reports.sales-report.invoice-detail-report', compact('customers','records'));
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *
