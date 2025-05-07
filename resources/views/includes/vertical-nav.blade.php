@@ -31,6 +31,7 @@
                         <li class="childmenu-item"><a href="/reports/sales-detail-report">Detail Report </a></li>
                         <li class="childmenu-item"><a href="/sales/returns">Sale Returns</a></li>
                         <li class="childmenu-item"><a href="/sales/returns/detail"> Sales Return Detail Report </a></li>
+                        <li class="childmenu-item"><a href="/reports/invoice-detail-report"> Sale Invoice Detail Report </a></li>
                     </ul>
                 </li>
                 <li class="submenu-item"></li>

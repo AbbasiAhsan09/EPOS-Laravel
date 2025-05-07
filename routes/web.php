@@ -227,6 +227,7 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
     Route::get('purchase-summary-report', [PurchaseReportController::class, 'summary'])->name('purchase-report.summary');
     Route::get('sales-summary-report', [SalesReportController::class, 'summary'])->name('sales-report.summary');
     Route::get('sales-detail-report', [SalesReportController::class, 'detail'])->name('sales-report.detail');
+    Route::get('invoice-detail-report', [SalesReportController::class, 'invoice_detail_report'])->name('invoice-detail-report');
 });
 
 
