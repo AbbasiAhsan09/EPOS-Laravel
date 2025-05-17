@@ -10,7 +10,7 @@
         @foreach ($vouchers as $voucher)
             <tr>
                 <td>{{$voucher->doc_no ?? ""}}</td>
-                <td>{{date('m-d-Y',strtotime($voucher->date))}}</td>
+                <td>{{date('d/m/Y',strtotime($voucher->date))}}</td>
                 <td>{{$voucher->account->title ?? ""}} - {{$voucher->account->type ?? ""}}</td>
                 <td>{{$voucher->account_from->title ?? ""}} - {{$voucher->account_from->type ?? ""}}</td>
                 <td>{{ConfigHelper::getStoreConfig()["symbol"].number_format($voucher->total,2)}}</td>

@@ -106,9 +106,9 @@
                     </td>
                     <td>{{$item->doc_no ?? ""}}</td>
                     <td>{{$item->labour->name ?? ""}}</td>
-                    <td>{{date("m-d-Y", strtotime($item->start_date))}}</td>
-                    <td>{{$item->end_date ? date("m-d-Y", strtotime($item->end_date)) : '-'}}</td>
-                    <td>{{date("m-d-Y", strtotime($item->created_at))}}</td>
+                    <td>{{date("d/m/Y", strtotime($item->start_date))}}</td>
+                    <td>{{$item->end_date ? date("d/m/Y", strtotime($item->end_date)) : '-'}}</td>
+                    <td>{{date("d/m/Y", strtotime($item->created_at))}}</td>
                     <td>{{ConfigHelper::getStoreConfig()["symbol"].number_format($item->net_total,2)}}</td>
                     <td>
                         <div class="s-btn-grp">

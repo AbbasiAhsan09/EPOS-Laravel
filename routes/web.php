@@ -221,6 +221,7 @@ Route::middleware('manager.role')->prefix('reports')->group(function(){
         Route::get("general-ledger",[AccountingReportController::class,'generate_general_ledger_report']);
         Route::get('/account-balance',[AccountingReportController::class, 'account_balance_report']);
         Route::get('/trial-balance',[AccountingReportController::class, 'trial_balance_report']);
+        Route::get('/pnl-month-wise',[AccountingReportController::class, 'month_wise_profit_loss']);
 
     });
     Route::get('purchase-detail-report', [PurchaseReportController::class, 'detail'])->name('purchase-report.detail');
