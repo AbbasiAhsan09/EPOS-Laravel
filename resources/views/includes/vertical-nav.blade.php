@@ -77,6 +77,7 @@
                 <li class="submenu-item"><a href="/account/transactions">Transaction</a></li>
                 <li class="submenu-item"><a href="/account/report/trial-balance">Financial Report</a></li>
                 <li class="submenu-item"><a href="/reports/accounting/trial-balance">Trial Balance Report</a></li>
+                <li class="submenu-item"><a href="/reports/accounting/pnl-month-wise">Profitl & Loss Report</a></li>
                 <li class="submenu-item"><a href="/reports/accounting/general-ledger">Ledger Report</a></li>
             </ul>
         </li>
@@ -118,7 +119,7 @@
                 <li class="submenu-item"><a href="/sales/returns">Sale Return Report</a></li>
                 <li class="submenu-item"><a href="/sales/returns/detail"> Sales Return Detail Report </a></li>
             
-                <li class="submenu-item"><a href="/labour-work/">Labour Bills Report</a></li>
+                {{-- <li class="submenu-item"><a href="/labour-work/">Labour Bills Report</a></li> --}}
             </ul>
         </li>
 
@@ -135,19 +136,15 @@
                 <li class="submenu-item"><a href="/uom">UOM</a></li>
             </ul>
         </li>
-        <li class="menu-item"><a href="/system/configurations">Settings</a>
-            <ul class="submenu">
-                <li class="submenu-item"><a href="/db-backup" target="_blank">DB Backup</a></li>
-            </ul></li>
+        <li class="menu-item"><a href="/system/configurations">Settings</a></li>
 
-        <li class="menu-item"><a href="/labour">Labour</a>
+        {{-- <li class="menu-item"><a href="/labour">Labour</a>
             <ul class="submenu">
                 <li class="submenu-item"><a href="/labour">Labours</a></li>
                 <li class="submenu-item"><a href="/labour-work/create">Create Bill</a></li>
                 <li class="submenu-item"><a href="/labour-work/">Bills</a></li>
-                {{-- <li class="submenu-item"><a href="/product-category">Reports</a></li> --}}
             </ul>
-        </li>
+        </li> --}}
 
         <li class="menu-item bg-logout"><a href="{{route('auth.logout')}}">Logout</a></li>
         <li class="menu-item">

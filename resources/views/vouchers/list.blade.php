@@ -102,6 +102,7 @@
     <table class="table table-responsive-sm table-striped table-bordered" border="3">
         <thead>
             <th>Doc #</th>
+            <th>Date</th>
             <th>Bank</th>
             <th>Account</th>
             <th>Total</th>
@@ -111,6 +112,7 @@
             @foreach ($vouchers as $voucher)
                 <tr>
                     <td>{{$voucher->doc_no ?? ""}}</td>
+                    <td>{{ date('d/m/Y', strtotime($voucher->date)) }}</td>
                     <td>{{$voucher->account->title ?? ""}} - {{$voucher->account->type ?? ""}}</td>
                     <td>{{$voucher->account_from->title ?? ""}} - {{$voucher->account_from->type ?? ""}}</td>
                     <td>{{ConfigHelper::getStoreConfig()["symbol"].number_format($voucher->total,2)}}</td>

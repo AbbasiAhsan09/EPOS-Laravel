@@ -84,7 +84,7 @@ $config = ConfigHelper::getStoreConfig();
                     <td>{{$item->sale_id}}</td>
                     <td>
                         <a href="{{url('sales/edit/'.$item->sale_id)}}" class="text-primary">{{$item->sale->tran_no ?? ''}}</a></td>
-                    <td>{{date('m-d-y', strtotime($item->created_at))}}</td>
+                    <td>{{date('d/m/Y', strtotime($item->created_at))}}</td>
                     {{-- <td>{{$item->item_details->categories->field->name ?? ""}}</td> --}}
                     <td>{{$item->item_details->categories->category ?? ""}}</td>
                     <td>{{$item->item_details->name ?? ""}}</td>

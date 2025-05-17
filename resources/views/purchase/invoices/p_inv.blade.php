@@ -163,7 +163,7 @@
                @if (isset($item->transactions ) && count($item->transactions ))
                <ul>
                 @foreach ($item->transactions as $transaction)
-                <li>{{$item->doc_num}} | {{date('m-d-y',strtotime($transaction->created_at))}} | {{ConfigHelper::getStoreConfig()["symbol"].$transaction->amount}}</li>
+                <li>{{$item->doc_num}} | {{date('d/m/Y',strtotime($transaction->created_at))}} | {{ConfigHelper::getStoreConfig()["symbol"].$transaction->amount}}</li>
                 @endforeach
                 </ul>
             @else

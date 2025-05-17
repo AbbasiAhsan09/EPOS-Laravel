@@ -90,4 +90,14 @@ class AccountTransaction extends Model
         return $this->belongsTo(SaleReturn::class, 'reference_id', 'id');
     }
     
+    /**
+     * Get the voucher that owns the AccountTransaction
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function voucher(): BelongsTo
+    {
+        return $this->belongsTo(Voucher::class, 'reference_id', 'id');
+    }
+    
 }

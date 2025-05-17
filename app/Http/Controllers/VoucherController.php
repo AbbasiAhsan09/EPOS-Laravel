@@ -48,9 +48,12 @@ class VoucherController extends Controller
             }
 
             if($request->has("type") && $request->input("type") == "pdf"){
-                
+                // dd($voucher_type);
                 $data = [
                     'vouchers' => $vouchers->get(),
+                    "from" => $request->from,
+                    "to" => $request->to,
+                    'report_title' => $voucher_type->name.' Report',
                 ];
                 $pdf = Pdf::loadView('vouchers.pdf', $data)->setPaper('a4', 'portrait');
                 return $pdf->stream();

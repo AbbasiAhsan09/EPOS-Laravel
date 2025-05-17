@@ -470,7 +470,7 @@ function auto_define_invoice_data(data){
         partyName = data?.party?.party_name;
     }
 
-    const billDate = data?.bill_date && moment(data?.bill_date).isValid() ? moment(data?.bill_date).format('MM-D-Y') : moment(data?.created_at).format('MM-DD-Y')
+    const billDate = data?.bill_date && moment(data?.bill_date).isValid() ? moment(data?.bill_date).format('Md/m/Y') : moment(data?.created_at).format('MM-DD-Y')
     const billDateDiv = `<div id="selected_inv_bill_date" class="col-lg-6"><strong>Bill Date: ${billDate ?? ''}</strong></div>`
     const invNoDiv = `<div id="selected_inv_no" class="col-lg-6"><strong>Purchase No: ${data?.doc_num ?? ''}</strong></div>`
     const customerDiv = `<div id="selected_inv_customer" class="col-lg-6"><strong>Party: ${partyName ?? ''}</strong></div>`;

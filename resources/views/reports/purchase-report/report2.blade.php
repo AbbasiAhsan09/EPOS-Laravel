@@ -84,7 +84,7 @@ $config = ConfigHelper::getStoreConfig();
                     <td>
                         <a href="{{url('purchase/invoice/'.$item->inv_id.'/edit')}}" class="text-primary">{{$item->invoice->doc_num}}</a></td>
                         {{-- <td>{{$item->items->categories->field->name ?? ""}}</td> --}}
-                        <td>{{date('m-d-y', strtotime($item->created_at))}}</td>
+                        <td>{{date('d/m/Y', strtotime($item->created_at))}}</td>
                     <td>{{$item->items->categories->category ?? ""}}</td>
                     <td>{{$item->items->name ?? ""}}</td>
             @if ($config && $config['show_bag_sizing']) 
