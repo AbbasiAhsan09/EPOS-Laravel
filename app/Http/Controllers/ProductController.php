@@ -14,6 +14,14 @@ use App\Models\ProductArrtributes;
 use App\Models\ProductCategory;
 use App\Models\Products;
 use App\Models\ProductUnit;
+use App\Models\PurchaseInvoiceDetails;
+use App\Models\PurchaseOrderDetails;
+use App\Models\PurchaseQuotationDetails;
+use App\Models\PurchaseRequestDetail;
+use App\Models\PurchaseReturnDetail;
+use App\Models\SaleReturnDetail;
+use App\Models\Sales;
+use App\Models\SalesDetails;
 use App\Models\Unit;
 use App\Models\UnitType;
 use Illuminate\Http\Request;
@@ -463,13 +471,67 @@ function setProductUnitConversionMultiplier($product_id)
     {
 
         try {
-            $item = Products::find($id);
+           
+
+            $sale = SalesDetails::where('item_id',$id)->count();
+            if($sale > 0){
+                toast('Cannot delete because it has associated sales', 'error');
+                return redirect()->back();
+            }
+            $sale_return = SaleReturnDetail::where('item_id',$id)->count();
+            if($sale_return > 0){
+                toast('Cannot delete because it has associated sale returns', 'error');
+                return redirect()->back();
+            }
+            $purchase = PurchaseInvoiceDetails::where('item_id',$id)->count();
+             if($purchase > 0){
+                toast('Cannot delete because it has associated purchases', 'error');
+                return redirect()->back();
+            }
+            $purchase_return = PurchaseReturnDetail::where('item_id',$id)->count();
+            if($purchase_return > 0){
+                toast('Cannot delete because it has associated purchase returns', 'error');
+                return redirect()->back();
+            }
+
+            $purchase_quatation = PurchaseQuotationDetails::where('item_id',$id)->count();
+            if($purchase_quatation > 0){
+                toast('Cannot delete because it has associated purchase quotations', 'error');
+                return redirect()->back();
+            }
+
+            $purchase_order = PurchaseOrderDetails::where('item_id',$id)->count();
+            if($purchase_order > 0){
+                toast('Cannot delete because it has associated purchase orders', 'error');
+                return redirect()->back();
+            }
+
+            $purchase_request = PurchaseRequestDetail::where('item_id',$id)->count();
+            if($purchase_request > 0){
+                toast('Cannot delete because it has associated purchase requests', 'error');
+                return redirect()->back();
+            }
+
+            $item = Products::where('id',$id)->filterByStore()->first();
+            DB::beginTransaction();
+            
             $item->delete();
 
+             AccountController::reverse_transaction([
+                        'reference_type' => 'opening_inventory',
+                        'reference_id' => $item->id,
+                        'description' => 'This transaction is reversed transaction because product '.$item->name.'   is deleted by '. Auth::user()->name.'',
+                        'transaction_count' => 2,
+                        'order_by' => 'DESC',
+                        'order_column' => 'id'
+            ]);
+
+            DB::commit();
             toast('Product Delete!', 'error');
             return redirect()->back();
         } catch (\Throwable $th) {
-            //throw $th;
+            DB::rollBack();
+            throw $th;
         }
     }
 

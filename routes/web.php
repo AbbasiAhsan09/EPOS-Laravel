@@ -274,6 +274,7 @@ Route::middleware('manager.role')->prefix('system')->group(function () {
     
 });
 Route::get('generate_cogs_old',[InventoryController::class, 'generate_old_cogs_data'])->middleware('manager.role');
+Route::get('generate_inventory_balance',[AccountingReportController::class, 'generate_product_opening_balance'])->middleware('manager.role');
 Route::get('/phpinfo', function () {
     phpinfo();
 });
