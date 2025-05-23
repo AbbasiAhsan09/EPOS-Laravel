@@ -175,6 +175,28 @@ class ProductController extends Controller
                     ProductUnit::where("product_id", $product->id)->delete();
                 }
 
+                if(ConfigHelper::getStoreConfig()["use_accounting_module"] && !empty($product->opening_stock_unit_cost) && !empty($product->opening_stock)){
+                    
+                    $inventory_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+                    $opening_balance_eq_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+
+                    $amount = $product->opening_stock_unit_cost * $product->opening_stock;
+
+                    AccountController::record_journal_entry([
+                      'account_id' => $inventory_account->id,
+                      'credit' => 0,
+                      'debit' => $amount,
+                      'reference_id' => $product->id,
+                      'reference_type' => 'opening_inventory',
+                      'note' => 'Opening inventory cost for item  '. ($product->name ?? "")." @" .number_format($amount,2),
+                      'source_account' => $opening_balance_eq_account->id,
+                      'transaction_date' => $product->return_date ? $product->return_date : date('Y-m-d',strtotime($product->created_at))
+                  ]);
+                }
 
                 toast('Product Added!', 'success');
                 return redirect()->back();
@@ -281,8 +303,41 @@ class ProductController extends Controller
             } else {
                 ProductUnit::where("product_id", $product->id)->forceDelete();
             }
-           
-            toast('Product Updated!', 'info');
+
+            if (ConfigHelper::getStoreConfig()["use_accounting_module"]) {
+                     AccountController::reverse_transaction([
+                        'reference_type' => 'opening_inventory',
+                        'reference_id' => $product->id,
+                        'description' => 'This transaction is reversed transaction because product '.$product->name.'   is update by '. Auth::user()->name.'',
+                        'transaction_count' => 2,
+                        'order_by' => 'DESC',
+                        'order_column' => 'id'
+                    ]);
+
+                if (!empty($product->opening_stock_unit_cost) && !empty($product->opening_stock)) {
+
+                    $inventory_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+                    $opening_balance_eq_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+
+                    $amount = $product->opening_stock_unit_cost * $product->opening_stock;
+
+                    AccountController::record_journal_entry([
+                        'account_id' => $inventory_account->id,
+                        'credit' => 0,
+                        'debit' => $amount,
+                        'reference_id' => $product->id,
+                        'reference_type' => 'opening_inventory',
+                        'note' => 'Opening inventory cost for item  ' . ($product->name ?? "") . " @" . number_format($amount, 2),
+                        'source_account' => $opening_balance_eq_account->id,
+                        'transaction_date' => $product->return_date ? $product->return_date : date('Y-m-d', strtotime($product->created_at))
+                    ]);
+                }
+            }
+           toast('Product Updated!', 'info');
             return redirect()->back();
         } catch (\Throwable $th) {
             throw $th;

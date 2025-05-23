@@ -255,12 +255,13 @@ class AccountingReportController extends Controller
 
             $coas = Account::where("coa", 1)->filterByStore()->get();
 
-            $opening_stock_cost = DB::table('products')
-                ->selectRaw('SUM(opening_stock * CASE WHEN opening_stock_unit_cost > 0 THEN opening_stock_unit_cost ELSE tp END) AS opening_stock_value')
-                ->where('opening_stock', '!=', 0)
-                ->where('deleted_at', null)
-                ->where('store_id', '=', Auth()->user()->store_id)
-                ->value('opening_stock_value');
+            $opening_stock_cost = 0;
+            // DB::table('products')
+            //     ->selectRaw('SUM(opening_stock * CASE WHEN opening_stock_unit_cost > 0 THEN opening_stock_unit_cost ELSE tp END) AS opening_stock_value')
+            //     ->where('opening_stock', '!=', 0)
+            //     ->where('deleted_at', null)
+            //     ->where('store_id', '=', Auth()->user()->store_id)
+            //     ->value('opening_stock_value');
 
             $results = array_map(function ($account) use ($opening_stock_cost) {
                 if ($account->account_number == 1030) {
