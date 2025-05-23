@@ -173,11 +173,12 @@ class PartiesController extends Controller
                 [
                     'pre_defined' => 1,
                     'type' => 'equity',
-                    'title' => 'Opening Balance Equity',
+                    'account_number' => 3500,
                     'store_id' => Auth::user()->store_id,
                     'parent_id' => $opening_balance_head->id ?? null,
                 ],
                 [
+                    'title' => 'Opening Balance Equity',
                     'reference_type' => null,
                     'reference_id' => null,
                     'opening_balance' => 0,

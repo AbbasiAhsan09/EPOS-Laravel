@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ConfigHelper;
 use App\Models\Account;
 use App\Models\AccountTransaction;
 use App\Models\Parties;
 use App\Models\PartyGroups;
+use App\Models\Products;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\TryCatch;
 
 class AccountingReportController extends Controller
 {
@@ -255,12 +258,13 @@ class AccountingReportController extends Controller
 
             $coas = Account::where("coa", 1)->filterByStore()->get();
 
-            $opening_stock_cost = DB::table('products')
-                ->selectRaw('SUM(opening_stock * CASE WHEN opening_stock_unit_cost > 0 THEN opening_stock_unit_cost ELSE tp END) AS opening_stock_value')
-                ->where('opening_stock', '!=', 0)
-                ->where('deleted_at', null)
-                ->where('store_id', '=', Auth()->user()->store_id)
-                ->value('opening_stock_value');
+            $opening_stock_cost = 0;
+            // DB::table('products')
+            //     ->selectRaw('SUM(opening_stock * CASE WHEN opening_stock_unit_cost > 0 THEN opening_stock_unit_cost ELSE tp END) AS opening_stock_value')
+            //     ->where('opening_stock', '!=', 0)
+            //     ->where('deleted_at', null)
+            //     ->where('store_id', '=', Auth()->user()->store_id)
+            //     ->value('opening_stock_value');
 
             $results = array_map(function ($account) use ($opening_stock_cost) {
                 if ($account->account_number == 1030) {
@@ -394,6 +398,53 @@ class AccountingReportController extends Controller
             }
 
             return view('reports.accounts.month-wise-pnl', compact('data','months','yearList'));
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function generate_product_opening_balance()
+    {
+        try {
+
+            $products = Products::filterByStore()->get();
+
+            foreach ($products as $key => $product) {
+
+                if (ConfigHelper::getStoreConfig()["use_accounting_module"]) {
+                    AccountController::reverse_transaction([
+                        'reference_type' => 'opening_inventory',
+                        'reference_id' => $product->id,
+                        'description' => 'This transaction is reversed transaction because product ' . $product->name . '   is update by ' . Auth::user()->name . '',
+                        'transaction_count' => 2,
+                        'order_by' => 'DESC',
+                        'order_column' => 'id'
+                    ]);
+
+                    if (!empty($product->opening_stock_unit_cost) && !empty($product->opening_stock)) {
+
+                        $inventory_account = AccountController::get_head_account([
+                            'account_number' => 1030
+                        ]);
+                        $opening_balance_eq_account = AccountController::get_head_account([
+                            'account_number' => 1030
+                        ]);
+
+                        $amount = $product->opening_stock_unit_cost * $product->opening_stock;
+
+                        AccountController::record_journal_entry([
+                            'account_id' => $inventory_account->id,
+                            'credit' => 0,
+                            'debit' => $amount,
+                            'reference_id' => $product->id,
+                            'reference_type' => 'opening_inventory',
+                            'note' => 'Opening inventory cost for item  ' . ($product->name ?? "") . " @" . number_format($amount, 2),
+                            'source_account' => $opening_balance_eq_account->id,
+                            'transaction_date' => $product->return_date ? $product->return_date : date('Y-m-d', strtotime($product->created_at))
+                        ]);
+                    }
+                }
+            }
         } catch (\Throwable $th) {
             throw $th;
         }

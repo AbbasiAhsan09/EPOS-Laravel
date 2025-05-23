@@ -14,6 +14,14 @@ use App\Models\ProductArrtributes;
 use App\Models\ProductCategory;
 use App\Models\Products;
 use App\Models\ProductUnit;
+use App\Models\PurchaseInvoiceDetails;
+use App\Models\PurchaseOrderDetails;
+use App\Models\PurchaseQuotationDetails;
+use App\Models\PurchaseRequestDetail;
+use App\Models\PurchaseReturnDetail;
+use App\Models\SaleReturnDetail;
+use App\Models\Sales;
+use App\Models\SalesDetails;
 use App\Models\Unit;
 use App\Models\UnitType;
 use Illuminate\Http\Request;
@@ -175,6 +183,28 @@ class ProductController extends Controller
                     ProductUnit::where("product_id", $product->id)->delete();
                 }
 
+                if(ConfigHelper::getStoreConfig()["use_accounting_module"] && !empty($product->opening_stock_unit_cost) && !empty($product->opening_stock)){
+                    
+                    $inventory_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+                    $opening_balance_eq_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+
+                    $amount = $product->opening_stock_unit_cost * $product->opening_stock;
+
+                    AccountController::record_journal_entry([
+                      'account_id' => $inventory_account->id,
+                      'credit' => 0,
+                      'debit' => $amount,
+                      'reference_id' => $product->id,
+                      'reference_type' => 'opening_inventory',
+                      'note' => 'Opening inventory cost for item  '. ($product->name ?? "")." @" .number_format($amount,2),
+                      'source_account' => $opening_balance_eq_account->id,
+                      'transaction_date' => $product->return_date ? $product->return_date : date('Y-m-d',strtotime($product->created_at))
+                  ]);
+                }
 
                 toast('Product Added!', 'success');
                 return redirect()->back();
@@ -281,8 +311,41 @@ class ProductController extends Controller
             } else {
                 ProductUnit::where("product_id", $product->id)->forceDelete();
             }
-           
-            toast('Product Updated!', 'info');
+
+            if (ConfigHelper::getStoreConfig()["use_accounting_module"]) {
+                     AccountController::reverse_transaction([
+                        'reference_type' => 'opening_inventory',
+                        'reference_id' => $product->id,
+                        'description' => 'This transaction is reversed transaction because product '.$product->name.'   is update by '. Auth::user()->name.'',
+                        'transaction_count' => 2,
+                        'order_by' => 'DESC',
+                        'order_column' => 'id'
+                    ]);
+
+                if (!empty($product->opening_stock_unit_cost) && !empty($product->opening_stock)) {
+
+                    $inventory_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+                    $opening_balance_eq_account = AccountController::get_head_account([
+                        'account_number' => 1030
+                    ]);
+
+                    $amount = $product->opening_stock_unit_cost * $product->opening_stock;
+
+                    AccountController::record_journal_entry([
+                        'account_id' => $inventory_account->id,
+                        'credit' => 0,
+                        'debit' => $amount,
+                        'reference_id' => $product->id,
+                        'reference_type' => 'opening_inventory',
+                        'note' => 'Opening inventory cost for item  ' . ($product->name ?? "") . " @" . number_format($amount, 2),
+                        'source_account' => $opening_balance_eq_account->id,
+                        'transaction_date' => $product->return_date ? $product->return_date : date('Y-m-d', strtotime($product->created_at))
+                    ]);
+                }
+            }
+           toast('Product Updated!', 'info');
             return redirect()->back();
         } catch (\Throwable $th) {
             throw $th;
@@ -408,13 +471,67 @@ function setProductUnitConversionMultiplier($product_id)
     {
 
         try {
-            $item = Products::find($id);
+           
+
+            $sale = SalesDetails::where('item_id',$id)->count();
+            if($sale > 0){
+                toast('Cannot delete because it has associated sales', 'error');
+                return redirect()->back();
+            }
+            $sale_return = SaleReturnDetail::where('item_id',$id)->count();
+            if($sale_return > 0){
+                toast('Cannot delete because it has associated sale returns', 'error');
+                return redirect()->back();
+            }
+            $purchase = PurchaseInvoiceDetails::where('item_id',$id)->count();
+             if($purchase > 0){
+                toast('Cannot delete because it has associated purchases', 'error');
+                return redirect()->back();
+            }
+            $purchase_return = PurchaseReturnDetail::where('item_id',$id)->count();
+            if($purchase_return > 0){
+                toast('Cannot delete because it has associated purchase returns', 'error');
+                return redirect()->back();
+            }
+
+            $purchase_quatation = PurchaseQuotationDetails::where('item_id',$id)->count();
+            if($purchase_quatation > 0){
+                toast('Cannot delete because it has associated purchase quotations', 'error');
+                return redirect()->back();
+            }
+
+            $purchase_order = PurchaseOrderDetails::where('item_id',$id)->count();
+            if($purchase_order > 0){
+                toast('Cannot delete because it has associated purchase orders', 'error');
+                return redirect()->back();
+            }
+
+            $purchase_request = PurchaseRequestDetail::where('item_id',$id)->count();
+            if($purchase_request > 0){
+                toast('Cannot delete because it has associated purchase requests', 'error');
+                return redirect()->back();
+            }
+
+            $item = Products::where('id',$id)->filterByStore()->first();
+            DB::beginTransaction();
+            
             $item->delete();
 
+             AccountController::reverse_transaction([
+                        'reference_type' => 'opening_inventory',
+                        'reference_id' => $item->id,
+                        'description' => 'This transaction is reversed transaction because product '.$item->name.'   is deleted by '. Auth::user()->name.'',
+                        'transaction_count' => 2,
+                        'order_by' => 'DESC',
+                        'order_column' => 'id'
+            ]);
+
+            DB::commit();
             toast('Product Delete!', 'error');
             return redirect()->back();
         } catch (\Throwable $th) {
-            //throw $th;
+            DB::rollBack();
+            throw $th;
         }
     }
 
